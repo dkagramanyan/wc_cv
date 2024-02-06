@@ -118,7 +118,7 @@ jupyter-ydoc @ file:///C:/b/abs_e7m6nh5lao/croot/jupyter_ydoc_1683747253535/work
 jupyter_client==8.3.0
 jupyter_core @ file:///C:/b/abs_9d0ttho3bs/croot/jupyter_core_1679906581955/work
 jupyter_packaging==0.12.3
-jupyter_server==2.7.0
+jupyter_server==2.11.2
 jupyter_server_fileid @ file:///C:/b/abs_f1yjnmiq_6/croot/jupyter_server_fileid_1684273602142/work
 jupyter_server_terminals==0.4.4
 jupyter_server_ydoc @ file:///C:/b/abs_8ai39bligw/croot/jupyter_server_ydoc_1686767445888/work
