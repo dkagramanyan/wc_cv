@@ -112,7 +112,7 @@ jsonschema-specifications==2023.7.1
 jupyter @ file:///C:/Windows/TEMP/abs_56xfdi__li/croots/recipe/jupyter_1659349053177/work
 jupyter-console @ file:///C:/b/abs_82xaa6i2y4/croot/jupyter_console_1680000189372/work
 jupyter-events==0.7.0
-jupyter-lsp==2.2.0
+jupyter-lsp==2.2.2
 jupyter-telemetry==0.1.0
 jupyter-ydoc @ file:///C:/b/abs_e7m6nh5lao/croot/jupyter_ydoc_1683747253535/work
 jupyter_client==8.3.0
