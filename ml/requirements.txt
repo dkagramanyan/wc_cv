@@ -72,7 +72,7 @@ ffmpy==0.3.1
 filelock==3.12.2
 fitz==0.0.1.dev2
 fluids @ file:///home/conda/feedstock_root/build_artifacts/fluids_1685905825136/work
-fonttools==4.40.0
+fonttools==4.43.0
 fqdn==1.5.1
 frozenlist==1.4.0
 fsspec @ file:///home/conda/feedstock_root/build_artifacts/fsspec_1686342280219/work
