@@ -83,7 +83,7 @@ GitPython==3.1.36
 gluonts==0.13.3
 google-auth==2.22.0
 google-auth-oauthlib==1.0.0
-gradio==3.39.0
+gradio==4.11.0
 gradio_client==0.3.0
 greenlet==2.0.2
 grpcio==1.56.2
