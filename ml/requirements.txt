@@ -328,7 +328,7 @@ webcolors==1.13
 webencodings==0.5.1
 websocket-client @ file:///C:/ci_310/websocket-client_1642093970919/work
 websockets==11.0.3
-Werkzeug==2.3.6
+Werkzeug==3.0.1
 widgetsnbextension @ file:///C:/b/abs_882k4_4kdf/croot/widgetsnbextension_1679313880295/work
 win-inet-pton @ file:///C:/ci_310/win_inet_pton_1642658466512/work
 win32-setctime @ file:///home/conda/feedstock_root/build_artifacts/win32_setctime_1642883564726/work
