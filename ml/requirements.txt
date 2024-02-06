@@ -165,7 +165,7 @@ neuralforecast==1.6.3
 nibabel==5.1.0
 ninja==1.11.1
 nipype==1.8.6
-notebook==7.0.2
+notebook==7.0.7
 notebook_shim @ file:///C:/b/abs_ebfczttg6x/croot/notebook-shim_1668160590914/work
 numba @ file:///D:/bld/numba_1687804899341/work
 numpy @ file:///D:/bld/numpy_1687808631724/work
