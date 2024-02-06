@@ -123,7 +123,7 @@ jupyter_server_fileid @ file:///C:/b/abs_f1yjnmiq_6/croot/jupyter_server_fileid_
 jupyter_server_terminals==0.4.4
 jupyter_server_ydoc @ file:///C:/b/abs_8ai39bligw/croot/jupyter_server_ydoc_1686767445888/work
 jupyterhub==4.0.1
-jupyterlab==4.0.5
+jupyterlab==4.0.11
 jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_1601490720602/work
 jupyterlab-widgets @ file:///C:/b/abs_38ad427jkz/croot/jupyterlab_widgets_1679055289211/work
 jupyterlab_server==2.24.0
