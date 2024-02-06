@@ -1,7 +1,7 @@
 absl-py==1.4.0
 accelerate==0.21.0
 aiofiles @ file:///C:/b/abs_9ex6mi6b56/croot/aiofiles_1683773603390/work
-aiohttp==3.8.6
+aiohttp==3.9.2
 aiosignal==1.3.1
 aiosqlite @ file:///C:/b/abs_9djc_0pyi3/croot/aiosqlite_1683773915844/work
 alembic==1.11.2
