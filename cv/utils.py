@@ -1,4 +1,4 @@
-import os
+Жimport os
 import requests
 import numpy as np
 
@@ -161,8 +161,12 @@ class Crack():
     def create_crack_graph(cls,
                            img_shape,
                            num_of_nodes,
-                           nodes_index2global_nodes_coord,
                            cnts,
+                           nodes_index2global_nodes_coord,
+                           nodes_index2global_contour_index,
+                           image_nodes_coord2nodes_index,
+                           nodes_index2local_contour_index,
+                           energy,
                            eps=100,
                            line_eps=3,
                            border = 30,
@@ -246,8 +250,16 @@ class Crack():
                             mean_border_pixels+=1
         
                     if mean_border_pixels>=border_number_min and start_node_index!=node_index:
-        
-                        g.add_edge(start_node_index,node_index, weight=np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y)))
+                        edge_type = Crack.get_edge_type(start_node_index,
+                                                        node_index,
+                                                        cnts,
+                                                        nodes_index2global_contour_index,
+                                                        nodes_index2global_nodes_coord,
+                                                        image_nodes_coord2nodes_index,
+                                                        nodes_index2local_contour_index)
+                        path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
+                        e = energy[edge_type]
+                        g.add_edge(start_node_index,node_index, weight=path*(1+e))
     
     
         return g, img_contours
