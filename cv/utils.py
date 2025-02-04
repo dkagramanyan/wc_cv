@@ -1,4 +1,4 @@
-Жimport os
+import os
 import requests
 import numpy as np
 
