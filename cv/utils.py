@@ -30,7 +30,8 @@ from sklearn.linear_model import LinearRegression
 
 from scipy import ndimage
 import os
-
+from bresenham import bresenham
+from shapely.geometry import Polygon, LineString
 import copy
 import cv2
 from tqdm.notebook import tqdm
@@ -44,6 +45,7 @@ import glob
 from logging import StreamHandler, Formatter
 
 import json
+import networkx as nx
 
 from collections import Counter
 
@@ -66,6 +68,283 @@ file_path = os.getcwd() + '/utils.py'
 # otsu - 
 # sobel + 
 # canny +
+
+class Crack():
+    @classmethod
+    def align_figures(cls, orig_img_padded, tol):
+        cnts = grainMark.get_contours(orig_img_padded,tol=tol)
+        cnts = [np.array(cnt)[:-1] for cnt in cnts if len(cnt)>2]
+        cnts_adj = [cnt.reshape((-1,1,2)) for cnt in cnts ]
+        
+        white_img = np.full((orig_img_padded.shape[0],orig_img_padded.shape[1],3),255)
+        white_img = np.ascontiguousarray(white_img, dtype=np.uint8)
+        img_viz = cv2.drawContours(white_img,cnts_adj,-1,(127,127,127),-1).astype(np.uint8)
+        
+        return img_viz, cnts
+        
+    @classmethod
+    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5):
+    
+        border_eps = border + border_node_eps
+    
+        # too small disk causes wrong contours detection
+        # check double median filter
+        tmp_img = SEMDataset.preprocess_image(image, pad=True, border=border,disk=8)
+        
+        img_aligned,cnts = cls.align_figures(tmp_img,tol)
+        
+        img_shape=np.array(img_aligned.shape)
+        
+        # coord2index
+        image_nodes_coord2nodes_index={}
+        nodes_index2global_nodes_coord={}
+        nodes_index2global_contour_index={}
+        nodes_index2local_contour_index={}
+        num_of_nodes=0
+        
+        for i,points in enumerate(reversed(cnts)):
+            for j, point in enumerate(points):
+                x,y = point[0],point[1]
+                image_nodes_coord2nodes_index[(y,x)]=num_of_nodes
+                nodes_index2global_nodes_coord[num_of_nodes]=(y,x)
+                nodes_index2global_contour_index[num_of_nodes] = i
+                nodes_index2local_contour_index[num_of_nodes] = j 
+                num_of_nodes+=1
+        
+        # entry points
+        entry_nodes=[]
+        
+        entry_dict={}
+        y_entry_max=0
+        
+        for points in cnts:
+            for point in points:
+                if point[1]<border_eps:
+                    x,y = point[0],point[1]
+                    # condition to make end exit poits below start points 
+                    if y_entry_max<y:
+                        y_entry_max=y
+                    
+                    index=image_nodes_coord2nodes_index[(y,x)]
+                    entry_dict[index]=1
+                    entry_nodes.append(index)
+        
+        # exit points
+        exit_nodes=[]
+        exit_dict={}
+        
+        for points in cnts:
+            for point in points:
+                if (img_shape[0] - point[1] < border_eps):
+                    x,y = point[0],point[1]
+                    index=image_nodes_coord2nodes_index[(y,x)]
+                    exit_nodes.append(index)
+                    exit_dict[index]=1
+        
+        img_drawings = copy.copy(Image.fromarray(img_aligned)).convert('RGB')
+        img_drawings = grainDraw.draw_contours(img_drawings, cnts=cnts, color_corner=(0, 139, 139), color_line = (255, 140, 0),corners = True)
+        draw = ImageDraw.Draw(img_drawings)
+        
+        # entry blue
+        for key in entry_nodes:
+            x,y=nodes_index2global_nodes_coord[key]
+            draw.ellipse((y - r, x - r, y + r, x + r), fill=(0,0,255), width=1)
+            
+        # exit red
+        for key in exit_nodes:
+            x,y=nodes_index2global_nodes_coord[key]
+            draw.ellipse((y - r, x - r, y + r, x + r), fill=(255,0,0), width=1)
+            
+        return entry_nodes, exit_nodes, num_of_nodes, img_aligned, img_drawings, nodes_index2global_nodes_coord, cnts, nodes_index2global_contour_index, nodes_index2local_contour_index, image_nodes_coord2nodes_index
+
+    @classmethod
+    def create_crack_graph(cls,
+                           img_shape,
+                           num_of_nodes,
+                           nodes_index2global_nodes_coord,
+                           cnts,
+                           eps=100,
+                           line_eps=3,
+                           border = 30,
+                           border_eps = 0,
+                           border_number_min = 2,
+                           border_pixel=255,
+                           same_node_eps = 5):
+        
+        g = nx.DiGraph()
+        image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
+        for key in range(num_of_nodes):
+            x,y=nodes_index2global_nodes_coord[key]
+            image_node_coord2node_index[x,y]=key
+            g.add_node(key, pos=(y,x)) 
+        
+        m=[]
+        a=[]
+        
+        
+        img_contours = grainDraw.draw_contours(Image.fromarray(np.zeros((img_shape[0],img_shape[1]))), color_line = (255), cnts=cnts,corners = False)
+        img_contours_np = np.array(img_contours)
+        
+        for start_node_index in tqdm(range(num_of_nodes)):
+            
+            # choose cell
+            start_node_x,start_node_y=nodes_index2global_nodes_coord[start_node_index]
+            
+            # for rectangular vertical slice only!
+            ###############################################
+    
+            # left y slice border
+            if start_node_y-eps<0:
+                left_border_y=0
+            else:
+                left_border_y=start_node_y-eps
+        
+            # right y slice border
+            if start_node_y+eps>image_node_coord2node_index.shape[1]:
+                right_border_y=image_node_coord2node_index.shape[1]-1
+            else:
+                right_border_y=start_node_y+eps
+        
+            # upper_border
+            if start_node_x+eps>image_node_coord2node_index.shape[0]-1:
+                upper_border=image_node_coord2node_index.shape[0]-1
+            else:
+                upper_border=start_node_x+eps
+                
+            map_slice = image_node_coord2node_index[start_node_x+1:upper_border,left_border_y:right_border_y]
+            ###############################################
+            
+            nodes_indices_indices = np.where(map_slice.flatten()!=0)
+            nodes_indices = map_slice.flatten()[nodes_indices_indices]
+            
+            # next node search
+            for node_index in nodes_indices:
+            
+                end_node_x, end_node_y = nodes_index2global_nodes_coord[node_index]
+        
+                if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
+                
+                    ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
+                    left = ab.parallel_offset(line_eps, 'left')
+                    left_p, _ = np.array(left.coords)
+                    perp_v = np.array((start_node_x-left_p[0],start_node_y-left_p[1]))
+                    perp_v = perp_v/np.linalg.norm(perp_v)
+                    
+                    mean_border_pixels=0
+        
+                        
+                    for p in range(0 - line_eps, 1 + line_eps):
+                        line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
+                                                            np.round(start_node_y+p*perp_v[1]).astype(np.int32),
+                                                            np.round(end_node_x+p*perp_v[0]).astype(np.int32),
+                                                            np.round(end_node_y+p*perp_v[1]).astype(np.int32)
+                                                           )))
+                        
+                        line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
+                        border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
+                        if border_pixels_num<=border_eps:
+                            mean_border_pixels+=1
+        
+                    if mean_border_pixels>=border_number_min and start_node_index!=node_index:
+        
+                        g.add_edge(start_node_index,node_index, weight=np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y)))
+    
+    
+        return g, img_contours
+
+    @classmethod
+    def find_intersection_2d(cls,p1, p2, p3, p4):
+        """
+        Check if two line segments defined by points (p1, p2) and (p3, p4) intersect.
+        """
+        # Vector representation
+        v1 = p2 - p1
+        v2 = p4 - p3
+        
+        # Cross product to check if lines are parallel
+        cross = np.cross(v1, v2)
+        
+        if np.isclose(cross, 0):
+            # Lines are parallel, check if they are collinear
+            cross2 = np.cross(p3 - p1, v1)
+            if np.isclose(cross2, 0):
+                # Lines are collinear, check if they overlap
+                t0 = np.dot(p3 - p1, v1) / np.dot(v1, v1)
+                t1 = np.dot(p4 - p1, v1) / np.dot(v1, v1)
+                if max(t0, t1) >= 0 and min(t0, t1) <= 1:
+                    return True  # Lines overlap
+            return False  # Lines are parallel but not collinear
+        
+        # Calculate the intersection point
+        t = np.cross(p3 - p1, v2) / cross
+        u = np.cross(p3 - p1, v1) / cross
+        
+        # Check if the intersection point lies within both line segments
+        if 0 <= t <= 1 and 0 <= u <= 1:
+            return True  # Lines intersect
+        
+        return False  # Lines do not intersect
+        
+    @classmethod
+    def get_edge_type(cls,
+                      node1,
+                      node2,
+                      cnts,
+                      nodes_index2global_contour_index,
+                      nodes_index2global_nodes_coord,
+                      image_nodes_coord2nodes_index,
+                      nodes_index2local_contour_index):
+        
+        cnt_index_1 = nodes_index2global_contour_index[node1]
+        cnt_index_2 = nodes_index2global_contour_index[node2]
+    
+        edge_type=0
+        
+        # different contours, WC-WC
+        if cnt_index_1!=cnt_index_2:
+            edge_type=0
+            
+        # same contour, WC-Co 
+        elif abs(node1-node2)<2:
+            edge_type=1
+            
+        else:
+    
+            x1,y1 = nodes_index2global_nodes_coord[node1]
+            x2,y2 = nodes_index2global_nodes_coord[node2]
+            
+            cnt = cnts[-cnt_index_1-1]
+            cnt_point_1_index = nodes_index2local_contour_index[node1]
+            
+            node0_x,node0_y=cnt[cnt_point_1_index-1]
+            new_key=cnt_point_1_index+1
+            if new_key>=len(cnt):
+                new_key=new_key-len(cnt)
+            node3_x,node3_y=cnt[new_key]            
+    
+            node0=image_nodes_coord2nodes_index[(node0_y,node0_x)]
+            node3=image_nodes_coord2nodes_index[(node3_y,node3_x)]
+    
+            if len(np.intersect1d([node1,node2],[node0,node3]))>0:
+                edge_type=1
+            else:
+                x0,y0 = nodes_index2global_nodes_coord[node0]
+                x3,y3 = nodes_index2global_nodes_coord[node3]
+                
+                inter = cls.find_intersection_2d(np.array((x1,y1)),
+                                             np.array((x2,y2)),
+                                             np.array((x0,y0)),
+                                             np.array((x3,y3)))
+                #  has intersection, Co
+                if inter:
+                    edge_type=2
+                else:
+                    # no intersection, WC 
+                    edge_type=0
+    
+        return edge_type
+    
+
 
 class SEMDataset(Dataset):
     def __init__(self, images_folder_path, no_cache=False, max_images_num_per_class=10, workers=None):
@@ -125,12 +404,12 @@ class SEMDataset(Dataset):
         self.images_paths = np.array([glob.glob(self.cached_dir + f'/{folder_name}/*')[:max_images_num_per_class] for folder_name in folder_names])
     
     @classmethod
-    def do_job(self, tasks_to_accomplish, cached_dir, tqdm_queue):
+    def do_job(cls, tasks_to_accomplish, cached_dir, tqdm_queue):
         while not tasks_to_accomplish.empty():
             images_paths = tasks_to_accomplish.get()
             for image_path in images_paths:
                 image = io.imread(image_path)
-                image = self.preprocess_image(image)
+                image = cls.preprocess_image(image)
 
                 splitted=image_path.split('/')
                 folder_name, file_name = splitted[-2], splitted[-1]
@@ -148,16 +427,25 @@ class SEMDataset(Dataset):
         return image, path
 
     @classmethod
-    def preprocess_image(self, image):
+    def pad_with(cls, vector, pad_width, iaxis, kwargs):
+        pad_value = kwargs.get('padder', 255)
+        vector[:pad_width[0]] = pad_value
+        vector[-pad_width[1]:] = pad_value
+
+    @classmethod
+    def preprocess_image(cls, image, pad=False, border=30,disk=3):
         if len(image.shape)==3:
             image = color.rgb2gray(image)
         
-        image = filters.rank.median(image, morphology.disk(3))
+        image = filters.rank.median(image, morphology.disk(disk))
 
         global_thresh = filters.threshold_otsu(image)
         image = image > global_thresh
         binary = image*255
         binary = binary.astype(np.uint8)
+
+        if pad:
+            binary = np.pad(binary, border, cls.pad_with)
 
         grad = abs(filters.rank.gradient(binary, morphology.disk(1)))
         bin_grad = (1 - binary + grad) * 127
