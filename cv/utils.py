@@ -166,7 +166,6 @@ class Crack():
                            nodes_index2global_contour_index,
                            image_nodes_coord2nodes_index,
                            nodes_index2local_contour_index,
-                           energy,
                            eps=100,
                            line_eps=3,
                            border = 30,
@@ -258,8 +257,7 @@ class Crack():
                                                         image_nodes_coord2nodes_index,
                                                         nodes_index2local_contour_index)
                         path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
-                        e = energy[edge_type]
-                        g.add_edge(start_node_index,node_index, weight=path*(1+e))
+                        g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
     
     
         return g, img_contours
