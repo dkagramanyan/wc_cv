@@ -156,23 +156,25 @@ class Crack():
             draw.ellipse((y - r, x - r, y + r, x + r), fill=(255,0,0), width=1)
 
         img_preprocessed = np.array(img_drawings)
+
+        nodes_metadata = {'nodes_index2global_nodes_coord':nodes_index2global_nodes_coord,
+                          'nodes_index2global_contour_index':nodes_index2global_contour_index,
+                          'nodes_index2local_contour_index':nodes_index2local_contour_index,
+                          'image_nodes_coord2nodes_index':image_nodes_coord2nodes_index,
+                            }
+        
         return (entry_nodes,
                 exit_nodes,
                 img_preprocessed,
                 cnts,
-                nodes_index2global_nodes_coord,
-                nodes_index2global_contour_index,
-                nodes_index2local_contour_index,
-                image_nodes_coord2nodes_index)
+                nodes_metadata
+               )
 
     @classmethod
     def create_crack_graph(cls,
                            img_shape,
                            cnts,
-                           nodes_index2global_nodes_coord,
-                           nodes_index2global_contour_index,
-                           image_nodes_coord2nodes_index,
-                           nodes_index2local_contour_index,
+                           nodes_metadata,
                            eps=100,
                            line_eps=3,
                            border = 30,
@@ -183,9 +185,9 @@ class Crack():
         
         g = nx.DiGraph()
         image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
-        num_of_nodes = len(nodes_index2global_nodes_coord)
+        num_of_nodes = len(nodes_metadata['nodes_index2global_nodes_coord'])
         for key in range(num_of_nodes):
-            x,y=nodes_index2global_nodes_coord[key]
+            x,y=nodes_metadata['nodes_index2global_nodes_coord'][key]
             image_node_coord2node_index[x,y]=key
             g.add_node(key, pos=(y,x)) 
         
@@ -199,7 +201,7 @@ class Crack():
         for start_node_index in tqdm(range(num_of_nodes)):
             
             # choose cell
-            start_node_x,start_node_y=nodes_index2global_nodes_coord[start_node_index]
+            start_node_x,start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][start_node_index]
             
             # for rectangular vertical slice only!
             ###############################################
@@ -231,7 +233,7 @@ class Crack():
             # next node search
             for node_index in nodes_indices:
             
-                end_node_x, end_node_y = nodes_index2global_nodes_coord[node_index]
+                end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
         
                 if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
                 
@@ -260,10 +262,7 @@ class Crack():
                         edge_type = Crack.get_edge_type(start_node_index,
                                                         node_index,
                                                         cnts,
-                                                        nodes_index2global_contour_index,
-                                                        nodes_index2global_nodes_coord,
-                                                        image_nodes_coord2nodes_index,
-                                                        nodes_index2local_contour_index)
+                                                        nodes_metadata)
                         path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
                         g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
     
@@ -308,13 +307,10 @@ class Crack():
                       node1,
                       node2,
                       cnts,
-                      nodes_index2global_contour_index,
-                      nodes_index2global_nodes_coord,
-                      image_nodes_coord2nodes_index,
-                      nodes_index2local_contour_index):
+                      nodes_metadata):
         
-        cnt_index_1 = nodes_index2global_contour_index[node1]
-        cnt_index_2 = nodes_index2global_contour_index[node2]
+        cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
+        cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
     
         edge_type=0
         
@@ -328,11 +324,11 @@ class Crack():
             
         else:
     
-            x1,y1 = nodes_index2global_nodes_coord[node1]
-            x2,y2 = nodes_index2global_nodes_coord[node2]
+            x1,y1 = nodes_metadata['nodes_index2global_nodes_coord'][node1]
+            x2,y2 = nodes_metadata['nodes_index2global_nodes_coord'][node2]
             
             cnt = cnts[-cnt_index_1-1]
-            cnt_point_1_index = nodes_index2local_contour_index[node1]
+            cnt_point_1_index = nodes_metadata['nodes_index2local_contour_index'][node1]
             
             node0_x,node0_y=cnt[cnt_point_1_index-1]
             new_key=cnt_point_1_index+1
@@ -340,14 +336,14 @@ class Crack():
                 new_key=new_key-len(cnt)
             node3_x,node3_y=cnt[new_key]            
     
-            node0=image_nodes_coord2nodes_index[(node0_y,node0_x)]
-            node3=image_nodes_coord2nodes_index[(node3_y,node3_x)]
+            node0=nodes_metadata['image_nodes_coord2nodes_index'][(node0_y,node0_x)]
+            node3=nodes_metadata['image_nodes_coord2nodes_index'][(node3_y,node3_x)]
     
             if len(np.intersect1d([node1,node2],[node0,node3]))>0:
                 edge_type=1
             else:
-                x0,y0 = nodes_index2global_nodes_coord[node0]
-                x3,y3 = nodes_index2global_nodes_coord[node3]
+                x0,y0 = nodes_metadata['nodes_index2global_nodes_coord'][node0]
+                x3,y3 = nodes_metadata['nodes_index2global_nodes_coord'][node3]
                 
                 inter = cls.find_intersection_2d(np.array((x1,y1)),
                                              np.array((x2,y2)),
@@ -435,10 +431,7 @@ class Crack():
                     edge_type = Crack.get_edge_type(node1,
                                                     node2,
                                                     cnts,
-                                                    nodes_index2global_contour_index,
-                                                    nodes_index2global_nodes_coord,
-                                                    image_nodes_coord2nodes_index,
-                                                    nodes_index2local_contour_index)
+                                                    nodes_metadata)
                     types.append(edge_type)
                     
                 
