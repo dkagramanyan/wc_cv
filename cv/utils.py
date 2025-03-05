@@ -37,12 +37,16 @@ import cv2
 from tqdm.notebook import tqdm
 
 from scipy.spatial import ConvexHull
+import pandas as pd
 
 import sys
 import logging
 import time
 import glob
 from logging import StreamHandler, Formatter
+
+import itertools
+from mpire import WorkerPool
 
 import json
 import networkx as nx
@@ -392,7 +396,7 @@ class Crack():
     class Energy():
         
         @classmethod
-        def find_shortest_energy_paths(cls, G, entry_node, exit_node): 
+        def find_shortest_energy_paths(cls, G, cnts, nodes_metadata,  entry_node, exit_node): 
             all_paths=[]
             all_entry_nodes=[]
             all_exit_nodes=[]
@@ -480,7 +484,7 @@ class Crack():
                                 })
             
         @classmethod
-        def get_energies(cls, g, entry_nodes, exit_nodes, energy, workers=23):
+        def get_energies(cls, g, cnts, nodes_metadata, entry_nodes, exit_nodes, energy, workers=23):
     
             # modify the energies of edges
             g_weighed = g.copy()
@@ -494,10 +498,10 @@ class Crack():
             # find the minimal energy paths
             cart_list=[entry_nodes, exit_nodes]
             cart_list=[element for element in itertools.product(*cart_list)]
-            cart_list=[(g_weighed,line[0],line[1]) for line in cart_list]
+            cart_list=[(g_weighed, cnts,nodes_metadata,  line[0],line[1]) for line in cart_list]
             
             with WorkerPool(n_jobs=workers) as pool:
-                results = pool.map(find_paths, cart_list, progress_bar= True)
+                results = pool.map(cls.find_shortest_energy_paths, cart_list, progress_bar= True)
             
             df = pd.concat(results,axis=0)
             
