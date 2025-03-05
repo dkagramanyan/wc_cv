@@ -91,9 +91,9 @@ class Crack():
         # check double median filter
         tmp_img = SEMDataset.preprocess_image(image, pad=True, border=border,disk=8)
         
-        img_aligned,cnts = cls.align_figures(tmp_img,tol)
+        img_preprocessed,cnts = cls.align_figures(tmp_img,tol)
         
-        img_shape=np.array(img_aligned.shape)
+        img_shape=np.array(img_preprocessed.shape)
         
         # coord2index
         image_nodes_coord2nodes_index={}
@@ -141,7 +141,7 @@ class Crack():
                     exit_nodes.append(index)
                     exit_dict[index]=1
         
-        img_drawings = copy.copy(Image.fromarray(img_aligned)).convert('RGB')
+        img_drawings = copy.copy(Image.fromarray(img_preprocessed)).convert('RGB')
         img_drawings = grainDraw.draw_contours(img_drawings, cnts=cnts, color_corner=(0, 139, 139), color_line = (255, 140, 0),corners = True)
         draw = ImageDraw.Draw(img_drawings)
         
@@ -154,13 +154,20 @@ class Crack():
         for key in exit_nodes:
             x,y=nodes_index2global_nodes_coord[key]
             draw.ellipse((y - r, x - r, y + r, x + r), fill=(255,0,0), width=1)
-            
-        return entry_nodes, exit_nodes, num_of_nodes, img_aligned, img_drawings, nodes_index2global_nodes_coord, cnts, nodes_index2global_contour_index, nodes_index2local_contour_index, image_nodes_coord2nodes_index
+
+        img_preprocessed = np.array(img_drawings)
+        return (entry_nodes,
+                exit_nodes,
+                img_preprocessed,
+                cnts,
+                nodes_index2global_nodes_coord,
+                nodes_index2global_contour_index,
+                nodes_index2local_contour_index,
+                image_nodes_coord2nodes_index)
 
     @classmethod
     def create_crack_graph(cls,
                            img_shape,
-                           num_of_nodes,
                            cnts,
                            nodes_index2global_nodes_coord,
                            nodes_index2global_contour_index,
@@ -176,6 +183,7 @@ class Crack():
         
         g = nx.DiGraph()
         image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
+        num_of_nodes = len(nodes_index2global_nodes_coord)
         for key in range(num_of_nodes):
             x,y=nodes_index2global_nodes_coord[key]
             image_node_coord2node_index[x,y]=key
@@ -353,7 +361,157 @@ class Crack():
                     edge_type=0
     
         return edge_type
+
+    class Viz():
+        @classmethod
+        def graph_plot(cls, g, img_contours, name ='graph.jpg', border = 30, save=False):
+
+            img_tmp = np.array(img_contours)
+            
+            pos = nx.get_node_attributes(g, 'pos')
+            fig,axes = plt.subplots(1,1,figsize=(50,50))
+            
+            nx.draw(g, pos, ax =axes,  with_labels=True, node_color='lightblue', node_size=500, font_size=15)
+            axes.imshow(img_tmp, cmap='gray')
+            
+            # axes[0].invert_yaxis()
+            # axes[1].invert_yaxis()
+            
+            plt.axis("on")
+            axes.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+            plt.xticks(np.arange(0,img_contours.shape[1],100), fontsize=15)
+            plt.yticks(np.arange(0,img_contours.shape[0],100),fontsize=15)
+            
+            axes.arrow(5, 0, 5, img_contours.shape[0], width=0.3, length_includes_head=True, head_width=10, head_length=10,color=(0,0,0))
+            axes.text(-20, img_contours.shape[0]*2/3,'hit direction',rotation=90, color=(0, 0, 0),fontsize=25)
+            
+            axes.text(img_contours.shape[1]/2 - border, - 2*border,'entry nodes', color=(0, 0, 1),fontsize=25)
+            axes.text(img_contours.shape[1]/2 - border,img_contours.shape[0]+ 2*border,'exit nodes', color=(1, 0, 0),fontsize=25)
+        
+            if save:
+                plt.savefig(name, bbox_inches='tight')
+                
+            plt.show()
+
+    class Energy():
+        
+        @classmethod
+        def find_shortest_energy_paths(cls, G, entry_node, exit_node): 
+            all_paths=[]
+            all_entry_nodes=[]
+            all_exit_nodes=[]
+            all_path_len_edges=[]
+            all_path_len_pixels=[]
+            
+            all_wc_edges = []
+            all_co_edges = []
+            all_wc_co_edges = []
+        
+            all_wc_edges_lens = []
+            all_co_edges_lens = []
+            all_wc_co_edges_lens = []
+            
+            all_wc_pixels = []
+            all_co_pixels = []
+            all_wc_co_pixels = []
+            
+            paths =  list(nx.all_shortest_paths(G, source=entry_node, target=exit_node, weight = 'weight'))
+        
+            for path in paths: 
+                all_paths.append(path)
+                all_entry_nodes.append(int(entry_node))
+                all_exit_nodes.append(int(exit_node))
+                all_path_len_edges.append(len(path))
+                l=nx.path_weight(G, path, 'weight')
+                all_path_len_pixels.append(l)
+                
+                points_stack = np.stack([path, np.roll(path,shift=-1,axis=0)],axis=1)[:-1]
+        
+                types = []
+                edges_lens=[]
+                for points in points_stack:
+                    node1,node2 = points
+                    edges_lens.append(nx.path_weight(G,[node1,node2], 'weight'))
+                    edge_type = Crack.get_edge_type(node1,
+                                                    node2,
+                                                    cnts,
+                                                    nodes_index2global_contour_index,
+                                                    nodes_index2global_nodes_coord,
+                                                    image_nodes_coord2nodes_index,
+                                                    nodes_index2local_contour_index)
+                    types.append(edge_type)
+                    
+                
+                types = np.array(types)
+                edges_lens = np.array(edges_lens)
+                
+                wc_edges_indices = np.where(types==0)[0]
+                co_edges_indices = np.where(types==2)[0]
+                wc_co_edges_indices = np.where(types==1)[0]
+        
+                wc_pixels_lens=edges_lens[wc_edges_indices]
+                co_pixels_lens=edges_lens[co_edges_indices]
+                wc_co_pixels_lens=edges_lens[wc_co_edges_indices]
+                z = np.sum(edges_lens)
+                    
+                all_wc_edges.append(len(wc_edges_indices)/len(path))
+                all_co_edges.append(len(co_edges_indices)/len(path))
+                all_wc_co_edges.append(len(wc_co_edges_indices)/len(path))
+        
+                all_wc_edges_lens.append(len(wc_pixels_lens))
+                all_co_edges_lens.append(len(co_pixels_lens))
+                all_wc_co_edges_lens.append(len(wc_co_pixels_lens))
+                
+                all_wc_pixels.append(np.sum(wc_pixels_lens)/z)
+                all_co_pixels.append(np.sum(co_pixels_lens)/z)
+                all_wc_co_pixels.append(np.sum(wc_co_pixels_lens)/z)
+        
+            return pd.DataFrame({'path':all_paths,
+                                 'path_len_edges':all_path_len_edges,
+                                 'energy': np.round(all_path_len_pixels,2),
+                                 
+                                 'entry_node':all_entry_nodes,
+                                 'exit_node':all_exit_nodes,
+                                 
+                                 'wc_edges': np.round(all_wc_edges,2),
+                                 'co_edges':np.round( all_co_edges,2),
+                                 'wc_co_edges': np.round(all_wc_co_edges,2),
+                                 
+                                 'wc_pixels': np.round(all_wc_pixels,2), 
+                                 'co_pixels': np.round(all_co_pixels,2), 
+                                 'wc_co_pixels': np.round(all_wc_co_pixels,2), 
+        
+                                 'wc_num': all_wc_edges_lens,
+                                 'co_num': all_co_edges_lens,
+                                 'wc_co_num': all_wc_co_edges_lens,
+                                })
+            
+        @classmethod
+        def get_energies(cls, g, entry_nodes, exit_nodes, energy, workers=23):
     
+            # modify the energies of edges
+            g_weighed = g.copy()
+            
+            for u, v in g_weighed.edges():
+                path_len = g.edges[u,v]['path_len']
+                edge_type = g.edges[u,v]['edge_type']
+                e=energy[edge_type]
+                g_weighed[u][v]['weight'] = path_len*e
+        
+            # find the minimal energy paths
+            cart_list=[entry_nodes, exit_nodes]
+            cart_list=[element for element in itertools.product(*cart_list)]
+            cart_list=[(g_weighed,line[0],line[1]) for line in cart_list]
+            
+            with WorkerPool(n_jobs=workers) as pool:
+                results = pool.map(find_paths, cart_list, progress_bar= True)
+            
+            df = pd.concat(results,axis=0)
+            
+            df['index'] = range(len(df))
+            df.set_index('index')
+            
+            return df
 
 
 class SEMDataset(Dataset):
