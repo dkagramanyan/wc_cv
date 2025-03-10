@@ -179,93 +179,7 @@ class Crack():
                 cnts,
                 nodes_metadata
                )
-
-    '''
-    @classmethod
-    def create_crack_graph(cls,
-                           img_shape,
-                           cnts,
-                           nodes_metadata,
-                           eps=100,
-                           line_eps=3,
-                           line_wc_eps = 5,
-                           border = 30,
-                           border_eps = 0,
-                           border_number_min = 2,
-                           border_pixel=255,
-                           same_node_eps = 5):
-        
-        g = nx.DiGraph()
-        image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
-        num_of_nodes = len(nodes_metadata['nodes_index2global_nodes_coord'])
-        for key in range(num_of_nodes):
-            x,y=nodes_metadata['nodes_index2global_nodes_coord'][key]
-            image_node_coord2node_index[x,y]=key
-            g.add_node(key, pos=(y,x)) 
-        
-        m=[]
-        a=[]
-        
-        
-        img_contours = grainDraw.draw_contours(Image.fromarray(np.zeros((img_shape[0],img_shape[1]))), color_line = (255), cnts=cnts,corners = False)
-        img_contours_np = np.array(img_contours)
-        
-        for start_node_index in tqdm(range(num_of_nodes)):
-            
-            # choose cell
-            start_node_x,start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][start_node_index]
-            
-            # for rectangular vertical slice only!
-            ###############################################
     
-            # left y slice border
-            if start_node_y-eps<0:
-                left_border_y=0
-            else:
-                left_border_y=start_node_y-eps
-        
-            # right y slice border
-            if start_node_y+eps>image_node_coord2node_index.shape[1]:
-                right_border_y=image_node_coord2node_index.shape[1]-1
-            else:
-                right_border_y=start_node_y+eps
-        
-            # upper_border
-            if start_node_x+eps>image_node_coord2node_index.shape[0]-1:
-                upper_border=image_node_coord2node_index.shape[0]-1
-            else:
-                upper_border=start_node_x+eps
-                
-            map_slice = image_node_coord2node_index[start_node_x+1:upper_border,left_border_y:right_border_y]
-            ###############################################
-            
-            nodes_indices_indices = np.where(map_slice.flatten()!=0)
-            nodes_indices = map_slice.flatten()[nodes_indices_indices]
-            
-            # next node search
-            for node_index in nodes_indices:
-            
-                end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
-        
-                if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
-                
-                   mean_border_pixels, _ = cls.get_bresenham_eps_pixels( start_node_x, start_node_y, end_node_x, end_node_y, line_eps, border_eps, wc_wc_detection=False)
-        
-                    if mean_border_pixels>=border_number_min and start_node_index!=node_index:
-                        
-                        edge_type = Crack.get_edge_type(img_contours_np,
-                                                        start_node_index,
-                                                        node_index,
-                                                        cnts,
-                                                        line_wc_eps,
-                                                        nodes_metadata)
-                        path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
-                        g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
-    
-    
-        return g, img_contours
-    '''
-
     @classmethod
     def get_bresenham_eps_pixels(cls, img_contours_np, start_node_x, start_node_y, end_node_x, end_node_y, line_eps, border_eps, wc_wc_detection=False):
     
@@ -328,120 +242,163 @@ class Crack():
             return True  # Lines intersect
         
         return False  # Lines do not intersect
+
+    @classmethod
+    def create_crack_graph(cls,
+                           img_shape,
+                           cnts,
+                           nodes_metadata,
+                           eps=100,
+                           line_eps=3,
+                           border = 30,
+                           border_eps = 0,
+                           border_number_min = 2,
+                           border_pixel=255,
+                           same_node_eps = 5):
         
-    '''
+        g = nx.DiGraph()
+        image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
+        num_of_nodes = len(nodes_metadata['nodes_index2global_nodes_coord'])
+        for key in range(num_of_nodes):
+            x,y=nodes_metadata['nodes_index2global_nodes_coord'][key]
+            image_node_coord2node_index[x,y]=key
+            g.add_node(key, pos=(y,x)) 
+        
+        m=[]
+        a=[]
+        
+        
+        img_contours = grainDraw.draw_contours(Image.fromarray(np.zeros((img_shape[0],img_shape[1]))), color_line = (255), cnts=cnts,corners = False)
+        img_contours_np = np.array(img_contours)
+        
+        for start_node_index in tqdm(range(num_of_nodes)):
+            
+            # choose cell
+            start_node_x,start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][start_node_index]
+            
+            # for rectangular vertical slice only!
+            ###############################################
+    
+            # left y slice border
+            if start_node_y-eps<0:
+                left_border_y=0
+            else:
+                left_border_y=start_node_y-eps
+        
+            # right y slice border
+            if start_node_y+eps>image_node_coord2node_index.shape[1]:
+                right_border_y=image_node_coord2node_index.shape[1]-1
+            else:
+                right_border_y=start_node_y+eps
+        
+            # upper_border
+            if start_node_x+eps>image_node_coord2node_index.shape[0]-1:
+                upper_border=image_node_coord2node_index.shape[0]-1
+            else:
+                upper_border=start_node_x+eps
+                
+            map_slice = image_node_coord2node_index[start_node_x+1:upper_border,left_border_y:right_border_y]
+            ###############################################
+            
+            nodes_indices_indices = np.where(map_slice.flatten()!=0)
+            nodes_indices = map_slice.flatten()[nodes_indices_indices]
+            
+            # next node search
+            for node_index in nodes_indices:
+            
+                end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
+        
+                if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
+                
+                    ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
+                    left = ab.parallel_offset(line_eps, 'left')
+                    left_p, _ = np.array(left.coords)
+                    perp_v = np.array((start_node_x-left_p[0],start_node_y-left_p[1]))
+                    perp_v = perp_v/np.linalg.norm(perp_v)
+                    
+                    mean_border_pixels=0
+        
+                        
+                    for p in range(0 - line_eps, 1 + line_eps):
+                        line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
+                                                            np.round(start_node_y+p*perp_v[1]).astype(np.int32),
+                                                            np.round(end_node_x+p*perp_v[0]).astype(np.int32),
+                                                            np.round(end_node_y+p*perp_v[1]).astype(np.int32)
+                                                           )))
+                        
+                        line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
+                        border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
+                        if border_pixels_num<=border_eps:
+                            mean_border_pixels+=1
+        
+                    if mean_border_pixels>=border_number_min and start_node_index!=node_index:
+                        edge_type = Crack.get_edge_type(start_node_index,
+                                                        node_index,
+                                                        cnts,
+                                                        nodes_metadata)
+                        path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
+                        g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
+    
+    
+        return g, img_contours
+
     @classmethod
     def get_edge_type(cls,
-                      img_contours_np,
                       node1,
                       node2,
                       cnts,
-                      line_wc_eps,
-                      nodes_metadata,
-                      wc_wc_border_rate=0.8,
-                      ):
-
-        # edge types
-        # 0 - Co
-        # 1 - WC-Co
-        # 2 - WC
-        # 3 - WC-WC
+                      nodes_metadata):
         
-        # node's contour's indices
         cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
         cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
     
-        # node's coords on image
-        start_node_x, start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][node1]
-        end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node2]
-
         edge_type=0
-        # different contours, WC classification
-        # necessary to use contour label
+        
+        # different contours, WC-WC
         if cnt_index_1!=cnt_index_2:
-            wc_pixels_num, line_length = cls.get_bresenham_eps_pixels(img_contours_np,
-                                                                      start_node_x,
-                                                                      start_node_y,
-                                                                      end_node_x,
-                                                                      end_node_y,
-                                                                      line_wc_eps,
-                                                                      border_eps=None,
-                                                                      wc_wc_detection=True)
-            # WC-WC
-            if wc_pixels_num/line_length>=wc_wc_border_rate:
-                edge_type=3
-            # WC
-            else:
-                edge_type=0
+            edge_type=0
             
         # same contour, WC-Co 
-        # for both WC and Co contours
-        # necessary to use contour label
         elif abs(node1-node2)<2:
             edge_type=1
-            # to do
-        
+            
         else:
-
-            # костыль из-за особенностей добавления контуров
+    
+            x1,y1 = nodes_metadata['nodes_index2global_nodes_coord'][node1]
+            x2,y2 = nodes_metadata['nodes_index2global_nodes_coord'][node2]
+            
             cnt = cnts[-cnt_index_1-1]
-            
-            # node index in contour list
             cnt_point_1_index = nodes_metadata['nodes_index2local_contour_index'][node1]
-
-            # take left node from current node
-            node0_x,node0_y=cnt[cnt_point_1_index-1]
             
-            # take right node from current node
+            node0_x,node0_y=cnt[cnt_point_1_index-1]
             new_key=cnt_point_1_index+1
             if new_key>=len(cnt):
                 new_key=new_key-len(cnt)
             node3_x,node3_y=cnt[new_key]            
-
-            # left and right nodes indices
+    
             node0=nodes_metadata['image_nodes_coord2nodes_index'][(node0_y,node0_x)]
             node3=nodes_metadata['image_nodes_coord2nodes_index'][(node3_y,node3_x)]
-            
-            # same contour, WC OR Co movement
-            # if the input lists have any element wise intersection
+    
             if len(np.intersect1d([node1,node2],[node0,node3]))>0:
-                # necessary to use contour label
-                # if both node1 and node2 have adjecent 
-                if label=='WC':
-                    edge_type = 2
-                    
-                else: 
-                    edge_type = 1
-                
+                edge_type=1
             else:
                 x0,y0 = nodes_metadata['nodes_index2global_nodes_coord'][node0]
                 x3,y3 = nodes_metadata['nodes_index2global_nodes_coord'][node3]
                 
-                inter = cls.find_intersection_2d(np.array((start_node_x,start_node_y)),
-                                                 np.array((end_node_x,end_node_y)),
-                                                 np.array((x0,y0)),
-                                                 np.array((x3,y3)))
+                inter = cls.find_intersection_2d(np.array((x1,y1)),
+                                             np.array((x2,y2)),
+                                             np.array((x0,y0)),
+                                             np.array((x3,y3)))
                 #  has intersection, Co
                 if inter:
                     edge_type=2
-                    
-                # no intersection, WC 
                 else:
-                    wc_pixels_num, line_length = cls.get_bresenham_eps_pixels(img_contours_np,
-                                                                              start_node_x,
-                                                                              start_node_y,
-                                                                              end_node_x,
-                                                                              end_node_y,
-                                                                              line_wc_eps,
-                                                                              border_eps=None,
-                                                                              wc_wc_detection=True)
-                    if wc_pixels_num/line_length>=wc_wc_border_rate
-                        edge_type=3
-                    else:
-                        edge_type=0
+                    # no intersection, WC 
+                    edge_type=0
     
         return edge_type
-'''
+
+
     class Viz():
         @classmethod
         def graph_plot(cls, g, img_contours, name ='graph.jpg', border = 30, save=False):
