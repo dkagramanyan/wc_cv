@@ -47,6 +47,7 @@ from logging import StreamHandler, Formatter
 
 import itertools
 from mpire import WorkerPool
+from numpy import linalg as LA
 
 import json
 import networkx as nx
@@ -75,27 +76,98 @@ file_path = os.getcwd() + '/utils.py'
 
 class Crack():
     @classmethod
-    def align_figures(cls, orig_img_padded, tol, labeled_cnts=False):
+    def align_figures(cls, orig_img_padded, tol, labeled_cnts=False, labels=False):
         
+        white_img = np.full((orig_img_padded.shape[0],orig_img_padded.shape[1],3),255)
+        white_img = np.ascontiguousarray(white_img, dtype=np.uint8)
+
         # if no labeled data
         if not labeled_cnts: 
             cnts = grainMark.get_contours(orig_img_padded,tol=tol)
             cnts = [np.array(cnt)[:-1] for cnt in cnts if len(cnt)>2]
             cnts_adj = [cnt.reshape((-1,1,2)) for cnt in cnts ]
-        
+
+            img_viz = cv2.drawContours(white_img,cnts_adj,-1,(127,127,127),-1).astype(np.uint8)
+
         # labeled contours by hand in label-studio
         else:
             cnts_adj = copy.copy(labeled_cnts)
             cnts = copy.copy(labeled_cnts)
+
+            wc_indices = np.where(labels=='wc')[0]
+            co_indices = np.where(labels=='co')[0]
         
-        white_img = np.full((orig_img_padded.shape[0],orig_img_padded.shape[1],3),255)
-        white_img = np.ascontiguousarray(white_img, dtype=np.uint8)
-        img_viz = cv2.drawContours(white_img,cnts_adj,-1,(127,127,127),-1).astype(np.uint8)
+            wc_contours = []
+            co_contours = []
+
+            for i in wc_indices:
+                wc_contours.append(labeled_cnts[i])
+
+            for i in co_indices:
+                co_contours.append(labeled_cnts[i])
+        
+            img_viz = cv2.drawContours(white_img,wc_contours,-1,(127,127,127),-1).astype(np.uint8)
+            img_viz = cv2.drawContours(white_img,co_contours,-1,(200,127,200),-1).astype(np.uint8)
         
         return img_viz, cnts
+    
+    @classmethod
+    def fill_polygon(cls, grid, corners, fill_value=1):
+        """
+        Fill a polygon defined by corner points in a 2D NumPy array.
+
+        Parameters:
+            corners (np.ndarray): Array of shape (N, 2) representing the (x, y) coordinates of the polygon's corners.
+            shape (tuple): Shape of the output array (height, width).
+            fill_value (int or float): Value to fill inside the polygon.
+
+        Returns:
+            np.ndarray: A 2D array with the polygon filled.
+        """
+
+        # Extract x and y coordinates of the corners
+        x_coords, y_coords = corners[:, 0], corners[:, 1]
+
+        # Find the bounding box of the polygon
+        min_x, max_x = int(np.min(x_coords)), int(np.max(x_coords))
+        min_y, max_y = int(np.min(y_coords)), int(np.max(y_coords))
+
+        # Iterate over each pixel in the bounding box
+        for y in range(min_y, max_y + 1):
+            for x in range(min_x, max_x + 1):
+                if cls.is_point_in_polygon(x, y, corners):
+                    grid[y, x] = fill_value
+
+        return grid
+
+    @classmethod
+    def is_point_in_polygon(cls, x, y, corners):
+        """
+        Determine if a point (x, y) lies inside a polygon using the ray casting algorithm.
+
+        Parameters:
+            x (int): X-coordinate of the point.
+            y (int): Y-coordinate of the point.
+            corners (np.ndarray): Array of shape (N, 2) representing the polygon's corners.
+
+        Returns:
+            bool: True if the point is inside the polygon, False otherwise.
+        """
+        n = len(corners)
+        inside = False
+        for i in range(n):
+            x1, y1 = corners[i]
+            x2, y2 = corners[(i + 1) % n]
+            # Check if the point is within the edge's y-range
+            if min(y1, y2) < y <= max(y1, y2):
+                # Calculate the x-intersection of the edge with the horizontal ray
+                x_intersect = (y - y1) * (x2 - x1) / (y2 - y1) + x1
+                if x <= x_intersect:
+                    inside = not inside
+        return inside
         
     @classmethod
-    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 12, labeled_cnts=False):
+    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 12, labeled_cnts=False, labels=False):
         border_eps = border + border_node_eps
 
         # if no labeled contours
@@ -112,24 +184,37 @@ class Crack():
         # if we labeled data by hand
         else:
             tmp_img = copy.copy(image)
-            img_preprocessed, cnts = cls.align_figures(tmp_img, tol, labeled_cnts=labeled_cnts)
+            img_preprocessed, cnts = cls.align_figures(tmp_img, tol, labeled_cnts=labeled_cnts, labels=labels)
         
         img_shape=np.array(img_preprocessed.shape)
         
         # coord2index
         image_nodes_coord2nodes_index={}
+        image_coords2contour_index=np.zeros_like(image, dtype=np.int32)
         nodes_index2global_nodes_coord={}
         nodes_index2global_contour_index={}
         nodes_index2local_contour_index={}
+        contour_index2label = {}
+
         num_of_nodes=0
         
         for i,points in enumerate(reversed(cnts)):
+                
+            image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
+                                                          points,
+                                                          i)
+            if labels is not False:
+                contour_index2label[i]=labels[i]
+
             for j, point in enumerate(points):
+                # very long. 40s for 2000x1000 image
+
                 x,y = point[0],point[1]
                 image_nodes_coord2nodes_index[(y,x)]=num_of_nodes
                 nodes_index2global_nodes_coord[num_of_nodes]=(y,x)
                 nodes_index2global_contour_index[num_of_nodes] = i
                 nodes_index2local_contour_index[num_of_nodes] = j 
+
                 num_of_nodes+=1
         
         # entry points
@@ -184,7 +269,9 @@ class Crack():
                           'nodes_index2global_contour_index':nodes_index2global_contour_index,
                           'nodes_index2local_contour_index':nodes_index2local_contour_index,
                           'image_nodes_coord2nodes_index':image_nodes_coord2nodes_index,
-                            }
+                          'image_coords2contour_index':image_coords2contour_index,
+                          'contour_index2label': contour_index2label,
+                         }
         
         return (entry_nodes,
                 exit_nodes,
@@ -194,14 +281,12 @@ class Crack():
                 nodes_metadata
                )
     
+
+    # NOT IN USE WTF??
     @classmethod
-    def get_bresenham_eps_pixels(cls, img_contours_np, start_node_x, start_node_y, end_node_x, end_node_y, line_eps, border_eps, wc_wc_detection=False):
-    
-        ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
-        left = ab.parallel_offset(line_eps, 'left')
-        left_p, _ = np.array(left.coords)
-        perp_v = np.array((start_node_x-left_p[0],start_node_y-left_p[1]))
-        perp_v = perp_v/np.linalg.norm(perp_v)
+    def get_bresenham_eps_pixels(cls, img_contours_np, start_node_x, start_node_y, end_node_x, end_node_y, line_eps, border_eps):
+
+        perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
         
         mean_border_pixels=0
             
@@ -215,13 +300,22 @@ class Crack():
             line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
             border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
 
-            if  wc_wc_detection is False:
-                if border_pixels_num<=border_eps:
-                    mean_border_pixels+=1
-            else:
-                mean_border_pixels+=border_pixels_num
 
-        return mean_border_pixels, ab.length
+            if border_pixels_num<=border_eps:
+                mean_border_pixels+=1
+
+
+        return mean_border_pixels
+    
+    @classmethod
+    def get_perp_v(cls, start_node_x, start_node_y, end_node_x, end_node_y):
+        ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
+        left = ab.parallel_offset(line_eps, 'left')
+        left_p, _ = np.array(left.coords)
+        perp_v = np.array((start_node_x-left_p[0],start_node_y-left_p[1]))
+        perp_v = perp_v/np.linalg.norm(perp_v)
+         
+        return perp_v
                             
 
     @classmethod
@@ -268,7 +362,9 @@ class Crack():
                            border_eps = 0,
                            border_number_min = 2,
                            border_pixel=255,
-                           same_node_eps = 5):
+                           same_node_eps = 5,
+                           labels = False,
+                           labeled_line_eps=10):
         
         g = nx.DiGraph()
         image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
@@ -277,10 +373,6 @@ class Crack():
             x,y=nodes_metadata['nodes_index2global_nodes_coord'][key]
             image_node_coord2node_index[x,y]=key
             g.add_node(key, pos=(y,x)) 
-        
-        m=[]
-        a=[]
-        
         
         img_contours = grainDraw.draw_contours(Image.fromarray(np.zeros((img_shape[0],img_shape[1]))), color_line = (255), cnts=cnts,corners = False)
         img_contours_np = np.array(img_contours)
@@ -323,15 +415,9 @@ class Crack():
                 end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
         
                 if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
-                
-                    ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
-                    left = ab.parallel_offset(line_eps, 'left')
-                    left_p, _ = np.array(left.coords)
-                    perp_v = np.array((start_node_x-left_p[0],start_node_y-left_p[1]))
-                    perp_v = perp_v/np.linalg.norm(perp_v)
-                    
+
+                    perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
                     mean_border_pixels=0
-        
                         
                     for p in range(0 - line_eps, 1 + line_eps):
                         line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
@@ -346,15 +432,110 @@ class Crack():
                             mean_border_pixels+=1
         
                     if mean_border_pixels>=border_number_min and start_node_index!=node_index:
-                        edge_type = Crack.get_edge_type(start_node_index,
-                                                        node_index,
-                                                        cnts,
-                                                        nodes_metadata)
+
+                        if labels is False:
+                            edge_type = Crack.get_edge_type(start_node_index,
+                                                            node_index,
+                                                            cnts,
+                                                            nodes_metadata,
+                                                            labels=labels)
+                        else:
+                            edge_type = Crack.get_edge_type_labeled(start_node_index,
+                                                            node_index,
+                                                            nodes_metadata,
+                                                            line_eps=labeled_line_eps
+                                                            )
                         path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
                         g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
     
-    
         return g, img_contours
+
+
+    @classmethod
+    def get_edge_type_labeled(cls,
+                             node1,
+                             node2,
+                             nodes_metadata,
+                             line_eps=10,
+                             ):
+
+        # edge types
+        # 0 - Co
+        # 1 - WC-Co
+        # 2 - WC
+        # 3 - WC-WC
+        
+        # node's contour's indices
+        cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
+        cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
+
+        # node's coords on image
+        start_node_x, start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][node1]
+        end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node2]
+
+        line_coords =list(bresenham(np.round(start_node_x).astype(np.int32),
+                                    np.round(start_node_y).astype(np.int32),
+                                    np.round(end_node_x).astype(np.int32),
+                                    np.round(end_node_y).astype(np.int32)
+                                ))
+        
+        perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
+
+        label1=[]
+        for p in range(1, line_eps+1):
+            line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
+                                                np.round(start_node_y+p*perp_v[1]).astype(np.int32),
+                                                np.round(end_node_x+p*perp_v[0]).astype(np.int32),
+                                                np.round(end_node_y+p*perp_v[1]).astype(np.int32)
+                                                )))
+            
+            line_coords_contour_indices=nodes_metadata['image_coords2contour_index'][line_coords[:,0],line_coords[:,1]][2:-2]
+            label1.extend(line_coords_contour_indices)
+
+        label2=[]
+        for p in range(-line_eps-1,-1):
+            line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
+                                                np.round(start_node_y+p*perp_v[1]).astype(np.int32),
+                                                np.round(end_node_x+p*perp_v[0]).astype(np.int32),
+                                                np.round(end_node_y+p*perp_v[1]).astype(np.int32)
+                                                )))
+            
+            line_coords_contour_indices=nodes_metadata['image_coords2contour_index'][line_coords[:,0],line_coords[:,1]][2:-2]
+            label2.extend(line_coords_contour_indices)
+
+        label1=[nodes_metadata['contour_index2label'][l] for l in label1]
+        label2=[nodes_metadata['contour_index2label'][l] for l in label2]
+        
+        wc_1 = len(np.where(label1='wc')[0])
+        co_1 = len(np.where(label1='co')[0])
+
+        if wc_1>co_1:
+            side_type_1='wc'
+        else:
+            side_type_1='co'
+
+        wc_2 = len(np.where(label2='wc')[0])
+        co_2 = len(np.where(label2='co')[0])
+
+        if wc_2>co_2:
+            side_type_2='wc'
+        else:
+            side_type_2='co'
+        
+        if (side_type_1=='co' and side_type_2=='co'):
+            edge_type=0
+
+        elif (side_type_1=='wc' and side_type_2=='co') or (side_type_2=='wc' and side_type_1=='co'):
+            edge_type=1
+        
+        elif (side_type_1=='wc' and side_type_2=='wc'):
+
+            if cnt_index_1==cnt_index_2:
+                edge_type=2
+            else:
+                edge_type=3
+
+        return edge_type
 
     @classmethod
     def get_edge_type(cls,
