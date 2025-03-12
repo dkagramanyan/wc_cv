@@ -308,7 +308,7 @@ class Crack():
         return mean_border_pixels
     
     @classmethod
-    def get_perp_v(cls, start_node_x, start_node_y, end_node_x, end_node_y):
+    def get_perp_v(cls, start_node_x, start_node_y, end_node_x, end_node_y, line_eps=10):
         ab = LineString([(start_node_x, start_node_y), (end_node_x, end_node_y)])
         left = ab.parallel_offset(line_eps, 'left')
         left_p, _ = np.array(left.coords)
@@ -502,20 +502,22 @@ class Crack():
             
             line_coords_contour_indices=nodes_metadata['image_coords2contour_index'][line_coords[:,0],line_coords[:,1]][2:-2]
             label2.extend(line_coords_contour_indices)
-
-        label1=[nodes_metadata['contour_index2label'][l] for l in label1]
-        label2=[nodes_metadata['contour_index2label'][l] for l in label2]
         
-        wc_1 = len(np.where(label1='wc')[0])
-        co_1 = len(np.where(label1='co')[0])
+        # BUG! label[i] is 3-dimentional
+
+        label1=np.array([nodes_metadata['contour_index2label'][l[0]] for l in label1])
+        label2=np.array([nodes_metadata['contour_index2label'][l[0]] for l in label2])
+        
+        wc_1 = len(np.where(label1=='wc')[0])
+        co_1 = len(np.where(label1=='co')[0])
 
         if wc_1>co_1:
             side_type_1='wc'
         else:
             side_type_1='co'
 
-        wc_2 = len(np.where(label2='wc')[0])
-        co_2 = len(np.where(label2='co')[0])
+        wc_2 = len(np.where(label2=='wc')[0])
+        co_2 = len(np.where(label2=='co')[0])
 
         if wc_2>co_2:
             side_type_2='wc'
