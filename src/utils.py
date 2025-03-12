@@ -75,10 +75,18 @@ file_path = os.getcwd() + '/utils.py'
 
 class Crack():
     @classmethod
-    def align_figures(cls, orig_img_padded, tol):
-        cnts = grainMark.get_contours(orig_img_padded,tol=tol)
-        cnts = [np.array(cnt)[:-1] for cnt in cnts if len(cnt)>2]
-        cnts_adj = [cnt.reshape((-1,1,2)) for cnt in cnts ]
+    def align_figures(cls, orig_img_padded, tol, labeled_cnts=False):
+        
+        # if no labeled data
+        if not labeled_cnts: 
+            cnts = grainMark.get_contours(orig_img_padded,tol=tol)
+            cnts = [np.array(cnt)[:-1] for cnt in cnts if len(cnt)>2]
+            cnts_adj = [cnt.reshape((-1,1,2)) for cnt in cnts ]
+        
+        # labeled contours by hand in label-studio
+        else:
+            cnts_adj = copy.copy(labeled_cnts)
+            cnts = copy.copy(labeled_cnts)
         
         white_img = np.full((orig_img_padded.shape[0],orig_img_padded.shape[1],3),255)
         white_img = np.ascontiguousarray(white_img, dtype=np.uint8)
@@ -87,18 +95,24 @@ class Crack():
         return img_viz, cnts
         
     @classmethod
-    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 12):
-    
+    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 12, labeled_cnts=False):
         border_eps = border + border_node_eps
-    
-        if len(image.shape)==3:
-            image = color.rgb2gray(image)
+
+        # if no labeled contours
+        if not labeled_cnts:
+            if len(image.shape)==3:
+                image = color.rgb2gray(image)
+            
+            # double median filter. Without it artefacts in contours may occur
+            image = filters.rank.median(image, morphology.disk(disk))
+            tmp_img = SEMDataset.preprocess_image(image, pad=True, border=border, disk=disk)
+            
+            img_preprocessed, cnts = cls.align_figures(tmp_img, tol)
         
-        # double median filter. Without it artefacts in contours may occur
-        image = filters.rank.median(image, morphology.disk(disk))
-        tmp_img = SEMDataset.preprocess_image(image, pad=True, border=border, disk=disk)
-        
-        img_preprocessed,cnts = cls.align_figures(tmp_img,tol)
+        # if we labeled data by hand
+        else:
+            tmp_img = copy.copy(image)
+            img_preprocessed, cnts = cls.align_figures(tmp_img, tol, labeled_cnts=labeled_cnts)
         
         img_shape=np.array(img_preprocessed.shape)
         
