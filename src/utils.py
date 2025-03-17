@@ -18,13 +18,13 @@ from scipy.spatial import distance
 
 from skimage import io, color, filters, morphology, util
 from skimage.measure import EllipseModel
-from skimage.color import rgb2gray
+
 from skimage import filters, util
 from skimage.morphology import disk, skeletonize, ball
-from skimage.measure import approximate_polygon
+
 from skimage import transform
 
-from PIL import Image, ImageDraw, ImageFilter, ImageOps
+from PIL import Image, ImageDraw
 
 from sklearn.linear_model import LinearRegression
 
@@ -36,7 +36,7 @@ import copy
 import cv2
 from tqdm.notebook import tqdm
 
-from scipy.spatial import ConvexHull
+
 import pandas as pd
 
 import sys
@@ -58,8 +58,10 @@ from crdp import rdp
 from pathlib import Path
 from torch.utils.data import Dataset
 
-from multiprocessing import Lock, Process, Queue, current_process
+from multiprocessing import  Process, Queue
 import multiprocessing
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 handler = StreamHandler(stream=sys.stdout)
 handler.setFormatter(Formatter(fmt='[%(asctime)s: %(levelname)s] %(message)s'))
@@ -199,10 +201,11 @@ class Crack():
         num_of_nodes=0
         
         for i,points in enumerate(reversed(cnts)):
-                
-            image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
-                                                          points,
-                                                          i)
+            
+            # errors on original images
+            # image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
+            #                                               points,
+            #                                               i)
             if labels is not False:
                 contour_index2label[i]=labels[i]
 
@@ -437,8 +440,7 @@ class Crack():
                             edge_type = Crack.get_edge_type(start_node_index,
                                                             node_index,
                                                             cnts,
-                                                            nodes_metadata,
-                                                            labels=labels)
+                                                            nodes_metadata)
                         else:
                             edge_type = Crack.get_edge_type_labeled(start_node_index,
                                                             node_index,
@@ -546,6 +548,11 @@ class Crack():
                       cnts,
                       nodes_metadata):
         
+        # edge types
+        # 0 - WC
+        # 1 - WC-Co
+        # 2 - Co
+        
         cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
         cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
     
@@ -626,6 +633,78 @@ class Crack():
                 plt.savefig(name, bbox_inches='tight')
                 
             plt.show()
+
+
+        @classmethod
+        def plot_optimized_energies(cls, dfs, N=6,M=6, co_co_e_max=10, wc_co_e_max=10, name='test.jpg',save=False):
+
+            fig, axes = plt.subplots(N, M, figsize=(50, 50))
+
+            step=0
+            # vertical lines subplots 
+            for i in tqdm(range(N)):
+                # horizontal lines subplots 
+                for j in range(M):      
+                    energy_grid=[] 
+                    # iterate over all entry-exit paths pairs
+                    # step is a pair index
+                    # BUG, [0,0] sometimes is bigger, then [0,1]
+                    if step<len(dfs[0][1]):
+                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
+                            energy_grid.append([])
+                            
+                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
+                                df = pd.DataFrame(dfs[k][p],columns=[
+                                                'path',
+                                                'path_len_edges',
+                                                'path_len_pixels',
+                                                'energy',
+                                                'entry_node',
+                                                'exit_node',
+                                                'wc_edges',
+                                                'co_edges',
+                                                'wc_co_edges',
+                                                'wc_pixels',
+                                                'co_pixels',
+                                                'wc_co_pixels',
+                                                'wc_num',
+                                                'co_num',
+                                                'wc_co_num',
+                                                'index'])
+                                val = df['energy'].iloc[step]
+                                energy_grid[k].append(val)
+                        
+                        data = np.array(energy_grid)
+                        data = data/np.max(data)
+                        im = axes[i,j].imshow(data)
+
+                        axes[i,j].set_title(f'entry {dfs[k][p]["entry_node"].values[step]}, exit {dfs[k][p]["exit_node"].values[step]}', fontsize=20)
+
+                        divider = make_axes_locatable(axes[i,j])
+                        cax = divider.append_axes('right', size='5%', pad=0.05)
+                        fig.colorbar(im, cax=cax, orientation='vertical')
+                    
+                        axes[i,j].invert_yaxis()
+                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
+                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
+                                axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[p, k],
+                                horizontalalignment='center',
+                                verticalalignment='center',
+                                )
+                                
+                        axes[i,j].set_ylabel(f'co_co_e',  fontsize=20)
+                        axes[i,j].set_xlabel(f'wc_co_e',  fontsize=20)
+
+                        step+=1
+                    else:
+                        fig.delaxes(axes[i][j])
+
+            if save:
+                plt.savefig(name,  bbox_inches='tight')
+
+            plt.show()
+
+
 
     class Energy():
         
@@ -735,7 +814,7 @@ class Crack():
             cart_list=[(g_weighed, cnts,nodes_metadata,  line[0],line[1]) for line in cart_list]
             
             with WorkerPool(n_jobs=workers) as pool:
-                results = pool.map(cls.find_shortest_energy_paths, cart_list, progress_bar= True)
+                results = pool.map(cls.find_shortest_energy_paths, cart_list, progress_bar= False)
             
             df = pd.concat(results,axis=0)
             
