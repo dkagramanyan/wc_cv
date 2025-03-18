@@ -192,7 +192,7 @@ class Crack():
         
         # coord2index
         image_nodes_coord2nodes_index={}
-        image_coords2contour_index=np.zeros_like(image, dtype=np.int32)
+        image_coords2contour_index=np.zeros_like(img_preprocessed, dtype=np.int32)
         nodes_index2global_nodes_coord={}
         nodes_index2global_contour_index={}
         nodes_index2local_contour_index={}
@@ -202,10 +202,9 @@ class Crack():
         
         for i,points in enumerate(reversed(cnts)):
             
-            # errors on original images
-            # image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
-            #                                               points,
-            #                                               i)
+            image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
+                                                          points,
+                                                          i)
             if labels is not False:
                 contour_index2label[i]=labels[i]
 
