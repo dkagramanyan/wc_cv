@@ -4,6 +4,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from matplotlib import cm
+import matplotlib.patches as mpatches
 
 from lmfit.models import Model
 
@@ -284,30 +285,20 @@ class Crack():
                )
     
 
-    # NOT IN USE WTF??
+
     @classmethod
-    def get_bresenham_eps_pixels(cls, img_contours_np, start_node_x, start_node_y, end_node_x, end_node_y, line_eps, border_eps):
+    def get_bresenham_eps_pixels(cls, img_contours_np, start_node_x, start_node_y, end_node_x, end_node_y,border_pixel=255):
 
-        perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
-        
-        mean_border_pixels=0
-            
-        for p in range(0 - line_eps, 1 + line_eps):
-            line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
-                                                np.round(start_node_y+p*perp_v[1]).astype(np.int32),
-                                                np.round(end_node_x+p*perp_v[0]).astype(np.int32),
-                                                np.round(end_node_y+p*perp_v[1]).astype(np.int32)
-                                               )))
-            
-            line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
-            border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
+        line_coords=np.array(list(bresenham(np.round(start_node_x).astype(np.int32),
+                                            np.round(start_node_y).astype(np.int32),
+                                            np.round(end_node_x).astype(np.int32),
+                                            np.round(end_node_y).astype(np.int32)
+                                            )))
+        line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
+        border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
 
 
-            if border_pixels_num<=border_eps:
-                mean_border_pixels+=1
-
-
-        return mean_border_pixels
+        return border_pixels_num
     
     @classmethod
     def get_perp_v(cls, start_node_x, start_node_y, end_node_x, end_node_y, line_eps=10):
@@ -545,21 +536,24 @@ class Crack():
                       node1,
                       node2,
                       cnts,
-                      nodes_metadata):
+                      nodes_metadata,
+                      wc_eps=30,
+                      border_pixel=0):
         
         # edge types
-        # 0 - WC
+        # 0 - Co
         # 1 - WC-Co
-        # 2 - Co
+        # 2 - WC
+        # 3 - WC-WC
         
         cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
         cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
     
         edge_type=0
         
-        # different contours, WC-WC
+        # different contours, WC
         if cnt_index_1!=cnt_index_2:
-            edge_type=0
+            edge_type=2
             
         # same contour, WC-Co 
         elif abs(node1-node2)<2:
@@ -592,26 +586,63 @@ class Crack():
                                              np.array((x2,y2)),
                                              np.array((x0,y0)),
                                              np.array((x3,y3)))
+                img_tmp = nodes_metadata['image_coords2contour_index']
+                pixels_num=cls.get_bresenham_eps_pixels(img_tmp,
+                                        x1,
+                                        y1,
+                                        x2,
+                                        y2,
+                                        border_pixel=border_pixel)
                 #  has intersection, Co
                 if inter:
-                    edge_type=2
+                    # WC movement
+                    if pixels_num>wc_eps:
+                        edge_type=2
+                    else:
+                        # Co movement
+                        edge_type=0
                 else:
-                    # no intersection, WC 
-                    edge_type=0
+                    
+                    if cnt_index_1==cnt_index_2:
+                        
+                        # WC movement
+                        if pixels_num>wc_eps:
+                           edge_type=2
+                        else:
+                        # unfolded angle, Co
+                            edge_type=0
+                    else:
+                        # no intersection, WC 
+                        edge_type=2
     
         return edge_type
 
 
     class Viz():
         @classmethod
-        def graph_plot(cls, g, img_contours, name ='graph.jpg', border = 30, save=False):
+        def graph_plot(cls, g, img_contours,N=50,M=50, name ='graph.jpg', border = 30, save=False):
+            # 0 - Co
+            # 1 - WC-Co
+            # 2 - WC
+            # 3 - WC-WC
+
+            color_dict={0:'red',
+                        1:'orange',
+                        2:'blue',
+                        3:'green'}
+            
+
+            colors=[]
+            for u,v in g.edges():
+                edge_type = g[u][v]['edge_type']
+                colors.append(color_dict[edge_type])
 
             img_tmp = np.array(img_contours)
             
             pos = nx.get_node_attributes(g, 'pos')
-            fig,axes = plt.subplots(1,1,figsize=(50,50))
+            fig,axes = plt.subplots(1,1,figsize=(N,M))
             
-            nx.draw(g, pos, ax =axes,  with_labels=True, node_color='lightblue', node_size=500, font_size=15)
+            nx.draw(g, pos, ax =axes,  with_labels=True, node_color='lightblue', node_size=500, font_size=15, edge_color=colors)
             axes.imshow(img_tmp, cmap='gray')
             
             # axes[0].invert_yaxis()
@@ -619,15 +650,23 @@ class Crack():
             
             plt.axis("on")
             axes.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-            plt.xticks(np.arange(0,img_contours.shape[1],100), fontsize=15)
-            plt.yticks(np.arange(0,img_contours.shape[0],100),fontsize=15)
+            plt.xticks(np.arange(0,img_tmp.shape[1],100), fontsize=15)
+            plt.yticks(np.arange(0,img_tmp.shape[0],100),fontsize=15)
             
-            axes.arrow(5, 0, 5, img_contours.shape[0], width=0.3, length_includes_head=True, head_width=10, head_length=10,color=(0,0,0))
-            axes.text(-20, img_contours.shape[0]*2/3,'hit direction',rotation=90, color=(0, 0, 0),fontsize=25)
+            axes.arrow(5, 0, 5, img_tmp.shape[0], width=0.3, length_includes_head=True, head_width=10, head_length=10,color=(0,0,0))
+            axes.text(-20, img_tmp.shape[0]*2/3,'hit direction',rotation=90, color=(0, 0, 0),fontsize=25)
             
-            axes.text(img_contours.shape[1]/2 - border, - 2*border,'entry nodes', color=(0, 0, 1),fontsize=25)
-            axes.text(img_contours.shape[1]/2 - border,img_contours.shape[0]+ 2*border,'exit nodes', color=(1, 0, 0),fontsize=25)
-        
+            axes.text(img_tmp.shape[1]/2 - border, - 2*border,'entry nodes', color=(0, 0, 1),fontsize=25)
+            axes.text(img_tmp.shape[1]/2 - border,img_tmp.shape[0]+ 2*border,'exit nodes', color=(1, 0, 0),fontsize=25)
+
+            path1 = mpatches.Patch(color='red', label='Co, type 0')
+            path2 = mpatches.Patch(color='orange', label='WC-Co, type 1')
+            path3 = mpatches.Patch(color='blue', label='WC, type 2')
+            path4 = mpatches.Patch(color='green', label='WC-WC, type 3')
+            
+            plt.legend(handles=[path1,path2,path3,path4],fontsize=25)
+
+
             if save:
                 plt.savefig(name, bbox_inches='tight')
                 
