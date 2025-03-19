@@ -197,17 +197,18 @@ class Crack():
         nodes_index2global_nodes_coord={}
         nodes_index2global_contour_index={}
         nodes_index2local_contour_index={}
-        contour_index2label = {}
 
         num_of_nodes=0
+
+        if labels is not False:
+            contour_index2label={i:l for i,l in enumerate(labels)}
         
         for i,points in enumerate(reversed(cnts)):
             
             image_coords2contour_index = cls.fill_polygon(image_coords2contour_index,
                                                           points,
                                                           i)
-            if labels is not False:
-                contour_index2label[i]=labels[i]
+
 
             for j, point in enumerate(points):
                 # very long. 40s for 2000x1000 image
@@ -274,6 +275,7 @@ class Crack():
                           'image_nodes_coord2nodes_index':image_nodes_coord2nodes_index,
                           'image_coords2contour_index':image_coords2contour_index,
                           'contour_index2label': contour_index2label,
+                          'labels':labels
                          }
         
         return (entry_nodes,
@@ -465,15 +467,12 @@ class Crack():
         start_node_x, start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][node1]
         end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node2]
 
-        line_coords =list(bresenham(np.round(start_node_x).astype(np.int32),
-                                    np.round(start_node_y).astype(np.int32),
-                                    np.round(end_node_x).astype(np.int32),
-                                    np.round(end_node_y).astype(np.int32)
-                                ))
+        # BUG! label[i] is 3-dimentional
+        tmg_tmp=nodes_metadata['image_coords2contour_index'][:,:,0]
         
         perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
 
-        label1=[]
+        label1_indices=[]
         for p in range(1, line_eps+1):
             line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
                                                 np.round(start_node_y+p*perp_v[1]).astype(np.int32),
@@ -481,10 +480,10 @@ class Crack():
                                                 np.round(end_node_y+p*perp_v[1]).astype(np.int32)
                                                 )))
             
-            line_coords_contour_indices=nodes_metadata['image_coords2contour_index'][line_coords[:,0],line_coords[:,1]][2:-2]
-            label1.extend(line_coords_contour_indices)
+            line_coords_contour_indices=tmg_tmp[line_coords[:,0],line_coords[:,1]][2:-2]
+            label1_indices.extend(line_coords_contour_indices)
 
-        label2=[]
+        label2_indices=[]
         for p in range(-line_eps-1,-1):
             line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
                                                 np.round(start_node_y+p*perp_v[1]).astype(np.int32),
@@ -492,13 +491,12 @@ class Crack():
                                                 np.round(end_node_y+p*perp_v[1]).astype(np.int32)
                                                 )))
             
-            line_coords_contour_indices=nodes_metadata['image_coords2contour_index'][line_coords[:,0],line_coords[:,1]][2:-2]
-            label2.extend(line_coords_contour_indices)
+            line_coords_contour_indices=tmg_tmp[line_coords[:,0],line_coords[:,1]][2:-2]
+            label2_indices.extend(line_coords_contour_indices)
         
-        # BUG! label[i] is 3-dimentional
 
-        label1=np.array([nodes_metadata['contour_index2label'][l[0]] for l in label1])
-        label2=np.array([nodes_metadata['contour_index2label'][l[0]] for l in label2])
+        label1=np.array([nodes_metadata['labels'][-l-1] for l in label1_indices])
+        label2=np.array([nodes_metadata['labels'][-l-1] for l in label2_indices])
         
         wc_1 = len(np.where(label1=='wc')[0])
         co_1 = len(np.where(label1=='co')[0])
@@ -849,7 +847,7 @@ class Crack():
             # find the minimal energy paths
             cart_list=[entry_nodes, exit_nodes]
             cart_list=[element for element in itertools.product(*cart_list)]
-            cart_list=[(g_weighed, cnts,nodes_metadata,  line[0],line[1]) for line in cart_list]
+            cart_list=[(g_weighed, cnts, nodes_metadata,  line[0],line[1]) for line in cart_list]
             
             with WorkerPool(n_jobs=workers) as pool:
                 results = pool.map(cls.find_shortest_energy_paths, cart_list, progress_bar= False)
