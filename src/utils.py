@@ -16,6 +16,7 @@ from radio_beam.commonbeam import getMinVolEllipse
 
 from scipy import ndimage as ndi
 from scipy.spatial import distance
+from collections import Counter
 
 from skimage import io, color, filters, morphology, util
 from skimage.measure import EllipseModel
@@ -36,7 +37,7 @@ from shapely.geometry import Polygon, LineString
 import copy
 import cv2
 from tqdm.notebook import tqdm
-
+from pathos.multiprocessing import ProcessingPool as Pool 
 
 import pandas as pd
 
@@ -274,9 +275,11 @@ class Crack():
                           'nodes_index2local_contour_index':nodes_index2local_contour_index,
                           'image_nodes_coord2nodes_index':image_nodes_coord2nodes_index,
                           'image_coords2contour_index':image_coords2contour_index,
-                          'contour_index2label': contour_index2label,
-                          'labels':labels
                          }
+        
+        if labels is not False:
+            nodes_metadata['contour_index2label'] = contour_index2label
+            nodes_metadata['labels'] = labels
         
         return (entry_nodes,
                 exit_nodes,
@@ -346,20 +349,22 @@ class Crack():
         
         return False  # Lines do not intersect
 
+
     @classmethod
-    def create_crack_graph(cls,
-                           img_shape,
-                           cnts,
-                           nodes_metadata,
-                           eps=100,
-                           line_eps=3,
-                           border = 30,
-                           border_eps = 0,
-                           border_number_min = 2,
-                           border_pixel=255,
-                           same_node_eps = 5,
-                           labels = False,
-                           labeled_line_eps=10):
+    def create_crack_graph( cls,
+                            img_shape,
+                            cnts,
+                            nodes_metadata,
+                            eps=100,
+                            line_eps=3,
+                            border = 30,
+                            border_eps = 0,
+                            border_number_min = 2,
+                            border_pixel=255,
+                            same_node_eps = 5,
+                            labels = False,
+                            labeled_line_eps=10,
+                            workers=10):
         
         g = nx.DiGraph()
         image_node_coord2node_index = np.zeros(img_shape,dtype=np.int32)
@@ -371,79 +376,131 @@ class Crack():
         
         img_contours = grainDraw.draw_contours(Image.fromarray(np.zeros((img_shape[0],img_shape[1]))), color_line = (255), cnts=cnts,corners = False)
         img_contours_np = np.array(img_contours)
-        
-        for start_node_index in tqdm(range(num_of_nodes)):
-            
-            # choose cell
-            start_node_x,start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][start_node_index]
-            
-            # for rectangular vertical slice only!
-            ###############################################
-    
-            # left y slice border
-            if start_node_y-eps<0:
-                left_border_y=0
-            else:
-                left_border_y=start_node_y-eps
-        
-            # right y slice border
-            if start_node_y+eps>image_node_coord2node_index.shape[1]:
-                right_border_y=image_node_coord2node_index.shape[1]-1
-            else:
-                right_border_y=start_node_y+eps
-        
-            # upper_border
-            if start_node_x+eps>image_node_coord2node_index.shape[0]-1:
-                upper_border=image_node_coord2node_index.shape[0]-1
-            else:
-                upper_border=start_node_x+eps
-                
-            map_slice = image_node_coord2node_index[start_node_x+1:upper_border,left_border_y:right_border_y]
-            ###############################################
-            
-            nodes_indices_indices = np.where(map_slice.flatten()!=0)
-            nodes_indices = map_slice.flatten()[nodes_indices_indices]
-            
-            # next node search
-            for node_index in nodes_indices:
-            
-                end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
-        
-                if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
 
-                    perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
-                    mean_border_pixels=0
-                        
-                    for p in range(0 - line_eps, 1 + line_eps):
-                        line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
-                                                            np.round(start_node_y+p*perp_v[1]).astype(np.int32),
-                                                            np.round(end_node_x+p*perp_v[0]).astype(np.int32),
-                                                            np.round(end_node_y+p*perp_v[1]).astype(np.int32)
-                                                           )))
-                        
-                        line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
-                        border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
-                        if border_pixels_num<=border_eps:
-                            mean_border_pixels+=1
+        process_metadata={'img_shape':img_shape,
+                        'cnts':cnts,
+                        'eps':eps,
+                        'line_eps':line_eps,
+                        'border':border,
+                        'border_eps':border_eps,
+                        'border_number_min':border_number_min,
+                        'border_pixel':border_pixel,
+                        'same_node_eps':same_node_eps,
+                        'labeled_line_eps':labeled_line_eps,
+                        'img_contours_np':img_contours_np,
+                        'image_node_coord2node_index':image_node_coord2node_index,
+                        'labels':labels,
+                        }
         
-                    if mean_border_pixels>=border_number_min and start_node_index!=node_index:
+        results = []
+        with Pool(workers) as pool:
+            res = pool.map(lambda x: cls.get_edges(x,
+                                        nodes_metadata,
+                                        process_metadata),
+                                        range(num_of_nodes))
+            results.extend(res)
 
-                        if labels is False:
-                            edge_type = Crack.get_edge_type(start_node_index,
-                                                            node_index,
-                                                            cnts,
-                                                            nodes_metadata)
-                        else:
-                            edge_type = Crack.get_edge_type_labeled(start_node_index,
-                                                            node_index,
-                                                            nodes_metadata,
-                                                            line_eps=labeled_line_eps
-                                                            )
-                        path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
-                        g.add_edge(start_node_index,node_index, edge_type=edge_type, path_len=path)
-    
+        
+        for res_line in results:
+            for r in res_line:
+                start_node_index = r['start_node_index']
+                end_node_index = r['end_node_index']
+                edge_type = r['edge_type']
+                path_len = r['path_len']
+
+                g.add_edge(start_node_index, end_node_index, edge_type=edge_type, path_len=path_len)
+
         return g, img_contours
 
+    @classmethod
+    def get_edges(cls, start_node_index, nodes_metadata, process_metadata):
+        results=[]
+
+        img_shape = process_metadata['img_shape']
+        cnts = process_metadata['cnts']
+        eps = process_metadata['eps']
+        line_eps = process_metadata['line_eps']
+        border = process_metadata['border']
+        border_eps = process_metadata['border_eps']
+        border_number_min = process_metadata['border_number_min']
+        border_pixel = process_metadata['border_pixel']
+        same_node_eps = process_metadata['same_node_eps']
+        labeled_line_eps = process_metadata['labeled_line_eps']
+        img_contours_np = process_metadata['img_contours_np']
+        image_node_coord2node_index = process_metadata['image_node_coord2node_index']
+        labels = process_metadata['labels']
+                
+        # choose cell
+        start_node_x,start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][start_node_index]
+
+        # for rectangular vertical slice only!
+        ###############################################
+
+        # left y slice border
+        if start_node_y-eps<0:
+            left_border_y=0
+        else:
+            left_border_y=start_node_y-eps
+
+        # right y slice border
+        if start_node_y+eps>image_node_coord2node_index.shape[1]:
+            right_border_y=image_node_coord2node_index.shape[1]-1
+        else:
+            right_border_y=start_node_y+eps
+
+        # upper_border
+        if start_node_x+eps>image_node_coord2node_index.shape[0]-1:
+            upper_border=image_node_coord2node_index.shape[0]-1
+        else:
+            upper_border=start_node_x+eps
+            
+        map_slice = image_node_coord2node_index[start_node_x+1:upper_border,left_border_y:right_border_y]
+        ###############################################
+        
+        nodes_indices_indices = np.where(map_slice.flatten()!=0)
+        nodes_indices = map_slice.flatten()[nodes_indices_indices]
+        
+        # next node search
+        for node_index in nodes_indices:
+        
+            end_node_x, end_node_y = nodes_metadata['nodes_index2global_nodes_coord'][node_index]
+
+            if abs(end_node_x-start_node_x)>same_node_eps or abs(end_node_y-start_node_y)>same_node_eps:
+
+                perp_v = cls.get_perp_v(start_node_x, start_node_y, end_node_x, end_node_y)
+                mean_border_pixels=0
+                    
+                for p in range(0 - line_eps, 1 + line_eps):
+                    line_coords=np.array(list(bresenham(np.round(start_node_x+p*perp_v[0]).astype(np.int32),
+                                                        np.round(start_node_y+p*perp_v[1]).astype(np.int32),
+                                                        np.round(end_node_x+p*perp_v[0]).astype(np.int32),
+                                                        np.round(end_node_y+p*perp_v[1]).astype(np.int32)
+                                                        )))
+                    
+                    line_coords_pixels=img_contours_np[line_coords[:,0],line_coords[:,1]][2:-2]
+                    border_pixels_num = np.where(line_coords_pixels==border_pixel)[0].shape[0]
+                    if border_pixels_num<=border_eps:
+                        mean_border_pixels+=1
+
+                if mean_border_pixels>=border_number_min and start_node_index!=node_index:
+
+                    if labels is False:
+                        edge_type = Crack.get_edge_type(start_node_index,
+                                                        node_index,
+                                                        cnts,
+                                                        nodes_metadata)
+                    else:
+                        edge_type = Crack.get_edge_type_labeled(start_node_index,
+                                                        node_index,
+                                                        nodes_metadata,
+                                                        line_eps=labeled_line_eps
+                                                        )
+                    path = np.linalg.norm((end_node_x-start_node_x, end_node_y-start_node_y))
+                    results.append({'start_node_index':start_node_index,
+                                    'end_node_index':node_index,
+                                    'edge_type':edge_type,
+                                    'path_len':path})
+        return results
 
     @classmethod
     def get_edge_type_labeled(cls,
@@ -522,7 +579,13 @@ class Crack():
         
         elif (side_type_1=='wc' and side_type_2=='wc'):
 
-            if cnt_index_1==cnt_index_2:
+            counter = Counter(label1_indices)
+            cnt_left_index_1, _ = counter.most_common(1)[0]
+
+            counter = Counter(label2_indices)
+            cnt_left_index_2, _ = counter.most_common(1)[0]
+
+            if cnt_left_index_1==cnt_left_index_2:
                 edge_type=2
             else:
                 edge_type=3
