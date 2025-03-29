@@ -66,6 +66,8 @@ import multiprocessing
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from itertools import islice
+
 handler = StreamHandler(stream=sys.stdout)
 handler.setFormatter(Formatter(fmt='[%(asctime)s: %(levelname)s] %(message)s'))
 
@@ -884,130 +886,61 @@ class Crack():
 
 
     class Energy():
-        
-        @classmethod
-        def find_shortest_energy_paths(cls, G, cnts, nodes_metadata,  entry_node, exit_node): 
-            all_paths=[]
-            all_entry_nodes=[]
-            all_exit_nodes=[]
-            all_path_len_edges=[]
-            all_path_len_pixels=[]
-            
-            all_wc_edges = []
-            all_co_edges = []
-            all_wc_co_edges = []
-        
-            all_wc_edges_lens = []
-            all_co_edges_lens = []
-            all_wc_co_edges_lens = []
-            
-            all_wc_pixels = []
-            all_co_pixels = []
-            all_wc_co_pixels = []
-            
-            paths =  list(nx.all_shortest_paths(G, source=entry_node, target=exit_node, weight = 'weight'))
-        
-            for path in paths: 
-                all_paths.append(path)
-                all_entry_nodes.append(int(entry_node))
-                all_exit_nodes.append(int(exit_node))
-                all_path_len_edges.append(len(path))
-                l=nx.path_weight(G, path, 'weight')
-                all_path_len_pixels.append(l)
-                
-                points_stack = np.stack([path, np.roll(path,shift=-1,axis=0)],axis=1)[:-1]
-        
-                types = []
-                edges_lens=[]
-                for points in points_stack:
-                    node1,node2 = points
-                    edges_lens.append(nx.path_weight(G,[node1,node2], 'weight'))
-                    edge_type = Crack.get_edge_type(node1,
-                                                    node2,
-                                                    cnts,
-                                                    nodes_metadata)
-                    types.append(edge_type)
-                    
-                
-                types = np.array(types)
-                edges_lens = np.array(edges_lens)
-                
-                wc_edges_indices = np.where(types==0)[0]
-                co_edges_indices = np.where(types==2)[0]
-                wc_co_edges_indices = np.where(types==1)[0]
-        
-                wc_pixels_lens=edges_lens[wc_edges_indices]
-                co_pixels_lens=edges_lens[co_edges_indices]
-                wc_co_pixels_lens=edges_lens[wc_co_edges_indices]
-                z = np.sum(edges_lens)
-                    
-                all_wc_edges.append(len(wc_edges_indices)/len(path))
-                all_co_edges.append(len(co_edges_indices)/len(path))
-                all_wc_co_edges.append(len(wc_co_edges_indices)/len(path))
-        
-                all_wc_edges_lens.append(len(wc_pixels_lens))
-                all_co_edges_lens.append(len(co_pixels_lens))
-                all_wc_co_edges_lens.append(len(wc_co_pixels_lens))
-                
-                all_wc_pixels.append(np.sum(wc_pixels_lens)/z)
-                all_co_pixels.append(np.sum(co_pixels_lens)/z)
-                all_wc_co_pixels.append(np.sum(wc_co_pixels_lens)/z)
-        
-            return pd.DataFrame({'path':all_paths,
-                                 'path_len_edges':all_path_len_edges,
-                                 'energy': np.round(all_path_len_pixels,2),
-                                 
-                                 'entry_node':all_entry_nodes,
-                                 'exit_node':all_exit_nodes,
-                                 
-                                 'wc_edges': np.round(all_wc_edges,2),
-                                 'co_edges':np.round( all_co_edges,2),
-                                 'wc_co_edges': np.round(all_wc_co_edges,2),
-                                 
-                                 'wc_pixels': np.round(all_wc_pixels,2), 
-                                 'co_pixels': np.round(all_co_pixels,2), 
-                                 'wc_co_pixels': np.round(all_wc_co_pixels,2), 
-        
-                                 'wc_num': all_wc_edges_lens,
-                                 'co_num': all_co_edges_lens,
-                                 'wc_co_num': all_wc_co_edges_lens,
-                                })
-            
-        @classmethod
-        def get_energies(cls, g, cnts, nodes_metadata, entry_nodes, exit_nodes, energy, workers=23):
     
-            # modify the energies of edges
-            g_weighed = g.copy()
-            
-            for u, v in g_weighed.edges():
-                path_len = g.edges[u,v]['path_len']
-                edge_type = g.edges[u,v]['edge_type']
-                e=energy[edge_type]
-                g_weighed[u][v]['weight'] = path_len*e
-        
-            # find the minimal energy paths
+        @classmethod
+        def get_energies(cls, g, cnts, nodes_metadata, entry_nodes, exit_nodes,co_co_e_max,  wc_co_e_max, first_k_paths=2, parallel=False, workers=23,):
             cart_list=[entry_nodes, exit_nodes]
             cart_list=[element for element in itertools.product(*cart_list)]
-            cart_list=[(g_weighed, cnts, nodes_metadata,  line[0],line[1]) for line in cart_list]
+
+            tasks_data=[]
+            grid_dict = {}
+            step=0
+
+            for i,co_co_e in enumerate(tqdm(range(0,co_co_e_max), desc='Step 1/2. Creating energies list')):
+                for j,wc_co_e in enumerate(range(0,wc_co_e_max)):
+                    energy = {
+                        0: co_co_e, # Co
+                        1: wc_co_e, # WC-Co
+                        2: 20, # WC
+                        
+                        } 
+                    
+                    g_weighed = copy.deepcopy(g)
+                    
+                    for u, v in g_weighed.edges():
+                        path_len = g.edges[u,v]['path_len']
+                        edge_type = g.edges[u,v]['edge_type']
+                        e=energy[edge_type]
+                        g_weighed[u][v]['weight'] = path_len*e
+
+                    cart_list_tmp=[(g_weighed, cnts, nodes_metadata, line[0],line[1], first_k_paths) for line in cart_list]
+
+                    for k, line in enumerate(cart_list_tmp):
+                        tasks_data.append(line)
+                        grid_dict[step]=(i,j,k)
+                        step+=1
+
+            results=[]
             
-            with WorkerPool(n_jobs=workers) as pool:
-                results = pool.map(cls.find_shortest_energy_paths, cart_list, progress_bar= False)
+            if parallel:
+                print("Step 2/2. Calculating path's energies")
+                with WorkerPool(n_jobs=workers) as pool:
+                    results = pool.map(cls.find_shortest_energy_paths, tasks_data, progress_bar = True)
+            else:
+                for line in tqdm(tasks_data, desc="Step 2/2. Calculating path's energies"):
+                    results.append(cls.find_shortest_energy_paths(*line))
             
-            df = pd.concat(results,axis=0)
-            
-            df['index'] = range(len(df))
-            df.set_index('index')
-            
-            return df
+            energies=np.zeros((len(cart_list), co_co_e_max, wc_co_e_max)).tolist()
+
+            for p in range(step):
+                i,j,k=grid_dict[p]
+                energies[k][i][j]=results[p]
+
+            return energies
+    
         
         @classmethod
-        def find_shortest_energy_paths_seq(cls,  G, cnts, nodes_metadata,  entry_node, exit_node, path_index): 
-
-            # print('path_index', path_index)
-            # if path_index_o is None:
-            #     path_index=0
-            # else:
-            #     path_index=path_index_o
+        def find_shortest_energy_paths(cls,  G, cnts, nodes_metadata,  entry_node, exit_node, k): 
 
             all_paths=[]
             all_entry_nodes=[]
@@ -1027,8 +960,7 @@ class Crack():
             all_co_pixels = []
             all_wc_co_pixels = []
             
-            # paths =  [list(nx.all_shortest_paths(G, source=entry_node, target=exit_node, weight = 'weight'))[path_index]]
-            paths =  [list(nx.shortest_path(G, source=entry_node, target=exit_node, weight = 'weight'))]
+            paths =  list(islice(nx.shortest_simple_paths(G, entry_node, exit_node, weight='weight'),k))
 
             for path in paths: 
                 all_paths.append(path)
@@ -1097,51 +1029,6 @@ class Crack():
                                 })
 
                 
-        @classmethod
-        def get_energies_paths_seq(cls, g, cnts, nodes_metadata,   entry_nodes, exit_nodes, co_co_e_max,  wc_co_e_max,  path_index):
-
-            cart_list=[entry_nodes, exit_nodes]
-            cart_list=[element for element in itertools.product(*cart_list)]
-
-            tasks_data=[]
-            grid_dict = {}
-            step=0
-            for i,co_co_e in enumerate(tqdm(range(0,co_co_e_max))):
-                for j,wc_co_e in enumerate(range(0,wc_co_e_max)):
-                    energy = {
-                        0: co_co_e, # Co
-                        1: wc_co_e, # WC-Co
-                        2: 20, # WC
-                        
-                        } 
-                    
-                    g_weighed = copy.deepcopy(g)
-                    
-                    for u, v in g_weighed.edges():
-                        path_len = g.edges[u,v]['path_len']
-                        edge_type = g.edges[u,v]['edge_type']
-                        e=energy[edge_type]
-                        g_weighed[u][v]['weight'] = path_len*e
-
-                    cart_list_tmp=[(g_weighed, cnts, nodes_metadata, line[0],line[1], path_index) for line in cart_list]
-
-                    for k, line in enumerate(cart_list_tmp):
-                        tasks_data.append(line)
-                        grid_dict[step]=(i,j,k)
-                        step+=1
-
-            results=[]
-
-            for line in tqdm(tasks_data):
-                results.append(cls.find_shortest_energy_paths_seq(line[0],line[1],line[2],line[3],line[4], line[5]))
-
-            energies=np.zeros((len(cart_list), co_co_e_max, wc_co_e_max)).tolist()
-
-            for p in range(step):
-                i,j,k=grid_dict[p]
-                energies[k][i][j]=results[p]
-
-            return energies
 
 
 class SEMDataset(Dataset):
