@@ -815,7 +815,7 @@ class Crack():
             plt.show()
 
         @classmethod
-        def plot_optimized_energies_seq(cls, energies, N=6,M=6, co_co_e_max=10, wc_co_e_max=10, name='test.jpg',save=False):
+        def plot_optimized_energies_seq(cls, energies, path_index=0, N=6,M=6, co_co_e_max=10, wc_co_e_max=10, name='test.jpg',save=False):
 
             fig, axes = plt.subplots(N, M, figsize=(50, 50))
 
@@ -851,14 +851,14 @@ class Crack():
                                                 'co_num',
                                                 'wc_co_num',
                                                 'index'])
-                                val = df['energy'].iloc[0]
+                                val = df['energy'].iloc[path_index]
                                 energy_grid[k].append(val)
                         
                         data = np.array(energy_grid)
                         data = data/np.max(data)
                         im = axes[i,j].imshow(data)
 
-                        axes[i,j].set_title(f'entry {df["entry_node"].iloc[0]}, exit {df["exit_node"].iloc[0]}', fontsize=20)
+                        axes[i,j].set_title(f'entry {df["entry_node"].iloc[path_index]}, exit {df["exit_node"].iloc[path_index]}', fontsize=20)
 
                         divider = make_axes_locatable(axes[i,j])
                         cax = divider.append_axes('right', size='5%', pad=0.05)
