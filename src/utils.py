@@ -174,7 +174,7 @@ class Crack():
         return inside
         
     @classmethod
-    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 12, labeled_cnts=False, labels=False):
+    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 5, labeled_cnts=False, labels=False):
         border_eps = border + border_node_eps
 
         # if no labeled contours
@@ -795,8 +795,8 @@ class Crack():
                         fig.colorbar(im, cax=cax, orientation='vertical')
                     
                         axes[i,j].invert_yaxis()
-                        for k  in range(0, len(energies[step][0])):
-                            for p  in range(0, len(energies[step][0][0])):
+                        for k  in range(0, len(energies[step])):
+                            for p  in range(0, len(energies[step][0])):
                                 axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[k,p],
                                 horizontalalignment='center',
                                 verticalalignment='center',
