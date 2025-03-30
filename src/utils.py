@@ -744,78 +744,8 @@ class Crack():
                 
             plt.show()
 
-
         @classmethod
-        def plot_optimized_energies(cls, dfs, N=6,M=6, co_co_e_max=10, wc_co_e_max=10, name='test.jpg',save=False):
-
-            fig, axes = plt.subplots(N, M, figsize=(50, 50))
-
-            step=0
-            # vertical lines subplots 
-            for i in tqdm(range(N)):
-                # horizontal lines subplots 
-                for j in range(M):      
-                    energy_grid=[] 
-                    # iterate over all entry-exit paths pairs
-                    # step is a pair index
-                    # BUG, [0,0] sometimes is bigger, then [0,1]
-                    if step<len(dfs[0][1]):
-                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
-                            energy_grid.append([])
-                            
-                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
-                                df = pd.DataFrame(dfs[k][p],columns=[
-                                                'path',
-                                                'path_len_edges',
-                                                'path_len_pixels',
-                                                'energy',
-                                                'entry_node',
-                                                'exit_node',
-                                                'wc_edges',
-                                                'co_edges',
-                                                'wc_co_edges',
-                                                'wc_pixels',
-                                                'co_pixels',
-                                                'wc_co_pixels',
-                                                'wc_num',
-                                                'co_num',
-                                                'wc_co_num',
-                                                'index'])
-                                val = df['energy'].iloc[step]
-                                energy_grid[k].append(val)
-                        
-                        data = np.array(energy_grid)
-                        data = data/np.max(data)
-                        im = axes[i,j].imshow(data)
-
-                        axes[i,j].set_title(f'entry {dfs[k][p]["entry_node"].values[step]}, exit {dfs[k][p]["exit_node"].values[step]}', fontsize=20)
-
-                        divider = make_axes_locatable(axes[i,j])
-                        cax = divider.append_axes('right', size='5%', pad=0.05)
-                        fig.colorbar(im, cax=cax, orientation='vertical')
-                    
-                        axes[i,j].invert_yaxis()
-                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
-                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
-                                axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[p, k],
-                                horizontalalignment='center',
-                                verticalalignment='center',
-                                )
-                                
-                        axes[i,j].set_ylabel(f'co_co_e',  fontsize=20)
-                        axes[i,j].set_xlabel(f'wc_co_e',  fontsize=20)
-
-                        step+=1
-                    else:
-                        fig.delaxes(axes[i][j])
-
-            if save:
-                plt.savefig(name,  bbox_inches='tight')
-
-            plt.show()
-
-        @classmethod
-        def plot_optimized_energies_seq(cls, energies, path_index=0, N=6,M=6, co_co_e_max=10, wc_co_e_max=10, name='test.jpg',save=False):
+        def plot_optimized_energies(cls, energies, path_index=0, N=6,M=6, name='test.jpg', y_label ='co_co_e', x_label = 'wc_co_e', save=False):
 
             fig, axes = plt.subplots(N, M, figsize=(50, 50))
 
@@ -830,10 +760,10 @@ class Crack():
                     # BUG, [0,0] sometimes is bigger, then [0,1]
                     if step<len(energies):
 
-                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
+                        for k in range(0, len(energies[step])):
                             energy_grid.append([])
                             
-                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
+                            for p in range(0, len(energies[step][0])):
                                 df = pd.DataFrame(energies[step][k][p],columns=[
                                                 'path',
                                                 'path_len_edges',
@@ -865,15 +795,15 @@ class Crack():
                         fig.colorbar(im, cax=cax, orientation='vertical')
                     
                         axes[i,j].invert_yaxis()
-                        for k,co_co_e in enumerate(range(1,co_co_e_max)):
-                            for p,wc_co_e in enumerate(range(1,wc_co_e_max)):
-                                axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[p, k],
+                        for k  in range(0, len(energies[step][0])):
+                            for p  in range(0, len(energies[step][0][0])):
+                                axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[k,p],
                                 horizontalalignment='center',
                                 verticalalignment='center',
                                 )
                                 
-                        axes[i,j].set_ylabel(f'co_co_e',  fontsize=20)
-                        axes[i,j].set_xlabel(f'wc_co_e',  fontsize=20)
+                        axes[i,j].set_ylabel(y_label,  fontsize=20)
+                        axes[i,j].set_xlabel(x_label,  fontsize=20)
 
                         step+=1
                     else:
@@ -888,7 +818,7 @@ class Crack():
     class Energy():
     
         @classmethod
-        def get_energies(cls, g, cnts, nodes_metadata, entry_nodes, exit_nodes,co_co_e_max,  wc_co_e_max, first_k_paths=2, parallel=False, workers=23,):
+        def get_energies(cls, energy_conf, g, cnts, nodes_metadata, entry_nodes, exit_nodes, first_k_paths=2, parallel=False, workers=23,):
             cart_list=[entry_nodes, exit_nodes]
             cart_list=[element for element in itertools.product(*cart_list)]
 
@@ -896,15 +826,10 @@ class Crack():
             grid_dict = {}
             step=0
 
-            for i,co_co_e in enumerate(tqdm(range(0,co_co_e_max), desc='Step 1/2. Creating energies list')):
-                for j,wc_co_e in enumerate(range(0,wc_co_e_max)):
-                    energy = {
-                        0: co_co_e, # Co
-                        1: wc_co_e, # WC-Co
-                        2: 20, # WC
-                        
-                        } 
-                    
+            for i in tqdm(range(0,energy_conf.__len__()), desc='Step 1/2. Creating energies list'):
+                for j in range(0,energy_conf[0].__len__()):
+
+                    energy = energy_conf[i][j]
                     g_weighed = copy.deepcopy(g)
                     
                     for u, v in g_weighed.edges():
@@ -925,12 +850,12 @@ class Crack():
             if parallel:
                 print("Step 2/2. Calculating path's energies")
                 with WorkerPool(n_jobs=workers) as pool:
-                    results = pool.map(cls.find_shortest_energy_paths, tasks_data, progress_bar = True)
+                    results = pool.map(Crack.Energy.find_shortest_energy_paths, tasks_data, progress_bar = True)
             else:
                 for line in tqdm(tasks_data, desc="Step 2/2. Calculating path's energies"):
-                    results.append(cls.find_shortest_energy_paths(*line))
+                    results.append(Crack.Energy.find_shortest_energy_paths(*line))
             
-            energies=np.zeros((len(cart_list), co_co_e_max, wc_co_e_max)).tolist()
+            energies=np.zeros((len(cart_list), energy_conf.__len__(), energy_conf[0].__len__())).tolist()
 
             for p in range(step):
                 i,j,k=grid_dict[p]
