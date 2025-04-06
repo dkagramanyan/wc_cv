@@ -526,10 +526,6 @@ class Crack():
         # 1 - WC-Co
         # 2 - WC
         # 3 - WC-WC
-        
-        # node's contour's indices
-        cnt_index_1 = nodes_metadata['nodes_index2global_contour_index'][node1]
-        cnt_index_2 = nodes_metadata['nodes_index2global_contour_index'][node2]
 
         # node's coords on image
         start_node_x, start_node_y=nodes_metadata['nodes_index2global_nodes_coord'][node1]
