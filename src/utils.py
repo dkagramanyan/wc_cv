@@ -750,7 +750,9 @@ class Crack():
                                     y_label ='co_co_e', 
                                     x_label = 'wc_co_e', 
                                     save=False, 
-                                    fixed_paths=False):
+                                    fixed_paths=False,
+                                    fontsize_h=10,
+                                    fontsize_axes=30):
 
             fig, axes = plt.subplots(N, M, figsize=(50, 50))
 
@@ -800,19 +802,20 @@ class Crack():
                         axes[i,j].invert_yaxis()
                         for k  in range(0, len(energies[step])):
                             for p  in range(0, len(energies[step][0])):
-                                axes[i,j].text(k + 0.5, p + 0.5, '%.2f' % data[k,p],
+                                axes[i,j].text(p , k , '%.2f' % data[k,p],
                                 horizontalalignment='center',
                                 verticalalignment='center',
+                                fontsize=fontsize_h
                                 )
 
                         if fixed_paths is False:      
-                            axes[i,j].set_title(f'entry {df["entry_node"].iloc[path_index]}, exit {df["exit_node"].iloc[path_index]}', fontsize=20)
-                            axes[i,j].set_ylabel(y_label,  fontsize=20)
-                            axes[i,j].set_xlabel(x_label,  fontsize=20)
+                            axes[i,j].set_title(f'entry {df["entry_node"].iloc[path_index]}, exit {df["exit_node"].iloc[path_index]}', fontsize=fontsize_axes)
+                            axes[i,j].set_ylabel(y_label,  fontsize=fontsize_axes)
+                            axes[i,j].set_xlabel(x_label,  fontsize=fontsize_axes)
                         else:
-                            axes[i,j].set_ylabel(f'{y_label} ({ df["co_num"].iloc[path_index]})',  fontsize=20)
-                            axes[i,j].set_xlabel(f'{x_label} ({ df["wc_co_num"].iloc[path_index]})',  fontsize=20)
-                            axes[i,j].set_title(f'pix {df["path_len_pixels"].iloc[path_index]}, edg { df["path_len_edges"].iloc[path_index] }, entry {df["entry_node"].iloc[path_index]}, exit {df["exit_node"].iloc[path_index]}', fontsize=20)
+                            axes[i,j].set_ylabel(f'{y_label} ({ df["co_num"].iloc[path_index]})',  fontsize=fontsize_axes)
+                            axes[i,j].set_xlabel(f'{x_label} ({ df["wc_co_num"].iloc[path_index]})',  fontsize=fontsize_axes)
+                            axes[i,j].set_title(f'pix {df["path_len_pixels"].iloc[path_index]}, edg { df["path_len_edges"].iloc[path_index] }, entry {df["entry_node"].iloc[path_index]}, exit {df["exit_node"].iloc[path_index]}', fontsize=fontsize_axes)
             
                         step+=1
                     else:
