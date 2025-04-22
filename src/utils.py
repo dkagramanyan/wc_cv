@@ -174,7 +174,8 @@ class Crack():
         return inside
         
     @classmethod
-    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 5, labeled_cnts=False, labels=False):
+    def preprocess_graph_image(cls, image, r=2, border = 30, border_node_eps=10, tol = 5, disk = 5, labeled_cnts=False, labels=False,
+                               entry_ellps_w=1, exit_ellps_w=1):
         border_eps = border + border_node_eps
 
         # if no labeled contours
@@ -264,12 +265,12 @@ class Crack():
         # entry blue
         for key in entry_nodes:
             x,y=nodes_index2global_nodes_coord[key]
-            draw.ellipse((y - r, x - r, y + r, x + r), fill=(0,0,255), width=1)
+            draw.ellipse((y - r, x - r, y + r, x + r), fill=(0,0,255), width=entry_ellps_w)
             
         # exit red
         for key in exit_nodes:
             x,y=nodes_index2global_nodes_coord[key]
-            draw.ellipse((y - r, x - r, y + r, x + r), fill=(255,0,0), width=1)
+            draw.ellipse((y - r, x - r, y + r, x + r), fill=(255,0,0), width=exit_ellps_w)
 
         img_preprocessed_final = np.array(img_drawings)
 
