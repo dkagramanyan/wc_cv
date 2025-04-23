@@ -967,18 +967,23 @@ class Crack():
                 types = np.array(types)
                 edges_lens = np.array(edges_lens)
                 
-                wc_edges_indices = np.where(types==0)[0]
-                co_edges_indices = np.where(types==2)[0]
+                # 0 - Co
+                # 1 - WC-Co
+                # 2 - WC
+                # 3 - WC-WC
+
+                co_edges_indices = np.where(types==0)[0]
                 wc_co_edges_indices = np.where(types==1)[0]
+                wc_edges_indices = np.where(types==2)[0]
 
                 wc_pixels_lens=edges_lens[wc_edges_indices]
                 co_pixels_lens=edges_lens[co_edges_indices]
                 wc_co_pixels_lens=edges_lens[wc_co_edges_indices]
                 z = np.sum(edges_lens)
                     
-                all_wc_edges.append(len(wc_edges_indices)/len(path))
-                all_co_edges.append(len(co_edges_indices)/len(path))
-                all_wc_co_edges.append(len(wc_co_edges_indices)/len(path))
+                all_wc_edges.append(len(wc_edges_indices)/(len(path)-1))
+                all_co_edges.append(len(co_edges_indices)/(len(path)-1))
+                all_wc_co_edges.append(len(wc_co_edges_indices)/(len(path)-1))
 
                 all_wc_edges_lens.append(len(wc_pixels_lens))
                 all_co_edges_lens.append(len(co_pixels_lens))
