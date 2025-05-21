@@ -7,7 +7,6 @@
 module purge
 module load Python/Anaconda_v11.2021
 
-conda deactivate
 source activate torch
 
 BASE_DIR="/home/dgkagramanyan/wc_cv/ml/diffusion/runs"
