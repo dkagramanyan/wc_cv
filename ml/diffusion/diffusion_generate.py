@@ -70,7 +70,6 @@ def generate_images(model_path, test_dir, start_step, batch_size, epochs):
     accelerator = Accelerator(
         mixed_precision=config.mixed_precision,
         gradient_accumulation_steps=config.gradient_accumulation_steps,
-        log_with="tensorboard",
     )
     
     noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
