@@ -19,7 +19,7 @@ def make_grid(images, rows, cols):
 
 @dataclass
 class TrainingConfig:
-    image_size = 256
+    image_size = 768
     train_batch_size = 4
     eval_batch_size = 4  # how many images to sample during evaluation
     num_epochs = 100
