@@ -19,7 +19,7 @@ START=500
 BATCH=10
 EPOCHS=225
 
-srun python diffusion_generate.py \
+srun python /home/dgkagramanyan/wc_cv/ml/diffusion/diffusion_generate.py \
     --model_path "${BASE_DIR}/${MODEL_BASE}/0099.pth" \
     --test_dir "${BASE_DIR}/${OUTPUT_SUBDIR}" \
     --start_step $START \
