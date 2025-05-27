@@ -1025,7 +1025,7 @@ class SEMDataset(Dataset):
 
         def do_job(image_path):
             image = io.imread(image_path)
-            image = preprocess_image(image)
+            image = self.preprocess_image(image)
 
             splitted=image_path.split('/')
             folder_name, file_name = splitted[-2], splitted[-1]
@@ -1086,6 +1086,7 @@ class SEMDataset(Dataset):
         if len(image.shape)==3:
             image = color.rgb2gray(image)
         
+        image = util.img_as_ubyte(image) 
         image = filters.rank.median(image, morphology.disk(disk))
 
         global_thresh = filters.threshold_otsu(image)
@@ -2163,7 +2164,7 @@ class grainGenerate():
         return legend
 
     @classmethod
-    def angles_approx_save(self, images_path, save_path, types_dict, step, max_images_num_per_class=None, no_cache=False):
+    def angles_approx_save(self, images_path, save_path, types_dict, step, max_images_num_per_class=None, no_cache=False, workers = 5):
         """
         :param save_path:
         :param images: ndarray uint8 [[image1_class1,image2_class1,..],[image1_class2,image2_class2,..]..]
@@ -2178,7 +2179,7 @@ class grainGenerate():
 
         json_data = []
 
-        dataset = SEMDataset(images_path, no_cache=no_cache, max_images_num_per_class=max_images_num_per_class)
+        dataset = SEMDataset(images_path, no_cache=no_cache, max_images_num_per_class=max_images_num_per_class, workers=workers)
 
 
         for i in tqdm(range(dataset.images_paths.shape[0])):
