@@ -1019,16 +1019,27 @@ class Crack():
 
 
 class SEMDataset(Dataset):
-    def __init__(self, images_folder_path, no_cache=False, max_images_num_per_class=10, workers=None):
-        
-        self.cached_dir = 'tmp/'+ images_folder_path.split('/')[-1]
-        
+    def __init__(self, images_folder_path,cached_base_dir, no_cache=True, max_images_num_per_class=100, workers=None):
+
+        self.cached_dir = cached_base_dir + '/tmp/'+ images_folder_path.split('/')[-1]
+
+        def do_job(image_path):
+            image = io.imread(image_path)
+            image = preprocess_image(image)
+
+            splitted=image_path.split('/')
+            folder_name, file_name = splitted[-2], splitted[-1]
+            file_name = file_name.split('.')[0].split('/')[-1]
+
+            io.imsave(self.cached_dir + '/' + folder_name + '/' + file_name + '.png', image)
+
+
         if workers is None:
             workers = multiprocessing.cpu_count()-1
-        
+
         if images_folder_path[-1]=='/':
             raise ValueError('remove last "/" in path ')
-        
+
         if os.path.exists(self.cached_dir) is False or no_cache:
             
             Path(self.cached_dir).mkdir(parents=True, exist_ok=True)
@@ -1036,6 +1047,7 @@ class SEMDataset(Dataset):
             folders_paths = glob.glob(images_folder_path + '/*')
             images_paths = []
             
+            # folders creation in tmp folder
             for folder_path in folders_paths:
                 images_paths.extend(glob.glob(folder_path + '/*')[:max_images_num_per_class])
                 folder_name = folder_path.split('/')[-1]
@@ -1043,52 +1055,17 @@ class SEMDataset(Dataset):
                 new_folder_path = self.cached_dir + '/' + folder_name
                 Path(new_folder_path).mkdir(parents=True, exist_ok=True)
             
-            number_of_tasks = len(folders_paths)
-            images_paths = np.array(images_paths).reshape((number_of_tasks,-1))
 
-            tasks_to_accomplish = Queue()
-            tqdm_queue = Queue()
-            processes = []
-        
-            for i in range(number_of_tasks):
-                tasks_to_accomplish.put(images_paths[i])
-            
-            for w in range(workers):
-                p = Process(target=self.do_job, args=(tasks_to_accomplish,self.cached_dir,tqdm_queue))
-                processes.append(p)
-                p.start()
-                
-            total = images_paths.shape[0]*images_paths.shape[1]
-                
-            with tqdm(total=total) as pbar:
-                completed = 0
-                while completed < total:
-                    tqdm_queue.get()
-                    pbar.update(1)
-                    completed += 1
-
-            for p in processes:
-                p.join()
+            with WorkerPool(n_jobs=workers) as pool:
+                results = pool.map(do_job, images_paths, progress_bar = True)
             
         folders_paths = glob.glob(self.cached_dir + '/*')
-        folder_names= [folder_path.split('/')[-1] for folder_path in folders_paths] 
-            
-        self.images_paths = np.array([glob.glob(self.cached_dir + f'/{folder_name}/*')[:max_images_num_per_class] for folder_name in folder_names])
-    
-    @classmethod
-    def do_job(cls, tasks_to_accomplish, cached_dir, tqdm_queue):
-        while not tasks_to_accomplish.empty():
-            images_paths = tasks_to_accomplish.get()
-            for image_path in images_paths:
-                image = io.imread(image_path)
-                image = cls.preprocess_image(image)
+        folder_names = [folder_path.split('/')[-1] for folder_path in folders_paths] 
 
-                splitted=image_path.split('/')
-                folder_name, file_name = splitted[-2], splitted[-1]
-                file_name = file_name.split('.')[0]
+        self.images_paths = np.array([glob.glob(self.cached_dir + f'/{folder_name}/*')[:max_images_num_per_class] 
+                                for folder_name in folder_names])
 
-                io.imsave(cached_dir + '/' + folder_name + '/' + file_name + '.png', image)
-                tqdm_queue.put(1)
+
 
     def __len__(self):
         return len(self.images_paths)
@@ -1124,8 +1101,7 @@ class SEMDataset(Dataset):
         bin_grad = np.clip(bin_grad, 0, 255).astype(np.uint8)
 
         return bin_grad
-        
-
+    
 class grainPreprocess():
 
     @classmethod
@@ -1759,7 +1735,7 @@ class grainShow():
         
     
     @classmethod
-    def angles_plot_base(cls, data, save_name, step, N, M,  save=False,indices=None, font_size=20,scatter_size=20):
+    def angles_plot_base(cls, data, plot_file_name, step, N, M,  save=False,indices=None, font_size=20,scatter_size=20):
         alloys_indices=range(len(data))
 
         if indices is not None:
@@ -1792,10 +1768,10 @@ class grainShow():
         x = [0,60,120,180,240,300,360]
         plt.xticks(x, x)
 
-        plt.title(save_name)
+        plt.title(plot_file_name)
 
         if save:
-            plt.savefig(f'распределение_углов_{save_name}_шаг_{step}.png')
+            plt.savefig(f'angle_distribution_{plot_file_name}_step_{step}.png')
 
         plt.legend(legend)
         plt.show()
@@ -2235,7 +2211,7 @@ class grainGenerate():
                               # 'angles_series': all_unique_angels,
                               })
 
-        with open(f'{save_path}_step_{step}_angles.json', 'w', encoding='utf-8') as outfile:
+        with open(f'{save_path}_step_{step}_degrees.json', 'w', encoding='utf-8') as outfile:
             json.dump(json_data, outfile, cls=grainGenerate.NumpyEncoder, ensure_ascii=False)
 
     @classmethod
