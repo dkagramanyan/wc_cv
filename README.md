@@ -33,5 +33,9 @@ python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rg
 ```
 
 ```
+python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rgb --dest=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_512x512.zip --resolution=512x512
+```
+
+```
 python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rgb --dest=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_256x256.zip --resolution=256x256
 ```
