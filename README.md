@@ -12,4 +12,10 @@ Series of abstracs:
  [Documentation](https://dkagramanyan.github.io/wc_cv/)
 
 
+Torch env
+1) Python/Anaconda
+2) CUDA/12.4
+3) gnu9/9.3
 
+torch install
+linux+cuda12.6+pip3 install torch torchvision
