@@ -31,3 +31,7 @@ betas .0
 ```
 python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rgb --dest=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_768x768.zip     
 ```
+
+```
+python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rgb --dest=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_256x256.zip --resolution=256x256
+```
