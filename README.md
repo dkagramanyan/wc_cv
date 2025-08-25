@@ -16,6 +16,7 @@ Torch env
 1) Python/Anaconda
 2) CUDA/12.4
 3) gnu9/9.3
+4) python 3.13
 
 torch install
 linux+cuda12.6+pip3 install torch torchvision
