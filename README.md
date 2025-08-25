@@ -20,3 +20,10 @@ Torch env
 
 torch install
 linux+cuda12.6+pip3 install torch torchvision
+
+R3GAN
+
+2) pip install click Ninja 
+3) conda install -c conda-forge libstdcxx-ng
+
+betas .0
