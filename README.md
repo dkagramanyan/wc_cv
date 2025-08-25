@@ -43,5 +43,5 @@ python dataset_tool.py --source=./data/o_bc_left_4x_768_360_median_Ultra_Co11_rg
 training, 24gb vram
 
 ```
-python train.py --outdir=./training-runs --data=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_256x256.zip --gpus=1 --batch=16 --mirror=1 --aug=1 --preset=FFHQ-256 --tick=1 --snap=100
+python train.py --outdir=./training-runs --data=./datasets/o_bc_left_4x_768_360_median_Ultra_Co11_rgb_256x256.zip --gpus=1 --batch=16 --preset=FFHQ-256 --tick=1 --snap=100 --workers=8
 ```
