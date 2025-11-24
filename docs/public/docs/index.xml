@@ -1,0 +1,1144 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>wc_cv - Документация – Документация</title>
+    <link>http://localhost:1313/docs/</link>
+    <description>Recent content in Документация on wc_cv - Документация</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ru</language>
+    
+	  <atom:link href="http://localhost:1313/docs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Быстрый старт</title>
+      <link>http://localhost:1313/docs/usage_quickstart/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/usage_quickstart/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Ниже приведены минимальные примеры использования основных функций пакета &lt;code&gt;wc_cv&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Предобработка одного снимка&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;предобработка-одного-снимка&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d1%81%d0%bd%d0%b8%d0%bc%d0%ba%d0%b0&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;skimage&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;imread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;path/to/image.png&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;processed&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_preprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Извлечение контуров и углов&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;извлечение-контуров-и-углов&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%ba%d0%be%d0%bd%d1%82%d1%83%d1%80%d0%be%d0%b2-%d0%b8-%d1%83%d0%b3%d0%bb%d0%be%d0%b2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainMark&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;angles&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contours&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainMark&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get_angles&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;processed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Работа с датасетом (кэширование в /tmp)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;работа-с-датасетом-кэширование-в-tmp&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%b0-%d1%81-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%be%d0%bc-%d0%ba%d1%8d%d1%88%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b2-tmp&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEMDataset&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# подготовит кэш и вернёт индексы путей&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;dataset&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEMDataset&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;dataset_root&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;max_images_num_per_class&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;50&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;path&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;dataset&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;__getitem__&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Граф трещин (создание, визуализация)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;граф-трещин-создание-визуализация&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b3%d1%80%d0%b0%d1%84-%d1%82%d1%80%d0%b5%d1%89%d0%b8%d0%bd-%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainDraw&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;PIL&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Image&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;numpy&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;np&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# подготовка данных (пример)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;entry_nodes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;exit_nodes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_contours&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_marked&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nodes_meta&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;preprocess_graph_image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;processed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# граф&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;G&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;create_crack_graph&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;img_contours&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;shape&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nodes_meta&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# картинка с контурами&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;img_rgb&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainDraw&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;draw_contours&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Image&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fromarray&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;np&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;zeros_like&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;img_contours&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Подробнее см. страницы &amp;ldquo;Датасет&amp;rdquo;, &amp;ldquo;Граф трещин&amp;rdquo; и &amp;ldquo;Углы&amp;rdquo;.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Датасет: SEMDataset</title>
+      <link>http://localhost:1313/docs/usage_dataset/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/usage_dataset/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;code&gt;SEMDataset&lt;/code&gt; подготавливает кэш предобработанных изображений в &lt;code&gt;/tmp/&amp;lt;имя_датасета&amp;gt;&lt;/code&gt; и даёт удобный доступ к пути и изображению.&lt;/p&gt;
+&lt;h2&gt;Создание датасета&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;создание-датасета&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEMDataset&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# создаст кэш, распараллелит загрузку и предпросчёт&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# исключите завершающий &amp;#39;/&amp;#39; у пути&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;dataset&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SEMDataset&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;data/wc_co&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;max_images_num_per_class&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Индексация&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;индексация&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b8%d0%bd%d0%b4%d0%b5%d0%ba%d1%81%d0%b0%d1%86%d0%b8%d1%8f&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# получить изображение и путь&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;path&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;dataset&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;fm&#34;&gt;__getitem__&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;class_idx&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;idx&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Параметры&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;параметры&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;images_folder_path&lt;/code&gt;: корневая папка с подпапками-классами&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_images_num_per_class&lt;/code&gt;: лимит изображений на класс (int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;no_cache&lt;/code&gt;: если True, кэширование пропускается&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;workers&lt;/code&gt;: число процессов; по умолчанию &lt;code&gt;cpu_count()-1&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Примечание&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;примечание&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d0%b5&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Путь не должен оканчиваться на &lt;code&gt;/&lt;/code&gt;. Кэш строится однократно и переиспользуется.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Граф трещин: Crack</title>
+      <link>http://localhost:1313/docs/usage_graph/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/usage_graph/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;Пайплайн&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;пайплайн&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Предобработка входного изображения (&lt;code&gt;grainPreprocess.image_preprocess&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Crack.preprocess_graph_image&lt;/code&gt; — выделение контуров, подготовка метаданных узлов.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Crack.create_crack_graph&lt;/code&gt; — построение ориентированного графа по контурам.&lt;/li&gt;
+&lt;li&gt;(Опционально) &lt;code&gt;Energy.get_energies&lt;/code&gt; — расчёт энергий путей.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Viz.graph_plot&lt;/code&gt; — визуализация.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Минимальный пример&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;минимальный-пример&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bc%d0%b8%d0%bd%d0%b8%d0%bc%d0%b0%d0%bb%d1%8c%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Viz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;skimage&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;imread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;path/to/img.png&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;proc&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_preprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;entry_nodes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;exit_nodes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_contours&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_marked&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nodes_meta&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;preprocess_graph_image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;proc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tol&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;G&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_contours_mono&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Crack&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;create_crack_graph&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;img_contours&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;shape&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nodes_meta&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Viz&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;graph_plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;G&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;img_contours_mono&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;N&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;M&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Параметры и классы&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;параметры-и-классы&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d1%8b&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Crack.get_edge_type&lt;/code&gt; — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Crack.get_edge_type_labeled&lt;/code&gt; — определение типа на размеченных данных.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Viz.plot_optimized_energies&lt;/code&gt; — матрицы энергий по конфигурациям.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Energy.find_shortest_energy_paths&lt;/code&gt; — кратчайшие пути по весам.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Углы и их распределения</title>
+      <link>http://localhost:1313/docs/usage_angles/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/usage_angles/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;Извлечение углов&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;извлечение-углов&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainMark&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;skimage&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;imread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;path.png&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;proc&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_preprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;angles&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contours&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainMark&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;get_angles&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;proc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;border_eps&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tol&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;hello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;sa&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Hello, &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;hello&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;world&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Предобработка статистики&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;предобработка-статистики&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d0%ba%d0%b8&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainStats&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainStats&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;stats_preprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;angles&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;step&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Бимодальная аппроксимация&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;бимодальная-аппроксимация&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b1%d0%b8%d0%bc%d0%be%d0%b4%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d0%b0%d0%bf%d0%bf%d1%80%d0%be%d0%ba%d1%81%d0%b8%d0%bc%d0%b0%d1%86%d0%b8%d1%8f&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainApprox&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x_plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y_plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mus&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sigmas&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;amps&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainApprox&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bimodal_gauss_approx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Визуализация&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;визуализация&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;wc_cv&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;grainShow&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# см. также grainShow.angles_plot_base для комплексных графиков&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Введение</title>
+      <link>http://localhost:1313/docs/introduction/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/introduction/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Добыча полезных ископаемых и строительство сложных сооружений на протяжении многих столетий являются важными задачами. Их объединяет повышенное требование к применяемым инструментам, в частности сверлильным установкам. Зачастую для добычи природного газа, нефти или строительства линий метрополитена требуется сделать глубокие шахты в твердой неоднородной породе, где на бурильную головку оказывается сильное  давление и температура. Для такой работы характеристики наконечников бурильной головки должны максимально точно соответствовать требованиям окружающей среды. Например, твердосплавные напайки должны быть достаточно твердыми, чтобы эффективно разрушать породу, но и одновременно пластичными, чтобы не расколоться о случайный камень высокой прочности.&lt;/p&gt;
+&lt;p&gt;С развитием материаловедения получилось выделить группу  твердых сплавов карбида вольфрама с кобальтом (WC-Co), которые обладают высокими и гибкими прочностными характеристиками. Например, сплав будет более пластичным и меньше подтвержен выкрашиванию зерен, если добавить больше связующего вещества (кобальта). За многие годы успели достаточно подробно изучить все характеристики этого сплава, однако мы не можем утверждать, что у нее изучены все свойства.&lt;/p&gt;
+&lt;p&gt;Существует гипотеза о том, что между физическими характеристиками сплава присутствуют нелинейные зависимости. Есть множество работ по изучению сплавов WC-Co с различным процентным содержанием компонентов, однако тема поиска скрытых взаимосвязей остается нераскрытой. Цель этой работы - разработать программный комплекс для выделения на снимках микроструктур WC-Co важных признаков и поиска зависимостей между характеристиками сплава.&lt;/p&gt;
+&lt;p&gt;Самым многообещающими способами поиска зависимостей являются алгоритмы машинного обучения и компьютерного зрения. Современные модели нейронных сетей способны выявлять сложные зависимости между самыми разными видами данных. В арсенале компьютерного зрения  присутствует множество алгоритмов, которые эффективно выделяет геометрию на изображениях.&lt;/p&gt;
+&lt;p&gt;Для достижения цели необходимо исследовать и протестировать большой набор алгоритмов выделения признаков на снимках микроструктуры сплава. Затем полученные признаки нужно сопоставить характеристиками сплава, такими как: твердость, ударная вязкость, пластичность, коэффициенты ударной адиабаты и тд. Важно также провести моделирование сплава в различных CAD  системах для того, чтобы сравнить вычисленные параметры с экспериментальными.&lt;/p&gt;
+&lt;p&gt;Ожидаемый результат работы - программный комплекс для обработки SEM снимков микроструктур сплава WC-Co и анализ скрытых зависимостей между физическими характеристиками.&lt;/p&gt;
+&lt;p&gt;У данной работы есть явная практическая польза. В случае, если скрытые зависимости действительно есть, то математическая модель сплава WC-Co будет дополнена новыми данными. Как следствие - инженеры при изготовлении и применении твердосплавных напаек будут знать больше о поведении этого сплава при выпекании и работе при различных внешних условиях. Это поможет сократить издержки и повысит ресурс сверлильных установок.&lt;/p&gt;
+&lt;p&gt;Важно понимать, что ценность работы не уменьшится, если искомых скрытых зависимостей не окажется. В дальнейшем можно будет использовать разработанный программный комплекс для анализа изображений, других сплавов или других предметных областей, таких как биология и астрономия.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Установка</title>
+      <link>http://localhost:1313/docs/install/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/install/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Для работы с программным комплексом склонируйте &lt;a href=&#34;https://github.com/dkagramanyan/wc_cv&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;репозиторий&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt; и установите модули из файла requirements. Требуемая версия  Python - 3.X.&lt;/p&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/dkagramanyan/wc_cv
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; wc_cv
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pip install requirnments.txt&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Тестовые изображения находятся в хранилище s3 по адресам&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co11.jpg&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co11.jpg&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co15.jpg&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co15.jpg&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co25.jpg&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co25.jpg&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co6_2.jpg&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co6_2.jpg&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co8.jpg&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://pobedit.s3.us-east-2.amazonaws.com/default_images/Ultra_Co8.jpg&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Образцы сплава</title>
+      <link>http://localhost:1313/docs/alloy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/alloy/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Наши сплавы были получены жидкофазным спеканием примерно при 1380С (см. &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S0167577X17303361?via%3Dihub&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;статью&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;). То есть при спекании карбид вольфрама WС был твёрдым - а расплав на основе кобальта - соотвественно, жидким&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/alloy_properties.PNG&#34; alt=&#34;Характеристики исследуемых образцов сплава&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Наш сплав находится в районе &amp;ldquo;optimum&amp;rdquo; (см. &lt;a href=&#34;https://www.mdpi.com/2079-6412/8/7/247&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;статью&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Потом материал закаливается, кобальт затвердевает, и мы видим на РЭМ снимках две фазы: светдые ограненные кристаллы WС и темную кобальтовую матрицу между ними.&lt;/p&gt;
+&lt;p&gt;У нас в руках - &amp;ldquo;победиты&amp;rdquo; с самой простой для интерпретации структурой, где только две эти фазы (бывает там ещё и графит, другие карбиды и т.д.)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/temperature_diagram.jpg&#34; alt=&#34;Диаграмма состояний сплава от процента углерода&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Описание снимков</title>
+      <link>http://localhost:1313/docs/images_source/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/images_source/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Полученые шлифы проходили предварительное микроскопическое исследование с помощью оптической микроскопии до и после травления в реактиве Мураками для выявления включений свободного углерода и фазы, а также растровой электронной  микроскопии (РЭМ)  и рентгеновского микроанализа на приборе Tescan Vega TS5130 MM, оборудованном энерго- дисперсионным спектрометром LINK  производства фирмы Oxford Instruments. Размер изображения 100 на 100 мкм. Размер цифрового изображения  3072 на 1680 пикселей, каждый пиксель имеет 256 оттенков серого.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/Ultra_Co15.jpg&#34; alt=&#34;Пример SEM изображения микроструктуры сплава WC-Co&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Предобработка изображений</title>
+      <link>http://localhost:1313/docs/preprocess/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/preprocess/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Описанные инструменты разработаны для обработки SEM снимков.&lt;/p&gt;
+&lt;p&gt;Для явного выделения границ фаз WC/Co используется последовательное применение следующиих алгоритом&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;выбирается сторона снимка. По умолчанию использвуется снимок в отраженных электронах&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;изображение сглаживается медианным фильтром для подавления шумов и выравнивания цветового распределения пикселей&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;слаженное изображение бинаризуется при помощи метода Отсу&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;от бинаризованного изображения берется градиент. Он явно показывает переходы вас WC/Co&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;бинаризованное изобржение инвертируется и к нему добавляется карта градиентов, полученная в п.4&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Полная обработка изображения выглядит следующим образом:&lt;/p&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;preproc_image=1-Otsu(median_filter(image))&amp;#43;grad(Otsu(median_filter(image)))&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Значения пикселей по классам:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;0 - зерно WC&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;127 - регион Co&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;254 - граница региона Co, смежного с зернами WC. Толщина границы - 1 пиксель&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Обработка одного снимка&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;обработка-одного-снимка&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d1%81%d0%bd%d0%b8%d0%bc%d0%ba%d0%b0&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;img&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;imread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;img_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;img&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_preprocess&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;img&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Обработка всего датасета снимков&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;обработка-всего-датасета-снимков&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d0%b3%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0-%d1%81%d0%bd%d0%b8%d0%bc%d0%ba%d0%be%d0%b2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;all_images&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;grainPreprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read_preprocess_data&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;images_folder_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;images_num_per_class&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;150&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;preprocess&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;True&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;save&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;True&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Расположение снимков&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;расположение-снимков&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d1%80%d0%b0%d1%81%d0%bf%d0%be%d0%bb%d0%be%d0%b6%d0%b5%d0%bd%d0%b8%d0%b5-%d1%81%d0%bd%d0%b8%d0%bc%d0%ba%d0%be%d0%b2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Расположение исходных снимков и предобработанных снимков должно выглядеть следующим образом&lt;/p&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;project
+│
+└───images_folder
+   │
+   └───class1_images
+   │       image1
+   │       image2
+   │       ...
+   └───class2_images
+   │       image1
+   │       image2
+   │       ...
+   └───class3_images
+   │       image1
+   │       image2
+   │       ...&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Класс grainPreprocess&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;класс-grainpreprocess&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%ba%d0%bb%d0%b0%d1%81%d1%81-grainpreprocess&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;imdivide(image, h, side)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;imdivideimage-h-side&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#imdivideimage-h-side&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Разделяет входное изображение по середине и возвращает левую или правую часть&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;h&lt;/code&gt;: int scalar&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;side&lt;/code&gt;: float scalar&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (height,width/2,channels)&lt;/p&gt;
+&lt;h3&gt;combine(image, h, k=0.5)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;combineimage-h-k05&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#combineimage-h-k05&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Накладывает левую и правые части изображения. Если k=1, то на выходе будет левая часть изображения, если k=0, то будет правая часть&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;h&lt;/code&gt;: int scalar&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;k&lt;/code&gt;: float scalar&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (height,width/2,channels)&lt;/p&gt;
+&lt;h3&gt;do_otsu(image)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;do_otsuimage&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#do_otsuimage&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Бинаризация Отсу&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;img&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (height,width), Boolean&lt;/p&gt;
+&lt;h3&gt;image_preprocess(image)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;image_preprocessimage&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#image_preprocessimage&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Комбинация медианного фильтра, биноризации и градиента. У зерен значение пикселя - 0, у регионов связ. в-ва - 127,а у их границы - 254. Обраотанное изображение получается следующим образом: 1-Otsu(median_filter(image))+grad(Otsu(median_filter(image)))&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;img&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (height,width,1)&lt;/p&gt;
+&lt;h3&gt;read_preprocess_data(images_dir, max_images_num_per_class=100, preprocess=False, save=False, crop_bottom=False, h=135, resize=True, resize_shape=None, save_name=&amp;lsquo;all_images.npy&amp;rsquo;)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;read_preprocess_dataimages_dir-max_images_num_per_class100-preprocessfalse-savefalse-crop_bottomfalse-h135-resizetrue-resize_shapenone-save_nameall_imagesnpy&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#read_preprocess_dataimages_dir-max_images_num_per_class100-preprocessfalse-savefalse-crop_bottomfalse-h135-resizetrue-resize_shapenone-save_nameall_imagesnpy&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Считывание всего датасета, обработка и сохрание в .npy файл&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;images_dir&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_images_num_per_class&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;preprocess&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;crop_bottom&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;h&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resize&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resize_shape&lt;/code&gt;: tuple (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save_name&lt;/code&gt;: str&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (n_classes, n_images_per_class, width, height, channels)&lt;/p&gt;
+&lt;h3&gt;tiff2jpg(folder_path, start_name=0, stop_name=-4, new_folder_path=&amp;lsquo;resized&amp;rsquo;)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;tiff2jpgfolder_path-start_name0-stop_name-4-new_folder_pathresized&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#tiff2jpgfolder_path-start_name0-stop_name-4-new_folder_pathresized&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Переводит из tiff 2^16 в jpg 2^8 бит&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;folder_path&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;start_name&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;stop_name&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;new_folder_path&lt;/code&gt;: str&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; None&lt;/p&gt;
+&lt;h3&gt;get_example_images()&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;get_example_images&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#get_example_images&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Скачивает из контейнера s3 по 1 снимку каждого образца&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray [[img1],[img2]..]&lt;/p&gt;
+&lt;h3&gt;image_preprocess_kmeans(image, h=135, k=1, n_clusters=3, pos=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;image_preprocess_kmeansimage-h135-k1-n_clusters3-pos1&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#image_preprocess_kmeansimage-h135-k1-n_clusters3-pos1&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Выделение границ при помощи кластеризации и выравнивание шума медианным фильтром. Подходит только для смазанных фотограий, где границы у объектов достатчно широкие. Pos отвечает за выбор кластера, который будет отображен на возвращенном изображении&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: array (height,width,channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;h&lt;/code&gt;: int scalar&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;k&lt;/code&gt;: float scalar&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;n_clusters&lt;/code&gt;: int scalar&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pos&lt;/code&gt;: int scalar, cluster index&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (height,width)&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Morphology</title>
+      <link>http://localhost:1313/docs/morphology/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/morphology/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;kmeans_image(image, n_clusters)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;kmeans_imageimage-n_clusters&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#kmeans_imageimage-n_clusters&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Кластеризует при помощи kmeans и возвращает изображение с нанесенными цветами кластеров&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;n_clusters&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; (image, colors), colors - list of median colors of the clusters&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Fig</title>
+      <link>http://localhost:1313/docs/fig/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/fig/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;line(point1, point2)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;linepoint1-point2&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#linepoint1-point2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает растровые координаты прямой между двумя точками при помощи алгоритма &lt;a href=&#34;https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Брезенхема&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;point1&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point2&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (n_points,(x,y))&lt;/p&gt;
+&lt;h2&gt;rect(point1, point2)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;rectpoint1-point2&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#rectpoint1-point2&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает растровые координаты прямоугольника ширины 2r, построеного между двумя точками. Не ясно зачем умножать в размерность на 2.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;point1&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point2&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;r&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; tuple (n_points, rect_diag*2,2)&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Mark</title>
+      <link>http://localhost:1313/docs/mark/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/mark/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;Определение углов у регионов Co&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;определение-углов-у-регионов-co&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%be%d0%bf%d1%80%d0%b5%d0%b4%d0%b5%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2-%d1%83-%d1%80%d0%b5%d0%b3%d0%b8%d0%be%d0%bd%d0%be%d0%b2-co&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Для определения углов последовательно используется 3 инстурмента:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;поиск границ Кенни. Он находит на изображении все возможные границы и затем выделяет их&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;метод поиска конутров Suzuki. Он нужен для разметки (нумерования) пикселей найденных в п.1 контуров. Направление обхода контура - против часовой стрелки. Проверим направление. Точка - начало отрисовки контура&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/suzuki.jpg&#34; alt=&#34;Suzuki&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;полученные масивы пикселей контуров аппроксимируются методом Дугласа-Пекера. Он из массива точек оставляет только те точки, которые описывают характер полигона, например: точки в углах, перегибах и тд&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;В итоге для каждого контура мы имеем массив точек, которые с заданной точностью описывают периметр контура.&lt;/p&gt;
+&lt;p&gt;Для определения границы воспользуемся определителем тройкой векторов. Если определитель det меньше 0, то угол phi меньше 180 градусов, иначе больше 180.&lt;/p&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;grainMark.get_row_contours(image)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Вписывание регионов Co в эллипс&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;вписывание-регионов-co-в-эллипс&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b2%d0%bf%d0%b8%d1%81%d1%8b%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d1%80%d0%b5%d0%b3%d0%b8%d0%be%d0%bd%d0%be%d0%b2-co-%d0%b2-%d1%8d%d0%bb%d0%bb%d0%b8%d0%bf%d1%81&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Задача вписывания фигуры в эллипс называется minimal volume enclosing ellipsoid. Алгоритм решения задачи был разработан &lt;a href=&#34;https://ru.wikipedia.org/wiki/%d0%9c%d0%b5%d1%82%d0%be%d0%b4_%d1%8d%d0%bb%d0%bb%d0%b8%d0%bf%d1%81%d0%be%d0%b8%d0%b4%d0%be%d0%b2&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Л.Н.Хачуяном&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;. Мы взяли релизацию этого алгоритма из библиотеки &lt;a href=&#34;https://radio-beam.readthedocs.io/en/latest/api/radio_beam.commonbeam.getMinVolEllipse.html#radio_beam.commonbeam.getMinVolEllipse&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Radio_Beam&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;. Параметры эллипсоида подбираются так, чтобы заданные точки находились внутри фигуры, а ее геометрические характеристики были наименьшими.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/enclosed-ellipse.png&#34; alt=&#34;Enclosed Ellipse&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;h2&gt;Класс grainMark&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;класс-grainmark&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%ba%d0%bb%d0%b0%d1%81%d1%81-grainmark&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;mark_corners_and_classes(image, max_num=100000, sens=0.1, max_dist=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;mark_corners_and_classesimage-max_num100000-sens01-max_dist1&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#mark_corners_and_classesimage-max_num100000-sens01-max_dist1&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;(Deprecated)&lt;/strong&gt; Возвращает всевозможные координаты углов и исходное изображение с нанесенными классами кластеров градиента&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_num&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sens&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_dist&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; corners, classes, num&lt;/p&gt;
+&lt;h3&gt;mean_pixel(image, point1, point2, r)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;mean_pixelimage-point1-point2-r&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#mean_pixelimage-point1-point2-r&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;(Deprecated)&lt;/strong&gt; Возвращает среднее значение пикселей прямоугольника ширины 2r, построеного между двумя точками&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point1&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point2&lt;/code&gt;: tuple (int, int)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;r&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; mean, dist&lt;/p&gt;
+&lt;h3&gt;get_row_contours(image)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;get_row_contoursimage&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#get_row_contoursimage&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Возвращает кооридинаты пикселей контуров каждого региона&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height,3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; list (N_contours, (M_points,2))&lt;/p&gt;
+&lt;h3&gt;get_contours(cls, image, tol=3)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;get_contourscls-image-tol3&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#get_contourscls-image-tol3&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Уменьшение количества точек контура при помощи алгоритма Дугласа-Пекера&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height,3)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tol&lt;/code&gt;: int Maximum distance from original points of polygon to approximated polygonal chain&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; list (N_contours, (M_points,2))&lt;/p&gt;
+&lt;h3&gt;get_angles(image, thr=5)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;get_anglesimage-thr5&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#get_anglesimage-thr5&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Возвращает углы с направлением обхода контура против часовой стрелки, углы &amp;gt;180 градусов учитываются. На вход принимает только обработанное изображение&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height,1), only preprocessed image&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;thr&lt;/code&gt;: int, distance from original image edge to inner image edge (rect in rect)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; angles ndarray (n), angles coords list (n_angles, 2)&lt;/p&gt;
+&lt;h3&gt;get_mvee_params(image, tol=0.2, debug=False)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;get_mvee_paramsimage-tol02-debugfalse&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#get_mvee_paramsimage-tol02-debugfalse&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Возвращает полуоси и угол поворота фигуры minimal volume enclosing ellipsoid, которая ограничивает исходные точки контура эллипсом. Для расчетов центр координатной оси сдвигается на центроид полигона (исследуемого региона), а затем сдвигается на среднее значение координат полигона&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height,1), only preprocessed image&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tol&lt;/code&gt;: foat, koef of ellipse compactness&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray a_beams, b_beams, angles, centroids&lt;/p&gt;
+&lt;h3&gt;gskeletons_coords(image)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gskeletons_coordsimage&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gskeletons_coordsimage&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;На вход подается бинаризованное изображение создает массив индивидуальных скелетов пикселю скелета дается класс, на координатах которого он находится. Координаты класса определяются ndi.label&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height,1)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; bones&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Show</title>
+      <link>http://localhost:1313/docs/show/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/show/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;img_show(image, N=20, cmap=plt.cm.nipy_spectral)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;img_showimage-n20-cmappltcmnipy_spectral&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#img_showimage-n20-cmappltcmnipy_spectral&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Выводит изображение image&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;N&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cmap&lt;/code&gt;: plt cmap&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; None&lt;/p&gt;
+&lt;h2&gt;enclosing_ellipse_show(image, pos=0, tolerance=0.2, N=15)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;enclosing_ellipse_showimage-pos0-tolerance02-n15&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#enclosing_ellipse_showimage-pos0-tolerance02-n15&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Выводит точки многоугольника с позиции pos и описанного вокруг него эллипса&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (height,width,channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pos&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tolerance&lt;/code&gt;: foat, koef of ellipse compactness&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;N&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; None&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Draw</title>
+      <link>http://localhost:1313/docs/draw/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/draw/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;draw_corners(image, corners, color=255)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;draw_cornersimage-corners-color255&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#draw_cornersimage-corners-color255&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Наносит на изображение точки в местах, где есть углы списка corners&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;corners&lt;/code&gt;: list (n_corners,2)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;color&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (width, height, channels)&lt;/p&gt;
+&lt;h2&gt;draw_edges(image, cnts, color=(50, 50, 50))&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;draw_edgesimage-cnts-color50-50-50&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#draw_edgesimage-cnts-color50-50-50&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Рисует на изображении линии по точкам контура cnts, линии в стиле x^1-&amp;gt;x^2,x^2-&amp;gt;x^3 и тд&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height, channels)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cnts&lt;/code&gt;: ndarray (n_cnts,n,2)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;color&lt;/code&gt;: tuple (3,)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (width, height, channels)&lt;/p&gt;
+&lt;h2&gt;draw_tree(image, centres=False, leafs=False, nodes=False, bones=False)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;draw_treeimage-centresfalse-leafsfalse-nodesfalse-bonesfalse&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#draw_treeimage-centresfalse-leafsfalse-nodesfalse-bonesfalse&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;На вход подается бинаризованное изображение. Рисует на инвертированном изображении скелет: точки их центров, листьев, узлов и пикселей скелета&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;img&lt;/code&gt;: ndarray (width, height)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;centres&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;leafs&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nodes&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;bones&lt;/code&gt;: Bool&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; ndarray (width, height, channels)&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Stats</title>
+      <link>http://localhost:1313/docs/stats/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/stats/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;kernel_points(image, point, step=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;kernel_pointsimage-point-step1&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#kernel_pointsimage-point-step1&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает координаты пикселей квадратной матрицы шириной 2*step, центр которой это point&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;image&lt;/code&gt;: ndarray (width, height)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;point&lt;/code&gt;: tuple (2,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;step&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; tuple (n_points,2)&lt;/p&gt;
+&lt;h2&gt;stats_preprocess(array, step)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;stats_preprocessarray-step&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#stats_preprocessarray-step&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Приведение углов к кратости, например 0,step,2*step и тд&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;array&lt;/code&gt;: list, ndarray (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;step&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; array_copy, array_copy_set, dens_curve&lt;/p&gt;
+&lt;h2&gt;gaussian(x, mu, sigma, amp=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussianx-mu-sigma-amp1&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussianx-mu-sigma-amp1&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Наносит на изображение точки в местах, где есть углы списка corners&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; list (n,)&lt;/p&gt;
+&lt;h2&gt;gaussian_bimodal(x, mu1, mu2, sigma1, sigma2, amp1=1, amp2=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussian_bimodalx-mu1-mu2-sigma1-sigma2-amp11-amp21&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussian_bimodalx-mu1-mu2-sigma1-sigma2-amp11-amp21&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает бимодальную нормальную фунцию по заданным параметрам&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp2&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; list (n,)&lt;/p&gt;
+&lt;h2&gt;gaussian_termodal(x, mu1, mu2, mu3, sigma1, sigma2, sigma3, amp1=1, amp2=1, amp3=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussian_termodalx-mu1-mu2-mu3-sigma1-sigma2-sigma3-amp11-amp21-amp31&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussian_termodalx-mu1-mu2-mu3-sigma1-sigma2-sigma3-amp11-amp21-amp31&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает термодальную нормальную фунцию по заданным параметрам&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu3&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma3&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp3&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; list (n,)&lt;/p&gt;
+&lt;h2&gt;ellipse(a, b, angle, xc=0, yc=0, num=50)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;ellipsea-b-angle-xc0-yc0-num50&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#ellipsea-b-angle-xc0-yc0-num50&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Возвращает координаты эллипса, построенного по заданным параметрам. По умолчанию центр (0,0). Угол в радианах, уменьшение угла обозначает поворот эллипса по часовой стрелке&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;a&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;b&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;angle&lt;/code&gt;: float, rad&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xc&lt;/code&gt;: float, center coord x&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yc&lt;/code&gt;: float, center coord y&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;num&lt;/code&gt;: int, number of ellipse points&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; tuple (num, 2)&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Approximation</title>
+      <link>http://localhost:1313/docs/approx/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/approx/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;gaussian_fit(x, y, mu=1, sigma=1, amp=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussian_fitx-y-mu1-sigma1-amp1&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussian_fitx-y-mu1-sigma1-amp1&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Аппроксимация заданных точек нормальной функцией&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; mus, sigmas, amps&lt;/p&gt;
+&lt;h2&gt;gaussian_fit_bimodal(x, y, mu1=100, mu2=240, sigma1=30, sigma2=30, amp1=1, amp2=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussian_fit_bimodalx-y-mu1100-mu2240-sigma130-sigma230-amp11-amp21&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussian_fit_bimodalx-y-mu1100-mu2240-sigma130-sigma230-amp11-amp21&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Аппроксимация заданных точек бимодальной нормальной функцией&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp2&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; mus, sigmas, amps&lt;/p&gt;
+&lt;h2&gt;gaussian_fit_termodal(x, y, mu1=10, mu2=100, mu3=240, sigma1=10, sigma2=30, sigma3=30, amp1=1, amp2=1, amp3=1)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;gaussian_fit_termodalx-y-mu110-mu2100-mu3240-sigma110-sigma230-sigma330-amp11-amp21-amp31&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#gaussian_fit_termodalx-y-mu110-mu2100-mu3240-sigma110-sigma230-sigma330-amp11-amp21-amp31&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Аппроксимация заданных точек термодальной нормальной функцией&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mu3&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigma3&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp1&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp2&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amp3&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; mus, sigmas, amps&lt;/p&gt;
+&lt;h2&gt;lin_regr_approx(x, y)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;lin_regr_approxx-y&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#lin_regr_approxx-y&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Аппроксимация распределения линейной функцией и создание графика по параметрам распределения&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; (x_pred, y_pred), k, b, angle, score&lt;/p&gt;
+&lt;h2&gt;bimodal_gauss_approx(x, y)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;bimodal_gauss_approxx-y&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#bimodal_gauss_approxx-y&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Аппроксимация распределения бимодальным гауссом&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y&lt;/code&gt;: list (n,)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; (x_gauss, y_gauss), mus, sigmas, amps&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Generate</title>
+      <link>http://localhost:1313/docs/generate/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/generate/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;angles_legend(images_amount, name, itype, step, mus, sigmas, amps, norm)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;angles_legendimages_amount-name-itype-step-mus-sigmas-amps-norm&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#angles_legendimages_amount-name-itype-step-mus-sigmas-amps-norm&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Cоздание легенды распределения углов&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;images_amount&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;name&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;itype&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;step&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mus&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sigmas&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;amps&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;norm&lt;/code&gt;: int&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; str&lt;/p&gt;
+&lt;h2&gt;angles_approx_save(folder, images, names, types, step, save=True)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;angles_approx_savefolder-images-names-types-step-savetrue&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#angles_approx_savefolder-images-names-types-step-savetrue&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Вычисление и сохранение распределения углов для всех фотографий одного образца&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;folder&lt;/code&gt;: str path to dir&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;images&lt;/code&gt;: ndarray uint8 [[image1_class1,image2_class1,..],[image1_class2,image2_class2,..]..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;names&lt;/code&gt;: list str [class_name1,class_name2,..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;types&lt;/code&gt;: list str [class_type1,class_type2,..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;step&lt;/code&gt;: scalar int [0,N]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save&lt;/code&gt;: bool&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;beams_legend(name, itype, norm, k, angle, b, score, dist_step, dist_mean)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;beams_legendname-itype-norm-k-angle-b-score-dist_step-dist_mean&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#beams_legendname-itype-norm-k-angle-b-score-dist_step-dist_mean&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Создание легенды для распределения длин полуосей&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;name&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;itype&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;norm&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;k&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;angle&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;b&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;score&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dist_step&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dist_mean&lt;/code&gt;: float&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; str&lt;/p&gt;
+&lt;h2&gt;diametr_approx_save(folder, images, names, types, step, pixel, start=2, end=-3, save=True, debug=False)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;diametr_approx_savefolder-images-names-types-step-pixel-start2-end-3-savetrue-debugfalse&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#diametr_approx_savefolder-images-names-types-step-pixel-start2-end-3-savetrue-debugfalse&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Вычисление и сохранение распределения длин а- и б- полуосей и угла поворота эллипса для разных образцов&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;folder&lt;/code&gt;: str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;images&lt;/code&gt;: ndarray uint8 [[image1_class1,image2_class1,..],[image1_class2,image2_class2,..]..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;names&lt;/code&gt;: list str [class_name1,class_name2,..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;types&lt;/code&gt;: list str [class_type1,class_type2,..]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;step&lt;/code&gt;: scalar int [0,N]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pixel&lt;/code&gt;: float&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;start&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;end&lt;/code&gt;: int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save&lt;/code&gt;: bool&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;debug&lt;/code&gt;: bool&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Возвращает:&lt;/strong&gt; None&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Logs</title>
+      <link>http://localhost:1313/docs/logs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/logs/</guid>
+      <description>
+        
+        
+        &lt;h2&gt;printProgressBar(iteration, total, prefix=&amp;rsquo;&amp;rsquo;, suffix=&amp;rsquo;&amp;rsquo;, decimals=1, length=100, fill=&amp;rsquo;█&amp;rsquo;, printEnd=&amp;quot;\r&amp;quot;, eta=None)&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;printprogressbariteration-total-prefix-suffix-decimals1-length100-fill-printendr-etanone&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#printprogressbariteration-total-prefix-suffix-decimals1-length100-fill-printendr-etanone&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Вызывает цикл для вывода прогресс бара&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Параметры:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;current iteration&lt;/code&gt;: Int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;total iterations&lt;/code&gt;: Int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;prefix string&lt;/code&gt;: Str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;suffix string&lt;/code&gt;: Str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;positive number of decimals in percent complete&lt;/code&gt;: Int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;character length of bar&lt;/code&gt;: Int&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;bar fill character&lt;/code&gt;: Str&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;end character (e.g. &amp;quot;\r&amp;quot;, &amp;quot;\r\n&amp;quot;)&lt;/code&gt;: Str&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Blender</title>
+      <link>http://localhost:1313/docs/blender/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/blender/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Для генерации снимков на Windows необходимо установить Blender и загрузить файл GrainGenerator_pobedit.blend. В разделе Scripting в строке 92 указать путь к папке, в которой необходимо сохранить снимки (всё, что до &amp;ldquo;&amp;lsquo;blender&amp;rsquo;+&amp;rdquo; и так далее), в том же формате и запустить скрипт. Будут созданы три образца, и с каждого будут сделаны три снимка и сохранены по указанному пути.&lt;/p&gt;
+&lt;p&gt;Если не сработает, нужно открыть терминал Blender (в левом верхнем углу Window-Toggle System Console), там будут указаны ошибки&lt;/p&gt;
+&lt;p&gt;Для запуска в Linux предположительно нужно использовать команду:&lt;/p&gt;
+&lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
+
+&lt;div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;blender yourblendfilenameorpath --python drawcar.py&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&#34;hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0&#34;&gt;
+  &lt;button
+    class=&#34;hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50&#34;
+    title=&#34;Copy code&#34;
+  &gt;
+    &lt;div class=&#34;hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+&lt;div class=&#34;hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4&#34;&gt;&lt;/div&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;При запуске на Харизме вставить части кода, помеченные &amp;ldquo;для генерации на харизме&amp;rdquo;, и удалить строки, помеченные &amp;ldquo;для генерации локально&amp;rdquo;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Машинное обучение</title>
+      <link>http://localhost:1313/docs/nn/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/nn/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Для использования снимков нужно создать модель автоэнкодер, которая из снимков будет вытягивать вектор признаков. Затем этот вектор вместе с вычисленными характеристиками будет отправлться на вход другой нейронной сети, которая будет искать зависимости между входными значениями и физическими характеристиками сплавов&lt;/p&gt;
+&lt;h2&gt;Архитектура:&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;архитектура&#34;&gt;&lt;/span&gt;
+    &lt;a href=&#34;#%d0%b0%d1%80%d1%85%d0%b8%d1%82%d0%b5%d0%ba%d1%82%d1%83%d1%80%d0%b0&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://pobedit.s3.us-east-2.amazonaws.com/docs_images/pipeline.jpg&#34; alt=&#34;Pipeline&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/u2net_2021-11-19.h5&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Веса AE (tf)&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/vqvae_002_train_0.00976_test_0.00967_1024.pt&#34;target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Веса VQ-VAE-2 (pt)&lt;svg class=&#34;hx:inline hx:rtl:rotate-270 hx:align-baseline&#34; height=&#34;1em&#34; fill=&#34;none&#34; stroke=&#34;currentColor&#34; stroke-width=&#34;2&#34; viewBox=&#34;0 0 24 24&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34;&gt;
+ &lt;path d=&#34;m9.1716 7.7574h7.0711m0 0v7.0711m0-7.0711-8.4853 8.4853&#34; stroke-linecap=&#34;round&#34; stroke-linejoin=&#34;round&#34;/&gt;
+&lt;/svg&gt;&lt;/a&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>API Reference</title>
+      <link>http://localhost:1313/docs/api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/docs/api/</guid>
+      <description>
+        
+        
+        &lt;p&gt;API Reference для модуля &lt;code&gt;wc_cv&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Для подробной информации о функциях и классах см. соответствующие разделы документации.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,139 @@
+baseURL: 'http://localhost:1313/'
+languageCode: 'ru'
+title: 'wc_cv - Документация'
+
+# Markup configuration
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+    extensions:
+      passthrough:
+        delimiters:
+          block: [['\[', '\]'], ["$$", "$$"]]
+          inline: [['\(', '\)']]
+        enable: true
+  highlight:
+    noClasses: false
+
+# Parameters
+params:
+  # Theme
+  theme:
+    default: system
+    displayToggle: true
+  
+  # Navbar
+  navbar:
+    displayTitle: true
+    displayLogo: false
+  
+  # Search
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+  
+  # External links
+  externalLinkDecoration: true
+  
+  # Edit URL (optional)
+  editURL:
+    enable: false
+
+# Menu configuration
+menu:
+  main:
+    - name: Документация
+      pageRef: /docs
+      weight: 1
+    - name: Поиск
+      weight: 2
+      params:
+        type: search
+  sidebar:
+    - name: Быстрый старт
+      pageRef: /docs/usage_quickstart
+      weight: 1
+    - name: Датасет
+      pageRef: /docs/usage_dataset
+      weight: 2
+    - name: Граф трещин
+      pageRef: /docs/usage_graph
+      weight: 3
+    - name: Углы
+      pageRef: /docs/usage_angles
+      weight: 4
+    - name: Введение
+      pageRef: /docs/introduction
+      weight: 5
+    - name: Установка
+      pageRef: /docs/install
+      weight: 6
+    - name: Образцы сплава
+      pageRef: /docs/alloy
+      weight: 7
+    - name: Описание снимков
+      pageRef: /docs/images_source
+      weight: 8
+    - name: Предобработка
+      pageRef: /docs/preprocess
+      weight: 9
+    - name: Morphology
+      pageRef: /docs/morphology
+      weight: 10
+    - name: Fig
+      pageRef: /docs/fig
+      weight: 11
+    - name: Mark
+      pageRef: /docs/mark
+      weight: 12
+    - name: Show
+      pageRef: /docs/show
+      weight: 13
+    - name: Draw
+      pageRef: /docs/draw
+      weight: 14
+    - name: Stats
+      pageRef: /docs/stats
+      weight: 15
+    - name: Approximation
+      pageRef: /docs/approx
+      weight: 16
+    - name: Generate
+      pageRef: /docs/generate
+      weight: 17
+    - name: Logs
+      pageRef: /docs/logs
+      weight: 18
+    - name: Blender
+      pageRef: /docs/blender
+      weight: 19
+    - name: Машинное обучение
+      pageRef: /docs/nn
+      weight: 20
+    - name: API Reference
+      pageRef: /docs/api
+      weight: 21
+
+# Module configuration for Hextra theme
+module:
+  imports:
+    - path: github.com/imfing/hextra
+  mounts:
+    - source: content
+      target: content
+    - source: static
+      target: static
+    - source: layouts
+      target: layouts
+    - source: data
+      target: data
+    - source: assets
+      target: assets
+    - source: i18n
+      target: i18n
+    - source: archetypes
+      target: archetypes
+
