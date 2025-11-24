@@ -1,6 +1,6 @@
 baseURL: 'http://localhost:1313/'
 languageCode: 'ru'
-title: 'wc_cv - Документация'
+title: 'Combra - Документация'
 
 # Markup configuration
 markup:
