@@ -10,6 +10,8 @@ Series of abstracs:
 3) [Generation of Artificial Images of Cross Sections of WC/Co Composite Alloys Using Diffusion Networks (2025)](https://doi.org/10.1134/S1995080225605569) 
 
 
+Combra [docs](https://dkagramanyan.github.io/wc_cv/)
+
 Installation
 ------------
 
