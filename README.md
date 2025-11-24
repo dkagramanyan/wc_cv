@@ -71,6 +71,7 @@ hugo mod tidy
 
 ```bash
 hugo server
+hugo server --ignoreCache
 ```
 
 ## Шаг 6: Откройте браузер

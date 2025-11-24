@@ -3,12 +3,37 @@ title: "Установка"
 weight: 6
 ---
 
-Для работы с программным комплексом склонируйте [репозиторий](https://github.com/dkagramanyan/wc_cv) и установите модули из файла requirements. Требуемая версия  Python - 3.X. 
+## Установка из исходников
+
+Для работы с библиотекой `combra` склонируйте репозиторий и установите пакет в режиме разработки:
 
 ```bash
 git clone https://github.com/dkagramanyan/wc_cv
-cd wc_cv
-pip install requirnments.txt
+cd wc_cv/combra
+pip install -e .
+```
+
+Требуемая версия Python - 3.8 или выше.
+
+## Зависимости
+
+Основные зависимости устанавливаются автоматически при установке пакета. Основные библиотеки:
+- `numpy` - работа с массивами
+- `scikit-image` - обработка изображений
+- `networkx` - работа с графами
+- `lmfit` - аппроксимация функций
+- `opencv-python` - компьютерное зрение
+- `mpire` - параллельная обработка
+
+## Проверка установки
+
+```python
+import combra
+print(f"combra version: {combra.__version__}")
+
+# Проверка основных модулей
+from combra import data, image, angles, graph
+print("Все модули успешно импортированы!")
 ```
 
 Тестовые изображения находятся в хранилище s3 по адресам

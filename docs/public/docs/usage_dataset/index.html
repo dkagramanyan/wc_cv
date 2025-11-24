@@ -1,57 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr"><head>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="index, follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="noindex, nofollow" />
   <link rel="icon shortcut" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" id="favicon-svg" />
 <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
 <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 <link fetchpriority="low" href="/site.webmanifest" rel="manifest" />
-<title>Датасет: SEMDataset – wc_cv - Документация</title>
-  <meta name="description" content="SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и даёт удобный доступ к пути и изображению.
-Создание датасета from wc_cv import SEMDataset # создаст кэш, распараллелит загрузку и предпросчёт # исключите завершающий &#39;/&#39; у пути dataset = SEMDataset(&#39;data/wc_co&#39;, max_images_num_per_class=100) Индексация # получить изображение и путь image, path = dataset.__getitem__(class_idx=0, idx=0) Параметры images_folder_path: корневая папка с подпапками-классами max_images_num_per_class: лимит изображений на класс (int) no_cache: если True, кэширование пропускается workers: число процессов; по умолчанию cpu_count()-1 Примечание Путь не должен оканчиваться на /. Кэш строится однократно и переиспользуется." /><link rel="canonical" href="http://localhost:1313/docs/usage_dataset/" itemprop="url" />
+<title>Датасет: SEMDataset – Combra - Документация</title>
+  <meta name="description" content="Датасет: SEMDatasetКласс SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и предоставляет удобный доступ к изображениям и их путям.
+Основные возможности Автоматическое кэширование предобработанных изображений Параллельная обработка с использованием всех доступных CPU ядер Проверка целостности кэша и автоматическое обновление при необходимости Поддержка структуры папок с классами изображений Создание датасета from combra.data.dataset import SEMDataset # Создание датасета # Путь не должен оканчиваться на &#39;/&#39; dataset = SEMDataset( images_folder_path=&#39;data/wc_co&#39;, max_images_num_per_class=100, workers=None # По умолчанию: cpu_count()-1 ) Параметры:" /><link rel="canonical" href="http://localhost:1313/docs/usage_dataset/" itemprop="url" />
 
 <meta property="og:title" content="Датасет: SEMDataset">
 <meta
   property="og:description"
   content="
     
-      SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и даёт удобный доступ к пути и изображению.
+      Датасет: SEMDatasetКласс SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и предоставляет удобный доступ к изображениям и их путям.
+Основные возможности
+    
+Автоматическое кэширование предобработанных изображений
+Параллельная обработка с использованием всех доступных CPU ядер
+Проверка целостности кэша и автоматическое обновление при необходимости
+Поддержка структуры папок с классами изображений
+
 Создание датасета
     
 
-from wc_cv import SEMDataset
+from combra.data.dataset import SEMDataset
 
-# создаст кэш, распараллелит загрузку и предпросчёт
-# исключите завершающий &#39;/&#39; у пути
-dataset = SEMDataset(&#39;data/wc_co&#39;, max_images_num_per_class=100)
+# Создание датасета
+# Путь не должен оканчиваться на &#39;/&#39;
+dataset = SEMDataset(
+    images_folder_path=&#39;data/wc_co&#39;,
+    max_images_num_per_class=100,
+    workers=None  # По умолчанию: cpu_count()-1
+)
   
     
 
   
 
 
-Индексация
-    
-
-# получить изображение и путь
-image, path = dataset.__getitem__(class_idx=0, idx=0)
-  
-    
-
-  
-
-
-Параметры
-    
-images_folder_path: корневая папка с подпапками-классами
-max_images_num_per_class: лимит изображений на класс (int)
-no_cache: если True, кэширование пропускается
-workers: число процессов; по умолчанию cpu_count()-1
-
-Примечание
-    Путь не должен оканчиваться на /. Кэш строится однократно и переиспользуется.
+Параметры:
     
   ">
 <meta
@@ -65,22 +57,18 @@ workers: число процессов; по умолчанию cpu_count()-1
 
 
   <meta itemprop="name" content="Датасет: SEMDataset">
-  <meta itemprop="description" content="SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и даёт удобный доступ к пути и изображению.
-Создание датасета from wc_cv import SEMDataset # создаст кэш, распараллелит загрузку и предпросчёт # исключите завершающий &#39;/&#39; у пути dataset = SEMDataset(&#39;data/wc_co&#39;, max_images_num_per_class=100) Индексация # получить изображение и путь image, path = dataset.__getitem__(class_idx=0, idx=0) Параметры images_folder_path: корневая папка с подпапками-классами max_images_num_per_class: лимит изображений на класс (int) no_cache: если True, кэширование пропускается workers: число процессов; по умолчанию cpu_count()-1 Примечание Путь не должен оканчиваться на /. Кэш строится однократно и переиспользуется.">
-  <meta itemprop="wordCount" content="84">
+  <meta itemprop="description" content="Датасет: SEMDatasetКласс SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и предоставляет удобный доступ к изображениям и их путям.
+Основные возможности Автоматическое кэширование предобработанных изображений Параллельная обработка с использованием всех доступных CPU ядер Проверка целостности кэша и автоматическое обновление при необходимости Поддержка структуры папок с классами изображений Создание датасета from combra.data.dataset import SEMDataset # Создание датасета # Путь не должен оканчиваться на &#39;/&#39; dataset = SEMDataset( images_folder_path=&#39;data/wc_co&#39;, max_images_num_per_class=100, workers=None # По умолчанию: cpu_count()-1 ) Параметры:">
+  <meta itemprop="wordCount" content="598">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Датасет: SEMDataset">
-  <meta name="twitter:description" content="SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и даёт удобный доступ к пути и изображению.
-Создание датасета from wc_cv import SEMDataset # создаст кэш, распараллелит загрузку и предпросчёт # исключите завершающий &#39;/&#39; у пути dataset = SEMDataset(&#39;data/wc_co&#39;, max_images_num_per_class=100) Индексация # получить изображение и путь image, path = dataset.__getitem__(class_idx=0, idx=0) Параметры images_folder_path: корневая папка с подпапками-классами max_images_num_per_class: лимит изображений на класс (int) no_cache: если True, кэширование пропускается workers: число процессов; по умолчанию cpu_count()-1 Примечание Путь не должен оканчиваться на /. Кэш строится однократно и переиспользуется.">
-
-    <link rel="preload" href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" as="style" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
-    <link href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" rel="stylesheet" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
+  <meta name="twitter:description" content="Датасет: SEMDatasetКласс SEMDataset подготавливает кэш предобработанных изображений в /tmp/&lt;имя_датасета&gt; и предоставляет удобный доступ к изображениям и их путям.
+Основные возможности Автоматическое кэширование предобработанных изображений Параллельная обработка с использованием всех доступных CPU ядер Проверка целостности кэша и автоматическое обновление при необходимости Поддержка структуры папок с классами изображений Создание датасета from combra.data.dataset import SEMDataset # Создание датасета # Путь не должен оканчиваться на &#39;/&#39; dataset = SEMDataset( images_folder_path=&#39;data/wc_co&#39;, max_images_num_per_class=100, workers=None # По умолчанию: cpu_count()-1 ) Параметры:">
+<link href="/css/compiled/main.css" rel="stylesheet" />
+    <link href="/css/variables.css" rel="stylesheet" />
+    <link href="/css/custom.css" rel="stylesheet" />
 
   
-
-
-
-
 
 
   <script>
@@ -120,7 +108,7 @@ workers: число процессов; по умолчанию cpu_count()-1
 
   <nav class="hextra-max-navbar-width hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-16 hx:px-6">
     <a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="/">
-    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="wc_cv - Документация">wc_cv - Документация</span>
+    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="Combra - Документация">Combra - Документация</span>
 </a>
 <a
   title=""
@@ -214,27 +202,57 @@ workers: число процессов; по умолчанию cpu_count()-1
   
     <ul class='hx:flex hx:flex-col hx:gap-1 hx:relative hx:before:absolute hx:before:inset-y-1 hx:before:w-px hx:before:bg-gray-200 hx:before:content-[""] hx:dark:before:bg-neutral-800 hx:ltr:pl-3 hx:ltr:before:left-0 hx:rtl:pr-3 hx:rtl:before:right-0 hx:ltr:ml-3 hx:rtl:mr-3'><li>
               <a
+                href="#%d0%be%d1%81%d0%bd%d0%be%d0%b2%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Основные возможности</a>
+            </li>
+          <li>
+              <a
                 href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
               >Создание датасета</a>
             </li>
           <li>
               <a
-                href="#%d0%b8%d0%bd%d0%b4%d0%b5%d0%ba%d1%81%d0%b0%d1%86%d0%b8%d1%8f"
+                href="#%d1%81%d1%82%d1%80%d1%83%d0%ba%d1%82%d1%83%d1%80%d0%b0-%d0%bf%d0%b0%d0%bf%d0%be%d0%ba"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Индексация</a>
+              >Структура папок</a>
             </li>
           <li>
               <a
-                href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b"
+                href="#%d0%b4%d0%be%d1%81%d1%82%d1%83%d0%bf-%d0%ba-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d0%bc"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Параметры</a>
+              >Доступ к данным</a>
             </li>
           <li>
               <a
-                href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d0%b5"
+                href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Примечание</a>
+              >Предобработка изображений</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%ba%d1%8d%d1%88%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Кэширование</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80%d1%8b-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d1%8f"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Примеры использования</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Примечания</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bc%d0%b5%d1%82%d0%be%d0%b4%d1%8b-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d0%b0"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Методы класса</a>
             </li>
           </ul>
   
@@ -244,7 +262,7 @@ workers: число процессов; по умолчанию cpu_count()-1
       hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:contrast-more:border hx:contrast-more:border-transparent hx:contrast-more:text-gray-900 hx:contrast-more:hover:border-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:dark:text-gray-50 hx:contrast-more:dark:hover:border-gray-50"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a>
               
             </li><li class="hx:flex hx:flex-col "><a
@@ -542,7 +560,7 @@ workers: число процессов; по умолчанию cpu_count()-1
       hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:contrast-more:border hx:contrast-more:border-transparent hx:contrast-more:text-gray-900 hx:contrast-more:hover:border-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:dark:text-gray-50 hx:contrast-more:dark:hover:border-gray-50"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a></li>
           <li class=""><a
     class="hx:flex hx:items-center hx:justify-between hx:gap-2 hx:cursor-pointer hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
@@ -853,19 +871,91 @@ workers: число процессов; по умолчанию cpu_count()-1
 <nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:block hx:print:hidden hx:px-4" aria-label="table of contents">
     <div class="hextra-scrollbar hx:sticky hx:top-16 hx:overflow-y-auto hx:pr-4 hx:pt-6 hx:text-sm [hyphens:auto] hx:max-h-[calc(100vh-var(--navbar-height)-env(safe-area-inset-bottom))] hx:ltr:-mr-4 hx:rtl:-ml-4"><p class="hx:mb-4 hx:font-semibold hx:tracking-tight">On this page</p><ul>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d1%81%d0%bd%d0%be%d0%b2%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8">Основные возможности
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
         <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0">Создание датасета
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d0%bd%d0%b4%d0%b5%d0%ba%d1%81%d0%b0%d1%86%d0%b8%d1%8f">Индексация
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%81%d1%82%d1%80%d1%83%d0%ba%d1%82%d1%83%d1%80%d0%b0-%d0%bf%d0%b0%d0%bf%d0%be%d0%ba">Структура папок
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b">Параметры
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b4%d0%be%d1%81%d1%82%d1%83%d0%bf-%d0%ba-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d0%bc">Доступ к данным
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d0%b5">Примечание
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%be%d0%bb%d1%83%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f">Получение изображения
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%ba%d0%be%d0%bb%d0%b8%d1%87%d0%b5%d1%81%d1%82%d0%b2%d0%be-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d0%be%d0%b2">Количество классов
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d1%82%d0%b5%d1%80%d0%b0%d1%86%d0%b8%d1%8f-%d0%bf%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d1%83">Итерация по датасету
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9">Предобработка изображений
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%bc%d0%b5%d1%82%d0%be%d0%b4%d0%b0-%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b8-%d0%be%d1%82%d0%b4%d0%b5%d0%bb%d1%8c%d0%bd%d0%be">Использование метода предобработки отдельно
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%ba%d1%8d%d1%88%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5">Кэширование
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%be%d0%b2%d0%b5%d1%80%d0%ba%d0%b0-%d0%ba%d1%8d%d1%88%d0%b0">Проверка кэша
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d1%87%d0%b8%d1%81%d1%82%d0%ba%d0%b0-%d0%ba%d1%8d%d1%88%d0%b0">Очистка кэша
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80%d1%8b-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d1%8f">Примеры использования
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b1%d0%b0%d0%b7%d0%be%d0%b2%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80">Базовый пример
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d1%85-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9">Обработка всех изображений
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d1%81-%d0%b4%d1%80%d1%83%d0%b3%d0%b8%d0%bc%d0%b8-%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d1%8f%d0%bc%d0%b8">Использование с другими модулями
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f">Примечания
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bc%d0%b5%d1%82%d0%be%d0%b4%d1%8b-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d0%b0">Методы класса
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#__init__images_folder_path-max_images_num_per_class100-workersnone">__init__(images_folder_path, max_images_num_per_class=100, workers=None)
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#__getitem__class_idx-idx">__getitem__(class_idx, idx)
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#__len__">__len__()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#preprocess_imageimage-padfalse-border30-disk3-classmethod">preprocess_image(image, pad=False, border=30, disk=3) (classmethod)
         </a>
       </li></ul>
       <div class="hx:mt-8 hx:border-t hx:bg-white hx:pt-8 hx:shadow-[0_-12px_16px_white] hx:dark:bg-dark hx:dark:shadow-[0_-12px_16px_#111] hx:sticky hx:bottom-0 hx:flex hx:flex-col hx:items-start hx:gap-2 hx:pb-8 hx:border-gray-200 hx:dark:border-neutral-800 hx:contrast-more:border-t hx:contrast-more:border-neutral-400 hx:contrast-more:shadow-none hx:contrast-more:dark:border-neutral-400">
@@ -890,15 +980,26 @@ workers: число процессов; по умолчанию cpu_count()-1
 
         <div class="content">
           <h1>Датасет: SEMDataset</h1>
-          <p><code>SEMDataset</code> подготавливает кэш предобработанных изображений в <code>/tmp/&lt;имя_датасета&gt;</code> и даёт удобный доступ к пути и изображению.</p>
+          <h1>Датасет: SEMDataset</h1><p>Класс <code>SEMDataset</code> подготавливает кэш предобработанных изображений в <code>/tmp/&lt;имя_датасета&gt;</code> и предоставляет удобный доступ к изображениям и их путям.</p>
+<h2>Основные возможности<span class="hx:absolute hx:-mt-20" id="основные-возможности"></span>
+    <a href="#%d0%be%d1%81%d0%bd%d0%be%d0%b2%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
+<li>Автоматическое кэширование предобработанных изображений</li>
+<li>Параллельная обработка с использованием всех доступных CPU ядер</li>
+<li>Проверка целостности кэша и автоматическое обновление при необходимости</li>
+<li>Поддержка структуры папок с классами изображений</li>
+</ul>
 <h2>Создание датасета<span class="hx:absolute hx:-mt-20" id="создание-датасета"></span>
     <a href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra.data.dataset</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># создаст кэш, распараллелит загрузку и предпросчёт</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># исключите завершающий &#39;/&#39; у пути</span>
-</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="p">(</span><span class="s1">&#39;data/wc_co&#39;</span><span class="p">,</span> <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+</span></span><span class="line"><span class="cl"><span class="c1"># Создание датасета</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Путь не должен оканчиваться на &#39;/&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">images_folder_path</span><span class="o">=</span><span class="s1">&#39;data/wc_co&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">workers</span><span class="o">=</span><span class="kc">None</span>  <span class="c1"># По умолчанию: cpu_count()-1</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -908,29 +1009,275 @@ workers: число процессов; по умолчанию cpu_count()-1
   </button>
 </div>
 </div>
-<h2>Индексация<span class="hx:absolute hx:-mt-20" id="индексация"></span>
-    <a href="#%d0%b8%d0%bd%d0%b4%d0%b5%d0%ba%d1%81%d0%b0%d1%86%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
-
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># получить изображение и путь</span>
-</span></span><span class="line"><span class="cl"><span class="n">image</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">class_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
-  <button
-    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
-    title="Copy code"
-  >
-    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
-<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
-  </button>
-</div>
-</div>
-<h2>Параметры<span class="hx:absolute hx:-mt-20" id="параметры"></span>
-    <a href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
-<li><code>images_folder_path</code>: корневая папка с подпапками-классами</li>
-<li><code>max_images_num_per_class</code>: лимит изображений на класс (int)</li>
-<li><code>no_cache</code>: если True, кэширование пропускается</li>
-<li><code>workers</code>: число процессов; по умолчанию <code>cpu_count()-1</code></li>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>images_folder_path</code> (str): Корневая папка с подпапками-классами. <strong>Важно:</strong> путь не должен оканчиваться на <code>/</code></li>
+<li><code>max_images_num_per_class</code> (int): Лимит изображений на класс. Если <code>None</code>, используются все доступные изображения</li>
+<li><code>workers</code> (int, optional): Количество процессов для параллельной обработки. По умолчанию <code>cpu_count()-1</code></li>
 </ul>
-<h2>Примечание<span class="hx:absolute hx:-mt-20" id="примечание"></span>
-    <a href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d0%b5" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Путь не должен оканчиваться на <code>/</code>. Кэш строится однократно и переиспользуется.</p>
+<h2>Структура папок<span class="hx:absolute hx:-mt-20" id="структура-папок"></span>
+    <a href="#%d1%81%d1%82%d1%80%d1%83%d0%ba%d1%82%d1%83%d1%80%d0%b0-%d0%bf%d0%b0%d0%bf%d0%be%d0%ba" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Датасет ожидает следующую структуру:</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><pre><code>data/wc_co/
+├── Ultra_Co11/
+│   ├── image1.jpg
+│   ├── image2.jpg
+│   └── ...
+├── Ultra_Co25/
+│   ├── image1.jpg
+│   └── ...
+└── Ultra_Co8/
+    └── ...</code></pre></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Доступ к данным<span class="hx:absolute hx:-mt-20" id="доступ-к-данным"></span>
+    <a href="#%d0%b4%d0%be%d1%81%d1%82%d1%83%d0%bf-%d0%ba-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d0%bc" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3>Получение изображения<span class="hx:absolute hx:-mt-20" id="получение-изображения"></span>
+    <a href="#%d0%bf%d0%be%d0%bb%d1%83%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Получить изображение и путь по индексам класса и изображения</span>
+</span></span><span class="line"><span class="cl"><span class="n">image</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">class_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Путь к изображению: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Форма изображения: </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3>Количество классов<span class="hx:absolute hx:-mt-20" id="количество-классов"></span>
+    <a href="#%d0%ba%d0%be%d0%bb%d0%b8%d1%87%d0%b5%d1%81%d1%82%d0%b2%d0%be-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d0%be%d0%b2" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Количество классов в датасете</span>
+</span></span><span class="line"><span class="cl"><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Классов в датасете: </span><span class="si">{</span><span class="n">num_classes</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3>Итерация по датасету<span class="hx:absolute hx:-mt-20" id="итерация-по-датасету"></span>
+    <a href="#%d0%b8%d1%82%d0%b5%d1%80%d0%b0%d1%86%d0%b8%d1%8f-%d0%bf%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d1%83" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Итерация по всем классам и изображениям</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">class_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">num_images</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">images_paths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">img_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">image</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">class_idx</span><span class="p">,</span> <span class="n">img_idx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># Обработка изображения</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Класс </span><span class="si">{</span><span class="n">class_idx</span><span class="si">}</span><span class="s2">, Изображение </span><span class="si">{</span><span class="n">img_idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Предобработка изображений<span class="hx:absolute hx:-mt-20" id="предобработка-изображений"></span>
+    <a href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Класс автоматически применяет предобработку к каждому изображению:</p>
+<ol>
+<li>Конвертация в grayscale (если необходимо)</li>
+<li>Медианная фильтрация</li>
+<li>Бинаризация методом Otsu</li>
+<li>Вычисление градиента</li>
+</ol>
+<h3>Использование метода предобработки отдельно<span class="hx:absolute hx:-mt-20" id="использование-метода-предобработки-отдельно"></span>
+    <a href="#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%bc%d0%b5%d1%82%d0%be%d0%b4%d0%b0-%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b8-%d0%be%d1%82%d0%b4%d0%b5%d0%bb%d1%8c%d0%bd%d0%be" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra.data.dataset</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Загрузка изображения</span>
+</span></span><span class="line"><span class="cl"><span class="n">image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;path/to/image.jpg&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Предобработка</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="o">.</span><span class="n">preprocess_image</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">image</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># Добавить границу</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>      <span class="c1"># Размер границы в пикселях</span>
+</span></span><span class="line"><span class="cl">    <span class="n">disk</span><span class="o">=</span><span class="mi">3</span>          <span class="c1"># Размер диска для медианного фильтра</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Кэширование<span class="hx:absolute hx:-mt-20" id="кэширование"></span>
+    <a href="#%d0%ba%d1%8d%d1%88%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Датасет автоматически кэширует предобработанные изображения в <code>/tmp/&lt;имя_датасета&gt;</code>.</p>
+<h3>Проверка кэша<span class="hx:absolute hx:-mt-20" id="проверка-кэша"></span>
+    <a href="#%d0%bf%d1%80%d0%be%d0%b2%d0%b5%d1%80%d0%ba%d0%b0-%d0%ba%d1%8d%d1%88%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>При создании датасета выполняется проверка:</p>
+<ul>
+<li>Существования кэша</li>
+<li>Соответствия структуры папок</li>
+<li>Количества изображений</li>
+</ul>
+<p>Если кэш неполный или устарел, он автоматически пересоздается.</p>
+<h3>Очистка кэша<span class="hx:absolute hx:-mt-20" id="очистка-кэша"></span>
+    <a href="#%d0%be%d1%87%d0%b8%d1%81%d1%82%d0%ba%d0%b0-%d0%ba%d1%8d%d1%88%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">shutil</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">cache_dir</span> <span class="o">=</span> <span class="s1">&#39;/tmp/wc_co&#39;</span>  <span class="c1"># Замените на имя вашего датасета</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Кэш удален&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Примеры использования<span class="hx:absolute hx:-mt-20" id="примеры-использования"></span>
+    <a href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80%d1%8b-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3>Базовый пример<span class="hx:absolute hx:-mt-20" id="базовый-пример"></span>
+    <a href="#%d0%b1%d0%b0%d0%b7%d0%be%d0%b2%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra.data.dataset</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Создание датасета</span>
+</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="p">(</span><span class="s1">&#39;data/wc_co&#39;</span><span class="p">,</span> <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Получение первого изображения первого класса</span>
+</span></span><span class="line"><span class="cl"><span class="n">image</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Загружено: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Размер: </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3>Обработка всех изображений<span class="hx:absolute hx:-mt-20" id="обработка-всех-изображений"></span>
+    <a href="#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d1%85-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra.data.dataset</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="p">(</span><span class="s1">&#39;data/wc_co&#39;</span><span class="p">,</span> <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">all_angles</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">class_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">img_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">images_paths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">image</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">class_idx</span><span class="p">,</span> <span class="n">img_idx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># Вычисление углов</span>
+</span></span><span class="line"><span class="cl">        <span class="n">angles_array</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">all_angles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">angles_array</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Обработано: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Всего углов: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_angles</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3>Использование с другими модулями<span class="hx:absolute hx:-mt-20" id="использование-с-другими-модулями"></span>
+    <a href="#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d1%81-%d0%b4%d1%80%d1%83%d0%b3%d0%b8%d0%bc%d0%b8-%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d1%8f%d0%bc%d0%b8" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra.data.dataset</span> <span class="kn">import</span> <span class="n">SEMDataset</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">approx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Создание датасета</span>
+</span></span><span class="line"><span class="cl"><span class="n">dataset</span> <span class="o">=</span> <span class="n">SEMDataset</span><span class="p">(</span><span class="s1">&#39;data/wc_co&#39;</span><span class="p">,</span> <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Сбор углов из всех изображений</span>
+</span></span><span class="line"><span class="cl"><span class="n">all_angles</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">class_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">img_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">images_paths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">image</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">class_idx</span><span class="p">,</span> <span class="n">img_idx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">angles_array</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">all_angles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">angles_array</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Статистический анализ</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">stats_preprocess</span><span class="p">(</span><span class="n">all_angles</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Аппроксимация</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">),</span> <span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="n">amps</span> <span class="o">=</span> <span class="n">approx</span><span class="o">.</span><span class="n">bimodal_gauss_approx</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Данные&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Аппроксимация&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Примечания<span class="hx:absolute hx:-mt-20" id="примечания"></span>
+    <a href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
+<li>Путь к датасету <strong>не должен</strong> оканчиваться на <code>/</code></li>
+<li>Кэш создается однократно и переиспользуется при последующих запусках</li>
+<li>Предобработанные изображения сохраняются в формате PNG</li>
+<li>Все изображения должны иметь одинаковый размер (проверка не выполняется автоматически)</li>
+</ul>
+<h2>Методы класса<span class="hx:absolute hx:-mt-20" id="методы-класса"></span>
+    <a href="#%d0%bc%d0%b5%d1%82%d0%be%d0%b4%d1%8b-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>__init__(images_folder_path, max_images_num_per_class=100, workers=None)</code><span class="hx:absolute hx:-mt-20" id="__init__images_folder_path-max_images_num_per_class100-workersnone"></span>
+    <a href="#__init__images_folder_path-max_images_num_per_class100-workersnone" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Инициализация датасета.</p>
+<h3><code>__getitem__(class_idx, idx)</code><span class="hx:absolute hx:-mt-20" id="__getitem__class_idx-idx"></span>
+    <a href="#__getitem__class_idx-idx" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Получение изображения и пути.</p>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>class_idx</code> (int): Индекс класса</li>
+<li><code>idx</code> (int): Индекс изображения в классе</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li><code>tuple</code>: <code>(image, path)</code> где <code>image</code> - numpy array, <code>path</code> - строка с путем</li>
+</ul>
+<h3><code>__len__()</code><span class="hx:absolute hx:-mt-20" id="__len__"></span>
+    <a href="#__len__" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Возвращает количество классов в датасете.</p>
+<h3><code>preprocess_image(image, pad=False, border=30, disk=3)</code> (classmethod)<span class="hx:absolute hx:-mt-20" id="preprocess_imageimage-padfalse-border30-disk3-classmethod"></span>
+    <a href="#preprocess_imageimage-padfalse-border30-disk3-classmethod" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Статический метод для предобработки одного изображения.</p>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>image</code> (ndarray): Входное изображение</li>
+<li><code>pad</code> (bool): Добавить границу</li>
+<li><code>border</code> (int): Размер границы</li>
+<li><code>disk</code> (int): Размер диска для медианного фильтра</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li><code>ndarray</code>: Предобработанное изображение</li>
+</ul>
 
         </div>
         <div class="hx:mt-16"></div>
@@ -940,9 +1287,9 @@ workers: число процессов; по умолчанию cpu_count()-1
         class="hx:flex hx:max-w-[50%] hx:items-center hx:gap-1 hx:py-4 hx:text-base hx:font-medium hx:text-gray-600 hx:transition-colors [word-break:break-word] hx:hover:text-primary-600 hx:dark:text-gray-300 hx:md:text-lg hx:ltr:pr-4 hx:rtl:pl-4"
       ><svg class="hx:inline hx:h-5 hx:shrink-0 hx:ltr:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>Быстрый старт</a><a
         href="/docs/usage_graph/"
-        title="Граф трещин: Crack"
+        title="Граф трещин"
         class="hx:flex hx:max-w-[50%] hx:items-center hx:gap-1 hx:py-4 hx:text-base hx:font-medium hx:text-gray-600 hx:transition-colors [word-break:break-word] hx:hover:text-primary-600 hx:dark:text-gray-300 hx:md:text-lg hx:ltr:ml-auto hx:ltr:pl-4 hx:ltr:text-right hx:rtl:mr-auto hx:rtl:pr-4 hx:rtl:text-left"
-      >Граф трещин: Crack<svg class="hx:inline hx:h-5 hx:shrink-0 hx:rtl:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a></div>
+      >Граф трещин<svg class="hx:inline hx:h-5 hx:shrink-0 hx:rtl:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a></div>
         
       </main>
     </article>
@@ -956,8 +1303,8 @@ workers: число процессов; по умолчанию cpu_count()-1
   </a></div></div>
     </div></footer>
     
-    <script defer src="/js/main.min.cb7a23a5df1c111bc4480bf230e34602359a7a80de78a8cc15c369903ecd80fa.js" integrity="sha256-y3ojpd8cERvESAvyMONGAjWaeoDeeKjMFcNpkD7NgPo="></script>
-<script defer src="/js/flexsearch.433e941a8a573ebb9931fc16fc75266ab6b93f569ac2fb4f3dc66882e0416f4c.js" integrity="sha256-Qz6UGopXPruZMfwW/HUmara5P1aawvtPPcZoguBBb0w=" crossorigin="anonymous"></script>
-        <script defer src="/en.search.min.097e3a24da0aba2ac82ef0f53e82e1500343a7126260a0203f3a45bbe0876093.js" integrity="sha256-CX46JNoKuirILvD1PoLhUANDpxJiYKAgPzpFu&#43;CHYJM="></script>
+    <script defer src="/js/main.js" integrity=""></script>
+<script defer src="/js/flexsearch.9f5b5908f93ae86f1ecd4b043b799f580c2d1654e703dd9357d568ac41b2547a.js" integrity="sha256-n1tZCPk66G8ezUsEO3mfWAwtFlTnA92TV9VorEGyVHo=" crossorigin="anonymous"></script>
+        <script defer src="/en.search.js" integrity=""></script>
   </body>
 </html>

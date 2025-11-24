@@ -1,60 +1,88 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr"><head>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="index, follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="noindex, nofollow" />
   <link rel="icon shortcut" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" id="favicon-svg" />
 <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
 <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 <link fetchpriority="low" href="/site.webmanifest" rel="manifest" />
-<title>Граф трещин: Crack – wc_cv - Документация</title>
-  <meta name="description" content="Пайплайн Предобработка входного изображения (grainPreprocess.image_preprocess). Crack.preprocess_graph_image — выделение контуров, подготовка метаданных узлов. Crack.create_crack_graph — построение ориентированного графа по контурам. (Опционально) Energy.get_energies — расчёт энергий путей. Viz.graph_plot — визуализация. Минимальный пример from wc_cv import grainPreprocess, Crack, Viz from skimage import io image = io.imread(&#39;path/to/img.png&#39;) proc = grainPreprocess.image_preprocess(image) entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( Crack.preprocess_graph_image(proc, tol=5) ) G, img_contours_mono = Crack.create_crack_graph( img_contours.shape, cnts, nodes_meta ) Viz.graph_plot(G, img_contours_mono, N=10, M=10) Параметры и классы Crack.get_edge_type — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC. Crack.get_edge_type_labeled — определение типа на размеченных данных. Viz.plot_optimized_energies — матрицы энергий по конфигурациям. Energy.find_shortest_energy_paths — кратчайшие пути по весам. " /><link rel="canonical" href="http://localhost:1313/docs/usage_graph/" itemprop="url" />
+<title>Граф трещин – Combra - Документация</title>
+  <meta name="description" content="Граф трещинМодуль graph предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.
+Обзор Граф трещин представляет собой ориентированный граф, где:
+Узлы соответствуют точкам пересечения или разветвления трещин Ребра соответствуют сегментам трещин между узлами Типы ребер классифицируются по материалу: Co, WC-Co, WC, WC-WC Пайплайн работы Предобработка изображения (image.image_preprocess) Предобработка для графа (graph.preprocess_graph_image) - выделение контуров, подготовка метаданных узлов Построение графа (graph.create_crack_graph) - создание ориентированного графа Вычисление энергий (опционально) (graph.get_energies) - расчет энергий путей Визуализация (graph.graph_plot) - отображение графа на изображении Минимальный пример from combra import graph, image from skimage import io # 1. Загрузка и предобработка изображения img = io.imread(&#39;path/to/crack_image.png&#39;) processed = image.image_preprocess(img) # 2. Предобработка для графа entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( graph.preprocess_graph_image( processed, r=2, border=30, border_node_eps=10, tol=5 ) ) # 3. Создание графа G, img_contours_mono = graph.create_crack_graph( img_contours.shape, cnts, nodes_meta ) print(f&#34;Узлов в графе: {G.number_of_nodes()}&#34;) print(f&#34;Ребер в графе: {G.number_of_edges()}&#34;) # 4. Визуализация graph.graph_plot( G, img_contours_mono, N=10, M=10, name=&#39;crack_graph.png&#39;, save=True ) Предобработка для графа preprocess_graph_image() Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы." /><link rel="canonical" href="http://localhost:1313/docs/usage_graph/" itemprop="url" />
 
-<meta property="og:title" content="Граф трещин: Crack">
+<meta property="og:title" content="Граф трещин">
 <meta
   property="og:description"
   content="
     
-      Пайплайн
+      Граф трещинМодуль graph предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.
+Обзор
+    Граф трещин представляет собой ориентированный граф, где:
+
+Узлы соответствуют точкам пересечения или разветвления трещин
+Ребра соответствуют сегментам трещин между узлами
+Типы ребер классифицируются по материалу: Co, WC-Co, WC, WC-WC
+
+Пайплайн работы
     
-Предобработка входного изображения (grainPreprocess.image_preprocess).
-Crack.preprocess_graph_image — выделение контуров, подготовка метаданных узлов.
-Crack.create_crack_graph — построение ориентированного графа по контурам.
-(Опционально) Energy.get_energies — расчёт энергий путей.
-Viz.graph_plot — визуализация.
+Предобработка изображения (image.image_preprocess)
+Предобработка для графа (graph.preprocess_graph_image) - выделение контуров, подготовка метаданных узлов
+Построение графа (graph.create_crack_graph) - создание ориентированного графа
+Вычисление энергий (опционально) (graph.get_energies) - расчет энергий путей
+Визуализация (graph.graph_plot) - отображение графа на изображении
 
 Минимальный пример
     
 
-from wc_cv import grainPreprocess, Crack, Viz
+from combra import graph, image
 from skimage import io
 
-image = io.imread(&#39;path/to/img.png&#39;)
-proc = grainPreprocess.image_preprocess(image)
+# 1. Загрузка и предобработка изображения
+img = io.imread(&#39;path/to/crack_image.png&#39;)
+processed = image.image_preprocess(img)
 
+# 2. Предобработка для графа
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
-    Crack.preprocess_graph_image(proc, tol=5)
+    graph.preprocess_graph_image(
+        processed,
+        r=2,
+        border=30,
+        border_node_eps=10,
+        tol=5
+    )
 )
 
-G, img_contours_mono = Crack.create_crack_graph(
-    img_contours.shape, cnts, nodes_meta
+# 3. Создание графа
+G, img_contours_mono = graph.create_crack_graph(
+    img_contours.shape,
+    cnts,
+    nodes_meta
 )
 
-Viz.graph_plot(G, img_contours_mono, N=10, M=10)
+print(f&#34;Узлов в графе: {G.number_of_nodes()}&#34;)
+print(f&#34;Ребер в графе: {G.number_of_edges()}&#34;)
+
+# 4. Визуализация
+graph.graph_plot(
+    G,
+    img_contours_mono,
+    N=10,
+    M=10,
+    name=&#39;crack_graph.png&#39;,
+    save=True
+)
   
     
 
   
 
 
-Параметры и классы
-    
-Crack.get_edge_type — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC.
-Crack.get_edge_type_labeled — определение типа на размеченных данных.
-Viz.plot_optimized_energies — матрицы энергий по конфигурациям.
-Energy.find_shortest_energy_paths — кратчайшие пути по весам.
-
+Предобработка для графа
+    preprocess_graph_image()
+    Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы.
     
   ">
 <meta
@@ -67,21 +95,21 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
 
 
 
-  <meta itemprop="name" content="Граф трещин: Crack">
-  <meta itemprop="description" content="Пайплайн Предобработка входного изображения (grainPreprocess.image_preprocess). Crack.preprocess_graph_image — выделение контуров, подготовка метаданных узлов. Crack.create_crack_graph — построение ориентированного графа по контурам. (Опционально) Energy.get_energies — расчёт энергий путей. Viz.graph_plot — визуализация. Минимальный пример from wc_cv import grainPreprocess, Crack, Viz from skimage import io image = io.imread(&#39;path/to/img.png&#39;) proc = grainPreprocess.image_preprocess(image) entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( Crack.preprocess_graph_image(proc, tol=5) ) G, img_contours_mono = Crack.create_crack_graph( img_contours.shape, cnts, nodes_meta ) Viz.graph_plot(G, img_contours_mono, N=10, M=10) Параметры и классы Crack.get_edge_type — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC. Crack.get_edge_type_labeled — определение типа на размеченных данных. Viz.plot_optimized_energies — матрицы энергий по конфигурациям. Energy.find_shortest_energy_paths — кратчайшие пути по весам.">
-  <meta itemprop="wordCount" content="103">
+  <meta itemprop="name" content="Граф трещин">
+  <meta itemprop="description" content="Граф трещинМодуль graph предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.
+Обзор Граф трещин представляет собой ориентированный граф, где:
+Узлы соответствуют точкам пересечения или разветвления трещин Ребра соответствуют сегментам трещин между узлами Типы ребер классифицируются по материалу: Co, WC-Co, WC, WC-WC Пайплайн работы Предобработка изображения (image.image_preprocess) Предобработка для графа (graph.preprocess_graph_image) - выделение контуров, подготовка метаданных узлов Построение графа (graph.create_crack_graph) - создание ориентированного графа Вычисление энергий (опционально) (graph.get_energies) - расчет энергий путей Визуализация (graph.graph_plot) - отображение графа на изображении Минимальный пример from combra import graph, image from skimage import io # 1. Загрузка и предобработка изображения img = io.imread(&#39;path/to/crack_image.png&#39;) processed = image.image_preprocess(img) # 2. Предобработка для графа entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( graph.preprocess_graph_image( processed, r=2, border=30, border_node_eps=10, tol=5 ) ) # 3. Создание графа G, img_contours_mono = graph.create_crack_graph( img_contours.shape, cnts, nodes_meta ) print(f&#34;Узлов в графе: {G.number_of_nodes()}&#34;) print(f&#34;Ребер в графе: {G.number_of_edges()}&#34;) # 4. Визуализация graph.graph_plot( G, img_contours_mono, N=10, M=10, name=&#39;crack_graph.png&#39;, save=True ) Предобработка для графа preprocess_graph_image() Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы.">
+  <meta itemprop="wordCount" content="908">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Граф трещин: Crack">
-  <meta name="twitter:description" content="Пайплайн Предобработка входного изображения (grainPreprocess.image_preprocess). Crack.preprocess_graph_image — выделение контуров, подготовка метаданных узлов. Crack.create_crack_graph — построение ориентированного графа по контурам. (Опционально) Energy.get_energies — расчёт энергий путей. Viz.graph_plot — визуализация. Минимальный пример from wc_cv import grainPreprocess, Crack, Viz from skimage import io image = io.imread(&#39;path/to/img.png&#39;) proc = grainPreprocess.image_preprocess(image) entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( Crack.preprocess_graph_image(proc, tol=5) ) G, img_contours_mono = Crack.create_crack_graph( img_contours.shape, cnts, nodes_meta ) Viz.graph_plot(G, img_contours_mono, N=10, M=10) Параметры и классы Crack.get_edge_type — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC. Crack.get_edge_type_labeled — определение типа на размеченных данных. Viz.plot_optimized_energies — матрицы энергий по конфигурациям. Energy.find_shortest_energy_paths — кратчайшие пути по весам.">
-
-    <link rel="preload" href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" as="style" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
-    <link href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" rel="stylesheet" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
+  <meta name="twitter:title" content="Граф трещин">
+  <meta name="twitter:description" content="Граф трещинМодуль graph предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.
+Обзор Граф трещин представляет собой ориентированный граф, где:
+Узлы соответствуют точкам пересечения или разветвления трещин Ребра соответствуют сегментам трещин между узлами Типы ребер классифицируются по материалу: Co, WC-Co, WC, WC-WC Пайплайн работы Предобработка изображения (image.image_preprocess) Предобработка для графа (graph.preprocess_graph_image) - выделение контуров, подготовка метаданных узлов Построение графа (graph.create_crack_graph) - создание ориентированного графа Вычисление энергий (опционально) (graph.get_energies) - расчет энергий путей Визуализация (graph.graph_plot) - отображение графа на изображении Минимальный пример from combra import graph, image from skimage import io # 1. Загрузка и предобработка изображения img = io.imread(&#39;path/to/crack_image.png&#39;) processed = image.image_preprocess(img) # 2. Предобработка для графа entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = ( graph.preprocess_graph_image( processed, r=2, border=30, border_node_eps=10, tol=5 ) ) # 3. Создание графа G, img_contours_mono = graph.create_crack_graph( img_contours.shape, cnts, nodes_meta ) print(f&#34;Узлов в графе: {G.number_of_nodes()}&#34;) print(f&#34;Ребер в графе: {G.number_of_edges()}&#34;) # 4. Визуализация graph.graph_plot( G, img_contours_mono, N=10, M=10, name=&#39;crack_graph.png&#39;, save=True ) Предобработка для графа preprocess_graph_image() Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы.">
+<link href="/css/compiled/main.css" rel="stylesheet" />
+    <link href="/css/variables.css" rel="stylesheet" />
+    <link href="/css/custom.css" rel="stylesheet" />
 
   
-
-
-
-
 
 
   <script>
@@ -121,7 +149,7 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
 
   <nav class="hextra-max-navbar-width hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-16 hx:px-6">
     <a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="/">
-    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="wc_cv - Документация">wc_cv - Документация</span>
+    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="Combra - Документация">Combra - Документация</span>
 </a>
 <a
   title=""
@@ -218,14 +246,20 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
       hextra-sidebar-active-item hx:bg-primary-100 hx:font-semibold hx:text-primary-800 hx:contrast-more:border hx:contrast-more:border-primary-500 hx:dark:bg-primary-400/10 hx:dark:text-primary-600 hx:contrast-more:dark:border-primary-500"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a>
   
     <ul class='hx:flex hx:flex-col hx:gap-1 hx:relative hx:before:absolute hx:before:inset-y-1 hx:before:w-px hx:before:bg-gray-200 hx:before:content-[""] hx:dark:before:bg-neutral-800 hx:ltr:pl-3 hx:ltr:before:left-0 hx:rtl:pr-3 hx:rtl:before:right-0 hx:ltr:ml-3 hx:rtl:mr-3'><li>
               <a
-                href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd"
+                href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Пайплайн</a>
+              >Обзор</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd-%d1%80%d0%b0%d0%b1%d0%be%d1%82%d1%8b"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Пайплайн работы</a>
             </li>
           <li>
               <a
@@ -235,9 +269,57 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
             </li>
           <li>
               <a
-                href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d1%8b"
+                href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b4%d0%bb%d1%8f-%d0%b3%d1%80%d0%b0%d1%84%d0%b0"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Параметры и классы</a>
+              >Предобработка для графа</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d0%be%d1%81%d1%82%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b3%d1%80%d0%b0%d1%84%d0%b0"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Построение графа</a>
+            </li>
+          <li>
+              <a
+                href="#%d1%82%d0%b8%d0%bf%d1%8b-%d1%80%d0%b5%d0%b1%d0%b5%d1%80"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Типы ребер</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%8d%d0%bd%d0%b5%d1%80%d0%b3%d0%b8%d0%b9"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Вычисление энергий</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Визуализация</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Полный пример</a>
+            </li>
+          <li>
+              <a
+                href="#%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%b0-%d1%81-networkx"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Работа с NetworkX</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b8"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Параметры и настройки</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Примечания</a>
             </li>
           </ul>
   
@@ -537,7 +619,7 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
       hextra-sidebar-active-item hx:bg-primary-100 hx:font-semibold hx:text-primary-800 hx:contrast-more:border hx:contrast-more:border-primary-500 hx:dark:bg-primary-400/10 hx:dark:text-primary-600 hx:contrast-more:dark:border-primary-500"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a></li>
           <li class=""><a
     class="hx:flex hx:items-center hx:justify-between hx:gap-2 hx:cursor-pointer hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
@@ -848,7 +930,11 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
 <nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:block hx:print:hidden hx:px-4" aria-label="table of contents">
     <div class="hextra-scrollbar hx:sticky hx:top-16 hx:overflow-y-auto hx:pr-4 hx:pt-6 hx:text-sm [hyphens:auto] hx:max-h-[calc(100vh-var(--navbar-height)-env(safe-area-inset-bottom))] hx:ltr:-mr-4 hx:rtl:-ml-4"><p class="hx:mb-4 hx:font-semibold hx:tracking-tight">On this page</p><ul>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd">Пайплайн
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80">Обзор
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd-%d1%80%d0%b0%d0%b1%d0%be%d1%82%d1%8b">Пайплайн работы
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
@@ -856,7 +942,91 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d1%8b">Параметры и классы
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b4%d0%bb%d1%8f-%d0%b3%d1%80%d0%b0%d1%84%d0%b0">Предобработка для графа
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#preprocess_graph_image">preprocess_graph_image()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%be%d1%81%d1%82%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b3%d1%80%d0%b0%d1%84%d0%b0">Построение графа
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#create_crack_graph">create_crack_graph()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%82%d0%b8%d0%bf%d1%8b-%d1%80%d0%b5%d0%b1%d0%b5%d1%80">Типы ребер
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#get_edge_type">get_edge_type()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#get_edge_type_labeled">get_edge_type_labeled()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%8d%d0%bd%d0%b5%d1%80%d0%b3%d0%b8%d0%b9">Вычисление энергий
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#get_energies">get_energies()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#find_shortest_energy_paths">find_shortest_energy_paths()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f">Визуализация
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#graph_plot">graph_plot()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#plot_optimized_energies">plot_optimized_energies()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#plot_paths">plot_paths()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#plot_optimized_paths">plot_optimized_paths()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#draw_tree">draw_tree()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80">Полный пример
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%b0-%d1%81-networkx">Работа с NetworkX
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b8">Параметры и настройки
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%80%d0%b5%d0%ba%d0%be%d0%bc%d0%b5%d0%bd%d0%b4%d1%83%d0%b5%d0%bc%d1%8b%d0%b5-%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b">Рекомендуемые параметры
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b0-%d0%b4%d0%bb%d1%8f-%d1%80%d0%b0%d0%b7%d0%bd%d1%8b%d1%85-%d1%82%d0%b8%d0%bf%d0%be%d0%b2-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9">Настройка для разных типов изображений
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f">Примечания
         </a>
       </li></ul>
       <div class="hx:mt-8 hx:border-t hx:bg-white hx:pt-8 hx:shadow-[0_-12px_16px_white] hx:dark:bg-dark hx:dark:shadow-[0_-12px_16px_#111] hx:sticky hx:bottom-0 hx:flex hx:flex-col hx:items-start hx:gap-2 hx:pb-8 hx:border-gray-200 hx:dark:border-neutral-800 hx:contrast-more:border-t hx:contrast-more:border-neutral-400 hx:contrast-more:shadow-none hx:contrast-more:dark:border-neutral-400">
@@ -876,37 +1046,67 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
         <div class="hx:mt-1.5 hx:flex hx:items-center hx:gap-1 hx:overflow-hidden hx:text-sm hx:text-gray-500 hx:dark:text-gray-400 hx:contrast-more:text-current">
         <div class="hx:whitespace-nowrap hx:transition-colors hx:min-w-[24px] hx:overflow-hidden hx:text-ellipsis hx:hover:text-gray-900 hx:dark:hover:text-gray-100">
           <a href="/docs/">Документация</a>
-        </div><svg class="hx:w-3.5 hx:shrink-0 hx:rtl:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg><div class="hx:whitespace-nowrap hx:transition-colors hx:font-medium hx:text-gray-700 hx:contrast-more:font-bold hx:contrast-more:text-current hx:dark:text-gray-100 hx:contrast-more:dark:text-current">Граф трещин: Crack</div>
+        </div><svg class="hx:w-3.5 hx:shrink-0 hx:rtl:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg><div class="hx:whitespace-nowrap hx:transition-colors hx:font-medium hx:text-gray-700 hx:contrast-more:font-bold hx:contrast-more:text-current hx:dark:text-gray-100 hx:contrast-more:dark:text-current">Граф трещин</div>
   </div>
 
         <div class="content">
-          <h1>Граф трещин: Crack</h1>
-          <h2>Пайплайн<span class="hx:absolute hx:-mt-20" id="пайплайн"></span>
-    <a href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ol>
-<li>Предобработка входного изображения (<code>grainPreprocess.image_preprocess</code>).</li>
-<li><code>Crack.preprocess_graph_image</code> — выделение контуров, подготовка метаданных узлов.</li>
-<li><code>Crack.create_crack_graph</code> — построение ориентированного графа по контурам.</li>
-<li>(Опционально) <code>Energy.get_energies</code> — расчёт энергий путей.</li>
-<li><code>Viz.graph_plot</code> — визуализация.</li>
+          <h1>Граф трещин</h1>
+          <h1>Граф трещин</h1><p>Модуль <code>graph</code> предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.</p>
+<h2>Обзор<span class="hx:absolute hx:-mt-20" id="обзор"></span>
+    <a href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Граф трещин представляет собой ориентированный граф, где:</p>
+<ul>
+<li><strong>Узлы</strong> соответствуют точкам пересечения или разветвления трещин</li>
+<li><strong>Ребра</strong> соответствуют сегментам трещин между узлами</li>
+<li><strong>Типы ребер</strong> классифицируются по материалу: Co, WC-Co, WC, WC-WC</li>
+</ul>
+<h2>Пайплайн работы<span class="hx:absolute hx:-mt-20" id="пайплайн-работы"></span>
+    <a href="#%d0%bf%d0%b0%d0%b9%d0%bf%d0%bb%d0%b0%d0%b9%d0%bd-%d1%80%d0%b0%d0%b1%d0%be%d1%82%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ol>
+<li><strong>Предобработка изображения</strong> (<code>image.image_preprocess</code>)</li>
+<li><strong>Предобработка для графа</strong> (<code>graph.preprocess_graph_image</code>) - выделение контуров, подготовка метаданных узлов</li>
+<li><strong>Построение графа</strong> (<code>graph.create_crack_graph</code>) - создание ориентированного графа</li>
+<li><strong>Вычисление энергий</strong> (опционально) (<code>graph.get_energies</code>) - расчет энергий путей</li>
+<li><strong>Визуализация</strong> (<code>graph.graph_plot</code>) - отображение графа на изображении</li>
 </ol>
 <h2>Минимальный пример<span class="hx:absolute hx:-mt-20" id="минимальный-пример"></span>
     <a href="#%d0%bc%d0%b8%d0%bd%d0%b8%d0%bc%d0%b0%d0%bb%d1%8c%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">grainPreprocess</span><span class="p">,</span> <span class="n">Crack</span><span class="p">,</span> <span class="n">Viz</span>
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">graph</span><span class="p">,</span> <span class="n">image</span>
 </span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;path/to/img.png&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">proc</span> <span class="o">=</span> <span class="n">grainPreprocess</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 1. Загрузка и предобработка изображения</span>
+</span></span><span class="line"><span class="cl"><span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;path/to/crack_image.png&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. Предобработка для графа</span>
 </span></span><span class="line"><span class="cl"><span class="n">entry_nodes</span><span class="p">,</span> <span class="n">exit_nodes</span><span class="p">,</span> <span class="n">img_contours</span><span class="p">,</span> <span class="n">img_marked</span><span class="p">,</span> <span class="n">cnts</span><span class="p">,</span> <span class="n">nodes_meta</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Crack</span><span class="o">.</span><span class="n">preprocess_graph_image</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">graph</span><span class="o">.</span><span class="n">preprocess_graph_image</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">processed</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border_node_eps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tol</span><span class="o">=</span><span class="mi">5</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">G</span><span class="p">,</span> <span class="n">img_contours_mono</span> <span class="o">=</span> <span class="n">Crack</span><span class="o">.</span><span class="n">create_crack_graph</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="n">img_contours</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">cnts</span><span class="p">,</span> <span class="n">nodes_meta</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. Создание графа</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span><span class="p">,</span> <span class="n">img_contours_mono</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">create_crack_graph</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_meta</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">Viz</span><span class="o">.</span><span class="n">graph_plot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">img_contours_mono</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Узлов в графе: </span><span class="si">{</span><span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Ребер в графе: </span><span class="si">{</span><span class="n">G</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 4. Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">graph_plot</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours_mono</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;crack_graph.png&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -916,12 +1116,450 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
   </button>
 </div>
 </div>
-<h2>Параметры и классы<span class="hx:absolute hx:-mt-20" id="параметры-и-классы"></span>
-    <a href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%ba%d0%bb%d0%b0%d1%81%d1%81%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
-<li><code>Crack.get_edge_type</code> — типы рёбер: 0 Co, 1 WC-Co, 2 WC, 3 WC-WC.</li>
-<li><code>Crack.get_edge_type_labeled</code> — определение типа на размеченных данных.</li>
-<li><code>Viz.plot_optimized_energies</code> — матрицы энергий по конфигурациям.</li>
-<li><code>Energy.find_shortest_energy_paths</code> — кратчайшие пути по весам.</li>
+<h2>Предобработка для графа<span class="hx:absolute hx:-mt-20" id="предобработка-для-графа"></span>
+    <a href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b4%d0%bb%d1%8f-%d0%b3%d1%80%d0%b0%d1%84%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>preprocess_graph_image()</code><span class="hx:absolute hx:-mt-20" id="preprocess_graph_image"></span>
+    <a href="#preprocess_graph_image" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">entry_nodes</span><span class="p">,</span> <span class="n">exit_nodes</span><span class="p">,</span> <span class="n">img_contours</span><span class="p">,</span> <span class="n">img_marked</span><span class="p">,</span> <span class="n">cnts</span><span class="p">,</span> <span class="n">nodes_meta</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">graph</span><span class="o">.</span><span class="n">preprocess_graph_image</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">image</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                    <span class="c1"># Радиус для обработки</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>              <span class="c1"># Размер границы</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border_node_eps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>     <span class="c1"># Эпсилон для узлов на границе</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tol</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                  <span class="c1"># Точность упрощения контуров</span>
+</span></span><span class="line"><span class="cl">        <span class="n">disk</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                 <span class="c1"># Размер диска для морфологии</span>
+</span></span><span class="line"><span class="cl">        <span class="n">labeled_cnts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># Использовать размеченные контуры</span>
+</span></span><span class="line"><span class="cl">        <span class="n">labels</span><span class="o">=</span><span class="kc">False</span>            <span class="c1"># Использовать метки</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>image</code> (ndarray): Предобработанное изображение</li>
+<li><code>r</code> (int): Радиус для обработки узлов</li>
+<li><code>border</code> (int): Размер границы в пикселях</li>
+<li><code>border_node_eps</code> (int): Порог для определения узлов на границе</li>
+<li><code>tol</code> (int): Точность упрощения контуров (алгоритм Дугласа-Пекера)</li>
+<li><code>disk</code> (int): Размер диска для морфологических операций</li>
+<li><code>labeled_cnts</code> (bool): Использовать размеченные контуры</li>
+<li><code>labels</code> (bool): Использовать метки классов</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li><code>entry_nodes</code>: Список индексов входных узлов</li>
+<li><code>exit_nodes</code>: Список индексов выходных узлов</li>
+<li><code>img_contours</code>: Изображение с контурами</li>
+<li><code>img_marked</code>: Размеченное изображение</li>
+<li><code>cnts</code>: Список контуров</li>
+<li><code>nodes_meta</code>: Словарь с метаданными узлов</li>
+</ul>
+<h2>Построение графа<span class="hx:absolute hx:-mt-20" id="построение-графа"></span>
+    <a href="#%d0%bf%d0%be%d1%81%d1%82%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b3%d1%80%d0%b0%d1%84%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>create_crack_graph()</code><span class="hx:absolute hx:-mt-20" id="create_crack_graph"></span>
+    <a href="#create_crack_graph" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Создает ориентированный граф трещин на основе контуров и метаданных узлов.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">G</span><span class="p">,</span> <span class="n">img_contours_mono</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">create_crack_graph</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_shape</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_metadata</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Дополнительные параметры...</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>img_shape</code>: Форма изображения (tuple)</li>
+<li><code>cnts</code>: Список контуров</li>
+<li><code>nodes_metadata</code>: Словарь с метаданными узлов</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li><code>G</code>: NetworkX ориентированный граф</li>
+<li><code>img_contours_mono</code>: Монохромное изображение контуров</li>
+</ul>
+<p><strong>Структура графа:</strong></p>
+<ul>
+<li>Узлы содержат атрибуты: координаты, тип узла</li>
+<li>Ребра содержат атрибуты: тип ребра, длина, энергия (если вычислена)</li>
+</ul>
+<h2>Типы ребер<span class="hx:absolute hx:-mt-20" id="типы-ребер"></span>
+    <a href="#%d1%82%d0%b8%d0%bf%d1%8b-%d1%80%d0%b5%d0%b1%d0%b5%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>get_edge_type()</code><span class="hx:absolute hx:-mt-20" id="get_edge_type"></span>
+    <a href="#get_edge_type" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Определяет тип ребра между двумя узлами на основе анализа пикселей вдоль линии.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">edge_type</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edge_type</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">node1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">node2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_metadata</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">wc_eps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border_pixel</span><span class="o">=</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Типы ребер:</strong></p>
+<ul>
+<li><code>0</code>: Co (кобальт)</li>
+<li><code>1</code>: WC-Co (граница вольфрама-кобальта)</li>
+<li><code>2</code>: WC (вольфрам-карбид)</li>
+<li><code>3</code>: WC-WC (граница вольфрама-вольфрама)</li>
+</ul>
+<h3><code>get_edge_type_labeled()</code><span class="hx:absolute hx:-mt-20" id="get_edge_type_labeled"></span>
+    <a href="#get_edge_type_labeled" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Определение типа ребра для размеченных данных.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">edge_type</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edge_type_labeled</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">node1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">node2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_metadata</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">line_eps</span><span class="o">=</span><span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Вычисление энергий<span class="hx:absolute hx:-mt-20" id="вычисление-энергий"></span>
+    <a href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%8d%d0%bd%d0%b5%d1%80%d0%b3%d0%b8%d0%b9" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>get_energies()</code><span class="hx:absolute hx:-mt-20" id="get_energies"></span>
+    <a href="#get_energies" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Вычисляет энергии путей в графе для различных конфигураций.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">energies</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_energies</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_metadata</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">entry_nodes</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit_nodes</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">workers</span><span class="o">=</span><span class="mi">23</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>g</code>: NetworkX граф</li>
+<li><code>cnts</code>: Список контуров</li>
+<li><code>nodes_metadata</code>: Метаданные узлов</li>
+<li><code>entry_nodes</code>: Входные узлы</li>
+<li><code>exit_nodes</code>: Выходные узлы</li>
+<li><code>workers</code>: Количество процессов</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li>Словарь с энергиями для различных конфигураций</li>
+</ul>
+<h3><code>find_shortest_energy_paths()</code><span class="hx:absolute hx:-mt-20" id="find_shortest_energy_paths"></span>
+    <a href="#find_shortest_energy_paths" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Находит кратчайшие пути в графе на основе вычисленных энергий.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">paths</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">find_shortest_energy_paths</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">energies_paths</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Визуализация<span class="hx:absolute hx:-mt-20" id="визуализация"></span>
+    <a href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>graph_plot()</code><span class="hx:absolute hx:-mt-20" id="graph_plot"></span>
+    <a href="#graph_plot" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализирует граф на изображении контуров.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">graph_plot</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>              <span class="c1"># Количество строк в сетке</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>              <span class="c1"># Количество столбцов в сетке</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;graph.jpg&#39;</span><span class="p">,</span>  <span class="c1"># Имя файла для сохранения</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>         <span class="c1"># Размер границы</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">False</span>         <span class="c1"># Сохранить изображение</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Пример:</strong></p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">graph_plot</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours_mono</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;crack_graph.png&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3><code>plot_optimized_energies()</code><span class="hx:absolute hx:-mt-20" id="plot_optimized_energies"></span>
+    <a href="#plot_optimized_energies" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализирует матрицы энергий для различных конфигураций.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">plot_optimized_energies</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">energies</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3><code>plot_paths()</code><span class="hx:absolute hx:-mt-20" id="plot_paths"></span>
+    <a href="#plot_paths" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализирует пути на выровненном изображении.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">plot_paths</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">df</span><span class="p">,</span>           <span class="c1"># DataFrame с путями</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_aligned</span><span class="p">,</span>  <span class="c1"># Выровненное изображение</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border</span><span class="o">=</span><span class="mi">30</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3><code>plot_optimized_paths()</code><span class="hx:absolute hx:-mt-20" id="plot_optimized_paths"></span>
+    <a href="#plot_optimized_paths" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализирует оптимизированные пути.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">plot_optimized_paths</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">energies_paths</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours_o</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">param_1</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">param_2</span><span class="o">=</span><span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3><code>draw_tree()</code><span class="hx:absolute hx:-mt-20" id="draw_tree"></span>
+    <a href="#draw_tree" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализирует дерево на изображении.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">draw_tree</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">centres</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Показывать центры</span>
+</span></span><span class="line"><span class="cl">    <span class="n">leafs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>    <span class="c1"># Показывать листья</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>    <span class="c1"># Показывать узлы</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bones</span><span class="o">=</span><span class="kc">False</span>     <span class="c1"># Показывать кости</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Полный пример<span class="hx:absolute hx:-mt-20" id="полный-пример"></span>
+    <a href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">graph</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">contours</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 1. Загрузка и предобработка</span>
+</span></span><span class="line"><span class="cl"><span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;crack_image.png&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. Предобработка для графа</span>
+</span></span><span class="line"><span class="cl"><span class="n">entry_nodes</span><span class="p">,</span> <span class="n">exit_nodes</span><span class="p">,</span> <span class="n">img_contours</span><span class="p">,</span> <span class="n">img_marked</span><span class="p">,</span> <span class="n">cnts</span><span class="p">,</span> <span class="n">nodes_meta</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">graph</span><span class="o">.</span><span class="n">preprocess_graph_image</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">processed</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border_node_eps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tol</span><span class="o">=</span><span class="mi">5</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. Создание графа</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span><span class="p">,</span> <span class="n">img_contours_mono</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">create_crack_graph</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_meta</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 4. Анализ графа</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Узлов: </span><span class="si">{</span><span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Ребер: </span><span class="si">{</span><span class="n">G</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Входных узлов: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">entry_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Выходных узлов: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">exit_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 5. Вычисление энергий (опционально)</span>
+</span></span><span class="line"><span class="cl"><span class="n">energies</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_energies</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cnts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nodes_meta</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">entry_nodes</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">exit_nodes</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">workers</span><span class="o">=</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 6. Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">graph</span><span class="o">.</span><span class="n">graph_plot</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img_contours_mono</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;crack_graph.png&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 7. Анализ типов ребер</span>
+</span></span><span class="line"><span class="cl"><span class="n">edge_types</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">edge_type</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">edge_types</span><span class="p">[</span><span class="n">edge_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">edge_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Распределение типов ребер:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">edge_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">type_names</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Co&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;WC-Co&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;WC&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;WC-WC&#39;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;  </span><span class="si">{</span><span class="n">type_names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">edge_type</span><span class="p">,</span> <span class="s1">&#39;Unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Работа с NetworkX<span class="hx:absolute hx:-mt-20" id="работа-с-networkx"></span>
+    <a href="#%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%b0-%d1%81-networkx" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Поскольку граф является объектом NetworkX, можно использовать все стандартные функции NetworkX:</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Поиск кратчайших путей</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">has_path</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">entry_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">exit_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">path</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">entry_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">exit_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Кратчайший путь: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Вычисление центральности</span>
+</span></span><span class="line"><span class="cl"><span class="n">centrality</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Наиболее центральный узел: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">centrality</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">centrality</span><span class="o">.</span><span class="n">get</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Поиск компонент связности</span>
+</span></span><span class="line"><span class="cl"><span class="n">components</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">weakly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Компонент связности: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Параметры и настройки<span class="hx:absolute hx:-mt-20" id="параметры-и-настройки"></span>
+    <a href="#%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b-%d0%b8-%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b8" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3>Рекомендуемые параметры<span class="hx:absolute hx:-mt-20" id="рекомендуемые-параметры"></span>
+    <a href="#%d1%80%d0%b5%d0%ba%d0%be%d0%bc%d0%b5%d0%bd%d0%b4%d1%83%d0%b5%d0%bc%d1%8b%d0%b5-%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Для большинства случаев подходят следующие параметры:</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Предобработка</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Предобработка для графа</span>
+</span></span><span class="line"><span class="cl"><span class="n">entry_nodes</span><span class="p">,</span> <span class="n">exit_nodes</span><span class="p">,</span> <span class="n">img_contours</span><span class="p">,</span> <span class="n">img_marked</span><span class="p">,</span> <span class="n">cnts</span><span class="p">,</span> <span class="n">nodes_meta</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">graph</span><span class="o">.</span><span class="n">preprocess_graph_image</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">processed</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                <span class="c1"># Стандартное значение</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>          <span class="c1"># Зависит от размера изображения</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border_node_eps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># Стандартное значение</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tol</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>              <span class="c1"># Баланс между точностью и производительностью</span>
+</span></span><span class="line"><span class="cl">        <span class="n">disk</span><span class="o">=</span><span class="mi">5</span>              <span class="c1"># Стандартное значение</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h3>Настройка для разных типов изображений<span class="hx:absolute hx:-mt-20" id="настройка-для-разных-типов-изображений"></span>
+    <a href="#%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b0-%d0%b4%d0%bb%d1%8f-%d1%80%d0%b0%d0%b7%d0%bd%d1%8b%d1%85-%d1%82%d0%b8%d0%bf%d0%be%d0%b2-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><ul>
+<li><strong>Высокое разрешение</strong>: увеличьте <code>border</code> и <code>border_node_eps</code></li>
+<li><strong>Много шума</strong>: увеличьте <code>disk</code> для морфологии</li>
+<li><strong>Сложные контуры</strong>: уменьшите <code>tol</code> для большей точности</li>
+</ul>
+<h2>Примечания<span class="hx:absolute hx:-mt-20" id="примечания"></span>
+    <a href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
+<li>Граф является ориентированным (directed)</li>
+<li>Узлы на границе изображения автоматически определяются как входные/выходные</li>
+<li>Типы ребер определяются на основе анализа пикселей вдоль линии между узлами</li>
+<li>Для больших изображений рекомендуется использовать параллельную обработку (<code>workers</code> параметр)</li>
 </ul>
 
         </div>
@@ -948,8 +1586,8 @@ Energy.find_shortest_energy_paths — кратчайшие пути по вес�
   </a></div></div>
     </div></footer>
     
-    <script defer src="/js/main.min.cb7a23a5df1c111bc4480bf230e34602359a7a80de78a8cc15c369903ecd80fa.js" integrity="sha256-y3ojpd8cERvESAvyMONGAjWaeoDeeKjMFcNpkD7NgPo="></script>
-<script defer src="/js/flexsearch.433e941a8a573ebb9931fc16fc75266ab6b93f569ac2fb4f3dc66882e0416f4c.js" integrity="sha256-Qz6UGopXPruZMfwW/HUmara5P1aawvtPPcZoguBBb0w=" crossorigin="anonymous"></script>
-        <script defer src="/en.search.min.097e3a24da0aba2ac82ef0f53e82e1500343a7126260a0203f3a45bbe0876093.js" integrity="sha256-CX46JNoKuirILvD1PoLhUANDpxJiYKAgPzpFu&#43;CHYJM="></script>
+    <script defer src="/js/main.js" integrity=""></script>
+<script defer src="/js/flexsearch.9f5b5908f93ae86f1ecd4b043b799f580c2d1654e703dd9357d568ac41b2547a.js" integrity="sha256-n1tZCPk66G8ezUsEO3mfWAwtFlTnA92TV9VorEGyVHo=" crossorigin="anonymous"></script>
+        <script defer src="/en.search.js" integrity=""></script>
   </body>
 </html>

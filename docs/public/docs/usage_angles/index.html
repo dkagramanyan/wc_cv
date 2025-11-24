@@ -1,83 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr"><head>
+<html lang="en" dir="ltr"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="index, follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="robots" content="noindex, nofollow" />
   <link rel="icon shortcut" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" id="favicon-svg" />
 <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
 <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 <link fetchpriority="low" href="/site.webmanifest" rel="manifest" />
-<title>Углы и их распределения – wc_cv - Документация</title>
-  <meta name="description" content="Извлечение углов from wc_cv import grainPreprocess, grainMark from skimage import io image = io.imread(&#39;path.png&#39;) proc = grainPreprocess.image_preprocess(image) angles, contours = grainMark.get_angles(proc, border_eps=5, tol=3) def hello(name): print(f&#34;Hello, {name}&#34;) hello(&#34;world&#34;) Предобработка статистики from wc_cv import grainStats x, y = grainStats.stats_preprocess(angles, step=5) Бимодальная аппроксимация from wc_cv import grainApprox (x_plot, y_plot), mus, sigmas, amps = grainApprox.bimodal_gauss_approx(x, y) Визуализация from wc_cv import grainShow # см. также grainShow.angles_plot_base для комплексных графиков " /><link rel="canonical" href="http://localhost:1313/docs/usage_angles/" itemprop="url" />
+<title>Углы и их распределения – Combra - Документация</title>
+  <meta name="description" content="Углы и их распределенияМодуль angles предоставляет функциональность для вычисления углов на контурах зерен и анализа их распределений.
+Обзор Углы вычисляются на упрощенных контурах зерен:
+Контуры упрощаются алгоритмом Дугласа-Пекера Для каждой точки контура вычисляется угол между соседними сегментами Углы измеряются в градусах (0-360°) Учитывается направление обхода контура (против часовой стрелки) Вычисление углов для одного изображения get_angles() Основная функция для вычисления углов на предобработанном изображении." /><link rel="canonical" href="http://localhost:1313/docs/usage_angles/" itemprop="url" />
 
 <meta property="og:title" content="Углы и их распределения">
 <meta
   property="og:description"
   content="
     
-      Извлечение углов
-    
+      Углы и их распределенияМодуль angles предоставляет функциональность для вычисления углов на контурах зерен и анализа их распределений.
+Обзор
+    Углы вычисляются на упрощенных контурах зерен:
 
-from wc_cv import grainPreprocess, grainMark
-from skimage import io
+Контуры упрощаются алгоритмом Дугласа-Пекера
+Для каждой точки контура вычисляется угол между соседними сегментами
+Углы измеряются в градусах (0-360°)
+Учитывается направление обхода контура (против часовой стрелки)
 
-image = io.imread(&#39;path.png&#39;)
-proc = grainPreprocess.image_preprocess(image)
-angles, contours = grainMark.get_angles(proc, border_eps=5, tol=3)
-  
-    
-
-  
-
-
-
-
-def hello(name):
-    print(f&#34;Hello, {name}&#34;)
-
-hello(&#34;world&#34;)
-  
-    
-
-  
-
-
-Предобработка статистики
-    
-
-from wc_cv import grainStats
-
-x, y = grainStats.stats_preprocess(angles, step=5)
-  
-    
-
-  
-
-
-Бимодальная аппроксимация
-    
-
-from wc_cv import grainApprox
-
-(x_plot, y_plot), mus, sigmas, amps = grainApprox.bimodal_gauss_approx(x, y)
-  
-    
-
-  
-
-
-Визуализация
-    
-
-from wc_cv import grainShow
-# см. также grainShow.angles_plot_base для комплексных графиков
-  
-    
-
-  
-
-
+Вычисление углов для одного изображения
+    get_angles()
+    Основная функция для вычисления углов на предобработанном изображении.
     
   ">
 <meta
@@ -91,20 +43,20 @@ from wc_cv import grainShow
 
 
   <meta itemprop="name" content="Углы и их распределения">
-  <meta itemprop="description" content="Извлечение углов from wc_cv import grainPreprocess, grainMark from skimage import io image = io.imread(&#39;path.png&#39;) proc = grainPreprocess.image_preprocess(image) angles, contours = grainMark.get_angles(proc, border_eps=5, tol=3) def hello(name): print(f&#34;Hello, {name}&#34;) hello(&#34;world&#34;) Предобработка статистики from wc_cv import grainStats x, y = grainStats.stats_preprocess(angles, step=5) Бимодальная аппроксимация from wc_cv import grainApprox (x_plot, y_plot), mus, sigmas, amps = grainApprox.bimodal_gauss_approx(x, y) Визуализация from wc_cv import grainShow # см. также grainShow.angles_plot_base для комплексных графиков">
-  <meta itemprop="wordCount" content="65">
+  <meta itemprop="description" content="Углы и их распределенияМодуль angles предоставляет функциональность для вычисления углов на контурах зерен и анализа их распределений.
+Обзор Углы вычисляются на упрощенных контурах зерен:
+Контуры упрощаются алгоритмом Дугласа-Пекера Для каждой точки контура вычисляется угол между соседними сегментами Углы измеряются в градусах (0-360°) Учитывается направление обхода контура (против часовой стрелки) Вычисление углов для одного изображения get_angles() Основная функция для вычисления углов на предобработанном изображении.">
+  <meta itemprop="wordCount" content="988">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Углы и их распределения">
-  <meta name="twitter:description" content="Извлечение углов from wc_cv import grainPreprocess, grainMark from skimage import io image = io.imread(&#39;path.png&#39;) proc = grainPreprocess.image_preprocess(image) angles, contours = grainMark.get_angles(proc, border_eps=5, tol=3) def hello(name): print(f&#34;Hello, {name}&#34;) hello(&#34;world&#34;) Предобработка статистики from wc_cv import grainStats x, y = grainStats.stats_preprocess(angles, step=5) Бимодальная аппроксимация from wc_cv import grainApprox (x_plot, y_plot), mus, sigmas, amps = grainApprox.bimodal_gauss_approx(x, y) Визуализация from wc_cv import grainShow # см. также grainShow.angles_plot_base для комплексных графиков">
-
-    <link rel="preload" href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" as="style" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
-    <link href="/css/compiled/main.min.860421afd86baea436520550e3f5b912c5d0ca8bfec32b073ac5871b3ae0ca74.css" rel="stylesheet" integrity="sha256-hgQhr9hrrqQ2UgVQ4/W5EsXQyov&#43;wysHOsWHGzrgynQ=" />
+  <meta name="twitter:description" content="Углы и их распределенияМодуль angles предоставляет функциональность для вычисления углов на контурах зерен и анализа их распределений.
+Обзор Углы вычисляются на упрощенных контурах зерен:
+Контуры упрощаются алгоритмом Дугласа-Пекера Для каждой точки контура вычисляется угол между соседними сегментами Углы измеряются в градусах (0-360°) Учитывается направление обхода контура (против часовой стрелки) Вычисление углов для одного изображения get_angles() Основная функция для вычисления углов на предобработанном изображении.">
+<link href="/css/compiled/main.css" rel="stylesheet" />
+    <link href="/css/variables.css" rel="stylesheet" />
+    <link href="/css/custom.css" rel="stylesheet" />
 
   
-
-
-
-
 
 
   <script>
@@ -144,7 +96,7 @@ from wc_cv import grainShow
 
   <nav class="hextra-max-navbar-width hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-16 hx:px-6">
     <a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="/">
-    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="wc_cv - Документация">wc_cv - Документация</span>
+    <span class="hx:mr-2 hx:font-extrabold hx:inline hx:select-none" title="Combra - Документация">Combra - Документация</span>
 </a>
 <a
   title=""
@@ -241,7 +193,7 @@ from wc_cv import grainShow
       hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:contrast-more:border hx:contrast-more:border-transparent hx:contrast-more:text-gray-900 hx:contrast-more:hover:border-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:dark:text-gray-50 hx:contrast-more:dark:hover:border-gray-50"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a>
               
             </li><li class="hx:flex hx:flex-col open"><a
@@ -254,27 +206,63 @@ from wc_cv import grainShow
   
     <ul class='hx:flex hx:flex-col hx:gap-1 hx:relative hx:before:absolute hx:before:inset-y-1 hx:before:w-px hx:before:bg-gray-200 hx:before:content-[""] hx:dark:before:bg-neutral-800 hx:ltr:pl-3 hx:ltr:before:left-0 hx:rtl:pr-3 hx:rtl:before:right-0 hx:ltr:ml-3 hx:rtl:mr-3'><li>
               <a
-                href="#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2"
+                href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Извлечение углов</a>
+              >Обзор</a>
             </li>
           <li>
               <a
-                href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d0%ba%d0%b8"
+                href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2-%d0%b4%d0%bb%d1%8f-%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Предобработка статистики</a>
+              >Вычисление углов для одного изображения</a>
             </li>
           <li>
               <a
-                href="#%d0%b1%d0%b8%d0%bc%d0%be%d0%b4%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d0%b0%d0%bf%d0%bf%d1%80%d0%be%d0%ba%d1%81%d0%b8%d0%bc%d0%b0%d1%86%d0%b8%d1%8f"
+                href="#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d0%b3%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
-              >Бимодальная аппроксимация</a>
+              >Обработка всего датасета</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%b7%d0%b0%d0%b3%d1%80%d1%83%d0%b7%d0%ba%d0%b0-%d0%b8-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7-%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d0%be%d0%b2"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Загрузка и анализ результатов</a>
             </li>
           <li>
               <a
                 href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f"
                 class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
               >Визуализация</a>
+            </li>
+          <li>
+              <a
+                href="#%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b8%d0%b9-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Статистический анализ</a>
+            </li>
+          <li>
+              <a
+                href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%bb%d0%b5%d0%b3%d0%b5%d0%bd%d0%b4%d1%8b"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Создание легенды</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Полный пример</a>
+            </li>
+          <li>
+              <a
+                href="#%d1%80%d0%b5%d0%ba%d0%be%d0%bc%d0%b5%d0%bd%d0%b4%d0%b0%d1%86%d0%b8%d0%b8-%d0%bf%d0%be-%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d0%b0%d0%bc"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Рекомендации по параметрам</a>
+            </li>
+          <li>
+              <a
+                href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f"
+                class="hx:flex hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [word-break:break-word] hx:cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] hx:contrast-more:border hx:gap-2 hx:before:opacity-25 hx:before:content-['#'] hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:text-gray-900 hx:contrast-more:dark:text-gray-50 hx:contrast-more:border-transparent hx:contrast-more:hover:border-gray-900 hx:contrast-more:dark:hover:border-gray-50"
+              >Примечания</a>
             </li>
           </ul>
   
@@ -566,7 +554,7 @@ from wc_cv import grainShow
       hx:text-gray-500 hx:hover:bg-gray-100 hx:hover:text-gray-900 hx:contrast-more:border hx:contrast-more:border-transparent hx:contrast-more:text-gray-900 hx:contrast-more:hover:border-gray-900 hx:dark:text-neutral-400 hx:dark:hover:bg-primary-100/5 hx:dark:hover:text-gray-50 hx:contrast-more:dark:text-gray-50 hx:contrast-more:dark:hover:border-gray-50"
     href="/docs/usage_graph/"
     
-  >Граф трещин: Crack
+  >Граф трещин
     </a></li>
           <li class="open"><a
     class="hx:flex hx:items-center hx:justify-between hx:gap-2 hx:cursor-pointer hx:rounded-sm hx:px-2 hx:py-1.5 hx:text-sm hx:transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
@@ -877,19 +865,79 @@ from wc_cv import grainShow
 <nav class="hextra-toc hx:order-last hx:hidden hx:w-64 hx:shrink-0 hx:xl:block hx:print:hidden hx:px-4" aria-label="table of contents">
     <div class="hextra-scrollbar hx:sticky hx:top-16 hx:overflow-y-auto hx:pr-4 hx:pt-6 hx:text-sm [hyphens:auto] hx:max-h-[calc(100vh-var(--navbar-height)-env(safe-area-inset-bottom))] hx:ltr:-mr-4 hx:rtl:-ml-4"><p class="hx:mb-4 hx:font-semibold hx:tracking-tight">On this page</p><ul>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2">Извлечение углов
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80">Обзор
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d0%ba%d0%b8">Предобработка статистики
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2-%d0%b4%d0%bb%d1%8f-%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f">Вычисление углов для одного изображения
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
-        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b1%d0%b8%d0%bc%d0%be%d0%b4%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d0%b0%d0%bf%d0%bf%d1%80%d0%be%d0%ba%d1%81%d0%b8%d0%bc%d0%b0%d1%86%d0%b8%d1%8f">Бимодальная аппроксимация
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#get_angles">get_angles()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d0%b3%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0">Обработка всего датасета
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#angles_approx_save">angles_approx_save()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b7%d0%b0%d0%b3%d1%80%d1%83%d0%b7%d0%ba%d0%b0-%d0%b8-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7-%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d0%be%d0%b2">Загрузка и анализ результатов
         </a>
       </li>
       <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
         <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f">Визуализация
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#angles_plot_base">angles_plot_base()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#angles_approx_modes">angles_approx_modes()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b8%d0%b9-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7">Статистический анализ
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%b8%d0%bd%d1%82%d0%b5%d0%b3%d1%80%d0%b0%d1%86%d0%b8%d1%8f-%d1%81-%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d0%b5%d0%bc-stats">Интеграция с модулем stats
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%bb%d0%b5%d0%b3%d0%b5%d0%bd%d0%b4%d1%8b">Создание легенды
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#angles_legend">angles_legend()
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80">Полный пример
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d1%80%d0%b5%d0%ba%d0%be%d0%bc%d0%b5%d0%bd%d0%b4%d0%b0%d1%86%d0%b8%d0%b8-%d0%bf%d0%be-%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d0%b0%d0%bc">Рекомендации по параметрам
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#border_eps">border_eps
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#tol-%d1%82%d0%be%d1%87%d0%bd%d0%be%d1%81%d1%82%d1%8c-%d1%83%d0%bf%d1%80%d0%be%d1%89%d0%b5%d0%bd%d0%b8%d1%8f">tol (точность упрощения)
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:ltr:pl-4 hx:rtl:pr-4 hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#step-%d1%88%d0%b0%d0%b3-%d0%b4%d0%bb%d1%8f-%d0%b3%d0%b8%d1%81%d1%82%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d1%8b">step (шаг для гистограммы)
+        </a>
+      </li>
+      <li class="hx:my-2 hx:scroll-my-6 hx:scroll-py-6">
+        <a class="hx:font-medium hx:inline-block hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-300 hx:contrast-more:text-gray-900 hx:contrast-more:underline hx:contrast-more:dark:text-gray-50 hx:w-full hx:break-words" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f">Примечания
         </a>
       </li></ul>
       <div class="hx:mt-8 hx:border-t hx:bg-white hx:pt-8 hx:shadow-[0_-12px_16px_white] hx:dark:bg-dark hx:dark:shadow-[0_-12px_16px_#111] hx:sticky hx:bottom-0 hx:flex hx:flex-col hx:items-start hx:gap-2 hx:pb-8 hx:border-gray-200 hx:dark:border-neutral-800 hx:contrast-more:border-t hx:contrast-more:border-neutral-400 hx:contrast-more:shadow-none hx:contrast-more:dark:border-neutral-400">
@@ -914,30 +962,37 @@ from wc_cv import grainShow
 
         <div class="content">
           <h1>Углы и их распределения</h1>
-          <h2>Извлечение углов<span class="hx:absolute hx:-mt-20" id="извлечение-углов"></span>
-    <a href="#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
-
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">grainPreprocess</span><span class="p">,</span> <span class="n">grainMark</span>
-</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;path.png&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">proc</span> <span class="o">=</span> <span class="n">grainPreprocess</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="p">,</span> <span class="n">contours</span> <span class="o">=</span> <span class="n">grainMark</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
-  <button
-    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
-    title="Copy code"
-  >
-    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
-<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
-  </button>
-</div>
-</div>
+          <h1>Углы и их распределения</h1><p>Модуль <code>angles</code> предоставляет функциональность для вычисления углов на контурах зерен и анализа их распределений.</p>
+<h2>Обзор<span class="hx:absolute hx:-mt-20" id="обзор"></span>
+    <a href="#%d0%be%d0%b1%d0%b7%d0%be%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><p>Углы вычисляются на упрощенных контурах зерен:</p>
+<ul>
+<li>Контуры упрощаются алгоритмом Дугласа-Пекера</li>
+<li>Для каждой точки контура вычисляется угол между соседними сегментами</li>
+<li>Углы измеряются в градусах (0-360°)</li>
+<li>Учитывается направление обхода контура (против часовой стрелки)</li>
+</ul>
+<h2>Вычисление углов для одного изображения<span class="hx:absolute hx:-mt-20" id="вычисление-углов-для-одного-изображения"></span>
+    <a href="#%d0%b2%d1%8b%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d1%83%d0%b3%d0%bb%d0%be%d0%b2-%d0%b4%d0%bb%d1%8f-%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>get_angles()</code><span class="hx:absolute hx:-mt-20" id="get_angles"></span>
+    <a href="#get_angles" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Основная функция для вычисления углов на предобработанном изображении.</p>
 <div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">image</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">hello</span><span class="p">(</span><span class="s2">&#34;world&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+</span></span><span class="line"><span class="cl"><span class="c1"># Предобработка изображения</span>
+</span></span><span class="line"><span class="cl"><span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;image.png&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Вычисление углов</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles_array</span><span class="p">,</span> <span class="n">contours</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">processed</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>  <span class="c1"># Расстояние от края изображения</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tol</span><span class="o">=</span><span class="mi">3</span>          <span class="c1"># Точность упрощения контуров</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Найдено углов: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">angles_array</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Средний угол: </span><span class="si">{</span><span class="n">angles_array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Медианный угол: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">angles_array</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -947,12 +1002,45 @@ from wc_cv import grainShow
   </button>
 </div>
 </div>
-<h2>Предобработка статистики<span class="hx:absolute hx:-mt-20" id="предобработка-статистики"></span>
-    <a href="#%d0%bf%d1%80%d0%b5%d0%b4%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d0%ba%d0%b8" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>image</code> (ndarray): Предобработанное изображение (width, height, 1)</li>
+<li><code>border_eps</code> (int): Расстояние от края изображения до внутреннего края (игнорируются контуры слишком близко к краю)</li>
+<li><code>tol</code> (int): Точность упрощения контуров алгоритмом Дугласа-Пекера</li>
+</ul>
+<p><strong>Возвращает:</strong></p>
+<ul>
+<li><code>angles</code> (ndarray): Массив углов в градусах</li>
+<li><code>contours</code> (list): Список обработанных контуров</li>
+</ul>
+<p><strong>Пример использования:</strong></p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">grainStats</span>
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">approx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">grainStats</span><span class="o">.</span><span class="n">stats_preprocess</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+</span></span><span class="line"><span class="cl"><span class="c1"># Загрузка и предобработка</span>
+</span></span><span class="line"><span class="cl"><span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;grain_image.png&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Вычисление углов</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles_array</span><span class="p">,</span> <span class="n">cnts</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">processed</span><span class="p">,</span> <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Статистика</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Всего углов: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">angles_array</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Минимальный угол: </span><span class="si">{</span><span class="n">angles_array</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Максимальный угол: </span><span class="si">{</span><span class="n">angles_array</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Средний угол: </span><span class="si">{</span><span class="n">angles_array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Стандартное отклонение: </span><span class="si">{</span><span class="n">angles_array</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Гистограмма</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">angles_array</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Угол (градусы)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Частота&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Распределение углов&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -962,12 +1050,116 @@ from wc_cv import grainShow
   </button>
 </div>
 </div>
-<h2>Бимодальная аппроксимация<span class="hx:absolute hx:-mt-20" id="бимодальная-аппроксимация"></span>
-    <a href="#%d0%b1%d0%b8%d0%bc%d0%be%d0%b4%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d0%b0%d0%bf%d0%bf%d1%80%d0%be%d0%ba%d1%81%d0%b8%d0%bc%d0%b0%d1%86%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+<h2>Обработка всего датасета<span class="hx:absolute hx:-mt-20" id="обработка-всего-датасета"></span>
+    <a href="#%d0%be%d0%b1%d1%80%d0%b0%d0%b1%d0%be%d1%82%d0%ba%d0%b0-%d0%b2%d1%81%d0%b5%d0%b3%d0%be-%d0%b4%d0%b0%d1%82%d0%b0%d1%81%d0%b5%d1%82%d0%b0" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>angles_approx_save()</code><span class="hx:absolute hx:-mt-20" id="angles_approx_save"></span>
+    <a href="#angles_approx_save" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Вычисляет и сохраняет распределения углов для всех изображений в датасете с автоматической аппроксимацией.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">grainApprox</span>
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">x_plot</span><span class="p">,</span> <span class="n">y_plot</span><span class="p">),</span> <span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="n">amps</span> <span class="o">=</span> <span class="n">grainApprox</span><span class="o">.</span><span class="n">bimodal_gauss_approx</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+</span></span><span class="line"><span class="cl"><span class="c1"># Путь к датасету</span>
+</span></span><span class="line"><span class="cl"><span class="n">images_path</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">example_class_path</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Словарь типов зерен</span>
+</span></span><span class="line"><span class="cl"><span class="n">types_dict</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co11&#39;</span><span class="p">:</span> <span class="s1">&#39;средние зерна&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co25&#39;</span><span class="p">:</span> <span class="s1">&#39;мелкие зерна&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co8&#39;</span><span class="p">:</span> <span class="s1">&#39;средне-мелкие зерна&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co6_2&#39;</span><span class="p">:</span> <span class="s1">&#39;крупные зерна&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co15&#39;</span><span class="p">:</span> <span class="s1">&#39;средне-мелкие зерна&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Вычисление и сохранение</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="o">.</span><span class="n">angles_approx_save</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">images_path</span><span class="o">=</span><span class="n">images_path</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save_path</span><span class="o">=</span><span class="s1">&#39;angles_results&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">types_dict</span><span class="o">=</span><span class="n">types_dict</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                      <span class="c1"># Шаг угла в градусах</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">workers</span><span class="o">=</span><span class="mi">20</span>                   <span class="c1"># Количество процессов</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>images_path</code> (str): Путь к папке с классами изображений</li>
+<li><code>save_path</code> (str): Базовое имя для сохранения JSON файла</li>
+<li><code>types_dict</code> (dict): Словарь соответствия имен классов и их описаний</li>
+<li><code>step</code> (int): Шаг угла в градусах для гистограммы</li>
+<li><code>max_images_num_per_class</code> (int, optional): Максимум изображений на класс</li>
+<li><code>workers</code> (int, optional): Количество процессов для параллельной обработки</li>
+</ul>
+<p><strong>Результат:</strong>
+Создается JSON файл с именем <code>{save_path}_step_{step}_degrees.json</code> содержащий:</p>
+<ul>
+<li>Пути к изображениям</li>
+<li>Имена классов</li>
+<li>Текстовые легенды с параметрами распределений</li>
+<li>Данные для визуализации (гистограммы)</li>
+<li>Параметры гауссовой аппроксимации</li>
+</ul>
+<p><strong>Структура JSON файла:</strong></p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">[</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;/path/to/class&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Ultra_Co11&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;средние зерна&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;legend&#34;</span><span class="p">:</span> <span class="s2">&#34;--------------\nUltra_Co11 средние зерна\n количество углов 1000\n...&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;density_curve_scatter&#34;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="err">...</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="err">...</span><span class="p">]],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;gauss_approx_plot&#34;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="err">...</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.2</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mf">5.8</span><span class="p">,</span> <span class="err">...</span><span class="p">]],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;gauss_approx_data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;mus&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">270.3</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;sigmas&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mf">30.2</span><span class="p">,</span> <span class="mf">28.7</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;amps&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="err">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Загрузка и анализ результатов<span class="hx:absolute hx:-mt-20" id="загрузка-и-анализ-результатов"></span>
+    <a href="#%d0%b7%d0%b0%d0%b3%d1%80%d1%83%d0%b7%d0%ba%d0%b0-%d0%b8-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7-%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d0%be%d0%b2" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Загрузка результатов</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;angles_results_step_5_degrees.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Анализ каждого класса</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">Класс: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Тип: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Легенда:</span><span class="se">\n</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;legend&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Данные для визуализации</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;density_curve_scatter&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Точек в распределении: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Параметры аппроксимации</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mus</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;gauss_approx_data&#39;</span><span class="p">][</span><span class="s1">&#39;mus&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sigmas</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;gauss_approx_data&#39;</span><span class="p">][</span><span class="s1">&#39;sigmas&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">amps</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;gauss_approx_data&#39;</span><span class="p">][</span><span class="s1">&#39;amps&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Мода 1: μ=</span><span class="si">{</span><span class="n">mus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, σ=</span><span class="si">{</span><span class="n">sigmas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Мода 2: μ=</span><span class="si">{</span><span class="n">mus</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, σ=</span><span class="si">{</span><span class="n">sigmas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -978,10 +1170,29 @@ from wc_cv import grainShow
 </div>
 </div>
 <h2>Визуализация<span class="hx:absolute hx:-mt-20" id="визуализация"></span>
-    <a href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+    <a href="#%d0%b2%d0%b8%d0%b7%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>angles_plot_base()</code><span class="hx:absolute hx:-mt-20" id="angles_plot_base"></span>
+    <a href="#angles_plot_base" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализация распределений углов для нескольких классов.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
 
-<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">wc_cv</span> <span class="kn">import</span> <span class="n">grainShow</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># см. также grainShow.angles_plot_base для комплексных графиков</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Загрузка данных</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;angles_results_step_5_degrees.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="o">.</span><span class="n">angles_plot_base</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">plot_file_name</span><span class="o">=</span><span class="s1">&#39;angles_plot&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>              <span class="c1"># Количество строк в сетке</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>              <span class="c1"># Количество столбцов в сетке</span>
+</span></span><span class="line"><span class="cl">    <span class="n">indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="c1"># Индексы классов для отображения</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scatter_size</span><span class="o">=</span><span class="mi">20</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
   <button
     class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
     title="Copy code"
@@ -991,14 +1202,203 @@ from wc_cv import grainShow
   </button>
 </div>
 </div>
+<p><strong>Параметры:</strong></p>
+<ul>
+<li><code>data</code>: Данные из JSON файла</li>
+<li><code>plot_file_name</code>: Базовое имя для сохранения графиков</li>
+<li><code>step</code>: Шаг угла в градусах</li>
+<li><code>N</code>, <code>M</code>: Размеры сетки графиков</li>
+<li><code>indices</code>: Список индексов классов для отображения (если <code>None</code>, отображаются все)</li>
+<li><code>save</code>: Сохранить графики</li>
+<li><code>font_size</code>: Размер шрифта</li>
+<li><code>scatter_size</code>: Размер точек на графике</li>
+</ul>
+<h3><code>angles_approx_modes()</code><span class="hx:absolute hx:-mt-20" id="angles_approx_modes"></span>
+    <a href="#angles_approx_modes" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Визуализация мод распределения углов.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="o">.</span><span class="n">angles_approx_modes</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">folder</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">,</span>      <span class="c1"># Папка с JSON файлами</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">start1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop1</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>   <span class="c1"># Диапазон первой моды</span>
+</span></span><span class="line"><span class="cl">    <span class="n">start2</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">stop2</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="c1"># Диапазон второй моды</span>
+</span></span><span class="line"><span class="cl">    <span class="n">width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">font_size</span><span class="o">=</span><span class="mi">25</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Статистический анализ<span class="hx:absolute hx:-mt-20" id="статистический-анализ"></span>
+    <a href="#%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%81%d1%82%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b8%d0%b9-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3>Интеграция с модулем stats<span class="hx:absolute hx:-mt-20" id="интеграция-с-модулем-stats"></span>
+    <a href="#%d0%b8%d0%bd%d1%82%d0%b5%d0%b3%d1%80%d0%b0%d1%86%d0%b8%d1%8f-%d1%81-%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d0%b5%d0%bc-stats" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">approx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Вычисление углов</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles_array</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">processed</span><span class="p">,</span> <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Предобработка для статистики</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">stats_preprocess</span><span class="p">(</span><span class="n">angles_array</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Бимодальная гауссова аппроксимация</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">),</span> <span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="n">amps</span> <span class="o">=</span> <span class="n">approx</span><span class="o">.</span><span class="n">bimodal_gauss_approx</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Данные&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Бимодальная аппроксимация&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Угол (градусы)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Частота&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Распределение углов с аппроксимацией&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Мода 1: μ=</span><span class="si">{</span><span class="n">mus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, σ=</span><span class="si">{</span><span class="n">sigmas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, A=</span><span class="si">{</span><span class="n">amps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Мода 2: μ=</span><span class="si">{</span><span class="n">mus</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, σ=</span><span class="si">{</span><span class="n">sigmas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°, A=</span><span class="si">{</span><span class="n">amps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Создание легенды<span class="hx:absolute hx:-mt-20" id="создание-легенды"></span>
+    <a href="#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%bb%d0%b5%d0%b3%d0%b5%d0%bd%d0%b4%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>angles_legend()</code><span class="hx:absolute hx:-mt-20" id="angles_legend"></span>
+    <a href="#angles_legend" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><p>Создание текстовой легенды для распределения углов.</p>
+<div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">legend</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">angles_legend</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">images_amount</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>      <span class="c1"># Количество изображений</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ultra_Co11&#39;</span><span class="p">,</span>      <span class="c1"># Имя класса</span>
+</span></span><span class="line"><span class="cl">    <span class="n">itype</span><span class="o">=</span><span class="s1">&#39;средние зерна&#39;</span><span class="p">,</span>  <span class="c1"># Тип зерен</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                 <span class="c1"># Шаг угла</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mus</span><span class="o">=</span><span class="p">[</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">270.3</span><span class="p">],</span>      <span class="c1"># Средние значения мод</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sigmas</span><span class="o">=</span><span class="p">[</span><span class="mf">30.2</span><span class="p">,</span> <span class="mf">28.7</span><span class="p">],</span>    <span class="c1"># Стандартные отклонения</span>
+</span></span><span class="line"><span class="cl">    <span class="n">amps</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">],</span>       <span class="c1"># Амплитуды</span>
+</span></span><span class="line"><span class="cl">    <span class="n">norm</span><span class="o">=</span><span class="mi">1000</span>               <span class="c1"># Общее количество углов</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Полный пример<span class="hx:absolute hx:-mt-20" id="полный-пример"></span>
+    <a href="#%d0%bf%d0%be%d0%bb%d0%bd%d1%8b%d0%b9-%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code">
+
+<div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">combra</span> <span class="kn">import</span> <span class="n">angles</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">approx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 1. Обработка одного изображения</span>
+</span></span><span class="line"><span class="cl"><span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;grain_image.png&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">processed</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">image_preprocess</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">angles_array</span><span class="p">,</span> <span class="n">cnts</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">get_angles</span><span class="p">(</span><span class="n">processed</span><span class="p">,</span> <span class="n">border_eps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. Статистический анализ</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">stats_preprocess</span><span class="p">(</span><span class="n">angles_array</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">),</span> <span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="n">amps</span> <span class="o">=</span> <span class="n">approx</span><span class="o">.</span><span class="n">bimodal_gauss_approx</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. Визуализация</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Данные&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_gauss</span><span class="p">,</span> <span class="n">y_gauss</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Аппроксимация&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Угол (градусы)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Частота&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 4. Обработка всего датасета</span>
+</span></span><span class="line"><span class="cl"><span class="n">images_path</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">example_class_path</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">types_dict</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co11&#39;</span><span class="p">:</span> <span class="s1">&#39;средние зерна&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;Ultra_Co25&#39;</span><span class="p">:</span> <span class="s1">&#39;мелкие зерна&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="o">.</span><span class="n">angles_approx_save</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">images_path</span><span class="o">=</span><span class="n">images_path</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save_path</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">types_dict</span><span class="o">=</span><span class="n">types_dict</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_images_num_per_class</span><span class="o">=</span><span class="mi">100</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 5. Загрузка и визуализация результатов</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;results_step_5_degrees.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">results</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">angles</span><span class="o">.</span><span class="n">angles_plot_base</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">results</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">plot_file_name</span><span class="o">=</span><span class="s1">&#39;angles_plot&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">N</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0">
+  <button
+    class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+    title="Copy code"
+  >
+    <div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"></div>
+<div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"></div>
+  </button>
+</div>
+</div>
+<h2>Рекомендации по параметрам<span class="hx:absolute hx:-mt-20" id="рекомендации-по-параметрам"></span>
+    <a href="#%d1%80%d0%b5%d0%ba%d0%be%d0%bc%d0%b5%d0%bd%d0%b4%d0%b0%d1%86%d0%b8%d0%b8-%d0%bf%d0%be-%d0%bf%d0%b0%d1%80%d0%b0%d0%bc%d0%b5%d1%82%d1%80%d0%b0%d0%bc" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><h3><code>border_eps</code><span class="hx:absolute hx:-mt-20" id="border_eps"></span>
+    <a href="#border_eps" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><ul>
+<li><strong>Маленькие значения (3-5)</strong>: Больше углов, но могут быть артефакты на краях</li>
+<li><strong>Большие значения (10-15)</strong>: Меньше углов, но более надежные результаты</li>
+</ul>
+<h3><code>tol</code> (точность упрощения)<span class="hx:absolute hx:-mt-20" id="tol-точность-упрощения"></span>
+    <a href="#tol-%d1%82%d0%be%d1%87%d0%bd%d0%be%d1%81%d1%82%d1%8c-%d1%83%d0%bf%d1%80%d0%be%d1%89%d0%b5%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><ul>
+<li><strong>Маленькие значения (1-3)</strong>: Более точные контуры, больше точек, медленнее</li>
+<li><strong>Большие значения (5-10)</strong>: Меньше точек, быстрее, но может теряться детализация</li>
+</ul>
+<h3><code>step</code> (шаг для гистограммы)<span class="hx:absolute hx:-mt-20" id="step-шаг-для-гистограммы"></span>
+    <a href="#step-%d1%88%d0%b0%d0%b3-%d0%b4%d0%bb%d1%8f-%d0%b3%d0%b8%d1%81%d1%82%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d1%8b" class="subheading-anchor" aria-label="Permalink for this section"></a></h3><ul>
+<li><strong>5 градусов</strong>: Стандартное значение, хороший баланс</li>
+<li><strong>1-2 градуса</strong>: Высокая детализация, больше шума</li>
+<li><strong>10 градусов</strong>: Меньше деталей, более гладкие распределения</li>
+</ul>
+<h2>Примечания<span class="hx:absolute hx:-mt-20" id="примечания"></span>
+    <a href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f" class="subheading-anchor" aria-label="Permalink for this section"></a></h2><ul>
+<li>Углы вычисляются с учетом направления обхода контура (против часовой стрелки)</li>
+<li>Углы &gt;180° учитываются (полный диапазон 0-360°)</li>
+<li>Контуры слишком близко к краю изображения игнорируются</li>
+<li>Для больших датасетов рекомендуется использовать параллельную обработку (<code>workers</code> параметр)</li>
+</ul>
 
         </div>
         <div class="hx:mt-16"></div>
         <div class="hx:mb-8 hx:flex hx:items-center hx:border-t hx:pt-8 hx:border-gray-200 hx:dark:border-neutral-800 hx:contrast-more:border-neutral-400 hx:dark:contrast-more:border-neutral-400 hx:print:hidden"><a
         href="/docs/usage_graph/"
-        title="Граф трещин: Crack"
+        title="Граф трещин"
         class="hx:flex hx:max-w-[50%] hx:items-center hx:gap-1 hx:py-4 hx:text-base hx:font-medium hx:text-gray-600 hx:transition-colors [word-break:break-word] hx:hover:text-primary-600 hx:dark:text-gray-300 hx:md:text-lg hx:ltr:pr-4 hx:rtl:pl-4"
-      ><svg class="hx:inline hx:h-5 hx:shrink-0 hx:ltr:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>Граф трещин: Crack</a><a
+      ><svg class="hx:inline hx:h-5 hx:shrink-0 hx:ltr:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>Граф трещин</a><a
         href="/docs/introduction/"
         title="Введение"
         class="hx:flex hx:max-w-[50%] hx:items-center hx:gap-1 hx:py-4 hx:text-base hx:font-medium hx:text-gray-600 hx:transition-colors [word-break:break-word] hx:hover:text-primary-600 hx:dark:text-gray-300 hx:md:text-lg hx:ltr:ml-auto hx:ltr:pl-4 hx:ltr:text-right hx:rtl:mr-auto hx:rtl:pr-4 hx:rtl:text-left"
@@ -1016,8 +1416,8 @@ from wc_cv import grainShow
   </a></div></div>
     </div></footer>
     
-    <script defer src="/js/main.min.cb7a23a5df1c111bc4480bf230e34602359a7a80de78a8cc15c369903ecd80fa.js" integrity="sha256-y3ojpd8cERvESAvyMONGAjWaeoDeeKjMFcNpkD7NgPo="></script>
-<script defer src="/js/flexsearch.433e941a8a573ebb9931fc16fc75266ab6b93f569ac2fb4f3dc66882e0416f4c.js" integrity="sha256-Qz6UGopXPruZMfwW/HUmara5P1aawvtPPcZoguBBb0w=" crossorigin="anonymous"></script>
-        <script defer src="/en.search.min.097e3a24da0aba2ac82ef0f53e82e1500343a7126260a0203f3a45bbe0876093.js" integrity="sha256-CX46JNoKuirILvD1PoLhUANDpxJiYKAgPzpFu&#43;CHYJM="></script>
+    <script defer src="/js/main.js" integrity=""></script>
+<script defer src="/js/flexsearch.9f5b5908f93ae86f1ecd4b043b799f580c2d1654e703dd9357d568ac41b2547a.js" integrity="sha256-n1tZCPk66G8ezUsEO3mfWAwtFlTnA92TV9VorEGyVHo=" crossorigin="anonymous"></script>
+        <script defer src="/en.search.js" integrity=""></script>
   </body>
 </html>
