@@ -29,6 +29,7 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+          token: ${{ secrets.COMBRA_PAT }}
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
