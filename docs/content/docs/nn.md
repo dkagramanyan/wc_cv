@@ -1,15 +1,14 @@
 ---
-title: "Машинное обучение"
+title: "Machine Learning"
 weight: 20
 ---
 
-Для использования снимков нужно создать модель автоэнкодер, которая из снимков будет вытягивать вектор признаков. Затем этот вектор вместе с вычисленными характеристиками будет отправлться на вход другой нейронной сети, которая будет искать зависимости между входными значениями и физическими характеристиками сплавов
+To use images, you need to create an autoencoder model that will extract a feature vector from images. Then this vector together with computed characteristics will be sent to the input of another neural network, which will search for dependencies between input values and physical characteristics of alloys.
 
-## Архитектура:
+## Architecture:
 
 ![Pipeline](https://pobedit.s3.us-east-2.amazonaws.com/docs_images/pipeline.jpg)
 
-[Веса AE (tf)](https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/u2net_2021-11-19.h5)
+[AE weights (tf)](https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/u2net_2021-11-19.h5)
 
-[Веса VQ-VAE-2 (pt)](https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/vqvae_002_train_0.00976_test_0.00967_1024.pt)
-
+[VQ-VAE-2 weights (pt)](https://pobedit.s3.us-east-2.amazonaws.com/ml_weights/vqvae_002_train_0.00976_test_0.00967_1024.pt)

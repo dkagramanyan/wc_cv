@@ -1,8 +1,8 @@
-# Быстрый старт - Запуск документации
+# Quick Start - Running the Documentation
 
-## Шаг 1: Установите Hugo
+## Step 1: Install Hugo
 
-### macOS (через Homebrew)
+### macOS (via Homebrew)
 ```bash
 brew install hugo
 ```
@@ -12,15 +12,15 @@ brew install hugo
 # Ubuntu/Debian
 sudo apt-get install hugo
 
-# или скачайте бинарник с https://github.com/gohugoio/hugo/releases
+# or download binary from https://github.com/gohugoio/hugo/releases
 ```
 
 ### Windows
-Скачайте установщик с [официального сайта Hugo](https://gohugo.io/installation/)
+Download installer from [Hugo official website](https://gohugo.io/installation/)
 
-## Шаг 2: Установите Go (если еще не установлен)
+## Step 2: Install Go (if not already installed)
 
-Go необходим для работы Hugo Modules.
+Go is required for Hugo Modules to work.
 
 ### macOS
 ```bash
@@ -28,43 +28,43 @@ brew install go
 ```
 
 ### Linux/Windows
-Скачайте с [официального сайта Go](https://golang.org/dl/)
+Download from [Go official website](https://golang.org/dl/)
 
-## Шаг 3: Перейдите в директорию документации
+## Step 3: Navigate to the documentation directory
 
 ```bash
 cd docs
 ```
 
-## Шаг 4: Установите тему Hextra
+## Step 4: Install Hextra theme
 
 ```bash
 hugo mod get github.com/imfing/hextra
 hugo mod tidy
 ```
 
-## Шаг 5: Запустите локальный сервер
+## Step 5: Start local server
 
 ```bash
 hugo server
 ```
 
-## Шаг 6: Откройте браузер
+## Step 6: Open browser
 
-Перейдите по адресу: **http://localhost:1313/**
+Navigate to: **http://localhost:1313/**
 
 ---
 
-## Альтернативные команды
+## Alternative commands
 
 
-### Сборка статического сайта
+### Build static site
 ```bash
 hugo
 ```
-Результат будет в папке `public/`
+Result will be in the `public/` folder
 
-### Сборка с минификацией (для продакшена)
+### Build with minification (for production)
 ```bash
 hugo --minify
 ```

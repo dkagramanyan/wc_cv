@@ -5,9 +5,9 @@ weight: 17
 
 ## angles_legend(images_amount, name, itype, step, mus, sigmas, amps, norm)
 
-Cоздание легенды распределения углов
+Creates a legend for angle distribution
 
-**Параметры:**
+**Parameters:**
 - `images_amount`: int
 - `name`: str
 - `itype`: str
@@ -17,13 +17,13 @@ Cоздание легенды распределения углов
 - `amps`: float
 - `norm`: int
 
-**Возвращает:** str
+**Returns:** str
 
 ## angles_approx_save(folder, images, names, types, step, save=True)
 
-Вычисление и сохранение распределения углов для всех фотографий одного образца
+Computes and saves angle distribution for all photos of one sample
 
-**Параметры:**
+**Parameters:**
 - `folder`: str path to dir
 - `images`: ndarray uint8 [[image1_class1,image2_class1,..],[image1_class2,image2_class2,..]..]
 - `names`: list str [class_name1,class_name2,..]
@@ -33,9 +33,9 @@ Cоздание легенды распределения углов
 
 ## beams_legend(name, itype, norm, k, angle, b, score, dist_step, dist_mean)
 
-Создание легенды для распределения длин полуосей
+Creates a legend for semi-axis length distribution
 
-**Параметры:**
+**Parameters:**
 - `name`: str
 - `itype`: str
 - `norm`: int
@@ -46,13 +46,13 @@ Cоздание легенды распределения углов
 - `dist_step`: int
 - `dist_mean`: float
 
-**Возвращает:** str
+**Returns:** str
 
 ## diametr_approx_save(folder, images, names, types, step, pixel, start=2, end=-3, save=True, debug=False)
 
-Вычисление и сохранение распределения длин а- и б- полуосей и угла поворота эллипса для разных образцов
+Computes and saves distribution of a- and b- semi-axis lengths and ellipse rotation angle for different samples
 
-**Параметры:**
+**Parameters:**
 - `folder`: str
 - `images`: ndarray uint8 [[image1_class1,image2_class1,..],[image1_class2,image2_class2,..]..]
 - `names`: list str [class_name1,class_name2,..]
@@ -64,5 +64,4 @@ Cоздание легенды распределения углов
 - `save`: bool
 - `debug`: bool
 
-**Возвращает:** None
-
+**Returns:** None

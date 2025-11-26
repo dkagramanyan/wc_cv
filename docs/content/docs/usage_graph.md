@@ -1,36 +1,36 @@
 ---
-title: "Граф трещин"
+title: "Crack Graph"
 weight: 3
 ---
 
-Модуль `graph` предоставляет функциональность для построения и анализа графов трещин на изображениях композитных сплавов.
+The `graph` module provides functionality for constructing and analyzing crack graphs on composite alloy images.
 
-## Обзор
+## Overview
 
-Граф трещин представляет собой ориентированный граф, где:
-- **Узлы** соответствуют точкам пересечения или разветвления трещин
-- **Ребра** соответствуют сегментам трещин между узлами
-- **Типы ребер** классифицируются по материалу: Co, WC-Co, WC, WC-WC
+A crack graph is a directed graph where:
+- **Nodes** correspond to intersection or branching points of cracks
+- **Edges** correspond to crack segments between nodes
+- **Edge types** are classified by material: Co, WC-Co, WC, WC-WC
 
-## Пайплайн работы
+## Work pipeline
 
-1. **Предобработка изображения** (`image.image_preprocess`)
-2. **Предобработка для графа** (`graph.preprocess_graph_image`) - выделение контуров, подготовка метаданных узлов
-3. **Построение графа** (`graph.create_crack_graph`) - создание ориентированного графа
-4. **Вычисление энергий** (опционально) (`graph.get_energies`) - расчет энергий путей
-5. **Визуализация** (`graph.graph_plot`) - отображение графа на изображении
+1. **Image preprocessing** (`image.image_preprocess`)
+2. **Graph preprocessing** (`graph.preprocess_graph_image`) - contour extraction, node metadata preparation
+3. **Graph construction** (`graph.create_crack_graph`) - creating a directed graph
+4. **Energy computation** (optional) (`graph.get_energies`) - path energy calculation
+5. **Visualization** (`graph.graph_plot`) - displaying graph on image
 
-## Минимальный пример
+## Minimal example
 
 ```python
 from combra import graph, image
 from skimage import io
 
-# 1. Загрузка и предобработка изображения
+# 1. Load and preprocess image
 img = io.imread('path/to/crack_image.png')
 processed = image.image_preprocess(img)
 
-# 2. Предобработка для графа
+# 2. Preprocess for graph
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     graph.preprocess_graph_image(
         processed,
@@ -41,17 +41,17 @@ entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     )
 )
 
-# 3. Создание графа
+# 3. Create graph
 G, img_contours_mono = graph.create_crack_graph(
     img_contours.shape,
     cnts,
     nodes_meta
 )
 
-print(f"Узлов в графе: {G.number_of_nodes()}")
-print(f"Ребер в графе: {G.number_of_edges()}")
+print(f"Nodes in graph: {G.number_of_nodes()}")
+print(f"Edges in graph: {G.number_of_edges()}")
 
-# 4. Визуализация
+# 4. Visualization
 graph.graph_plot(
     G,
     img_contours_mono,
@@ -62,78 +62,78 @@ graph.graph_plot(
 )
 ```
 
-## Предобработка для графа
+## Graph preprocessing
 
 ### `preprocess_graph_image()`
 
-Подготавливает изображение для построения графа: выделяет контуры, находит узлы, определяет входные и выходные узлы.
+Prepares image for graph construction: extracts contours, finds nodes, determines entry and exit nodes.
 
 ```python
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     graph.preprocess_graph_image(
         image,
-        r=2,                    # Радиус для обработки
-        border=30,              # Размер границы
-        border_node_eps=10,     # Эпсилон для узлов на границе
-        tol=5,                  # Точность упрощения контуров
-        disk=5,                 # Размер диска для морфологии
-        labeled_cnts=False,     # Использовать размеченные контуры
-        labels=False            # Использовать метки
+        r=2,                    # Radius for processing
+        border=30,              # Border size
+        border_node_eps=10,     # Epsilon for border nodes
+        tol=5,                  # Contour simplification accuracy
+        disk=5,                 # Disk size for morphology
+        labeled_cnts=False,     # Use labeled contours
+        labels=False            # Use labels
     )
 )
 ```
 
-**Параметры:**
-- `image` (ndarray): Предобработанное изображение
-- `r` (int): Радиус для обработки узлов
-- `border` (int): Размер границы в пикселях
-- `border_node_eps` (int): Порог для определения узлов на границе
-- `tol` (int): Точность упрощения контуров (алгоритм Дугласа-Пекера)
-- `disk` (int): Размер диска для морфологических операций
-- `labeled_cnts` (bool): Использовать размеченные контуры
-- `labels` (bool): Использовать метки классов
+**Parameters:**
+- `image` (ndarray): Preprocessed image
+- `r` (int): Radius for node processing
+- `border` (int): Border size in pixels
+- `border_node_eps` (int): Threshold for determining border nodes
+- `tol` (int): Contour simplification accuracy (Douglas-Peucker algorithm)
+- `disk` (int): Disk size for morphological operations
+- `labeled_cnts` (bool): Use labeled contours
+- `labels` (bool): Use class labels
 
-**Возвращает:**
-- `entry_nodes`: Список индексов входных узлов
-- `exit_nodes`: Список индексов выходных узлов
-- `img_contours`: Изображение с контурами
-- `img_marked`: Размеченное изображение
-- `cnts`: Список контуров
-- `nodes_meta`: Словарь с метаданными узлов
+**Returns:**
+- `entry_nodes`: List of entry node indices
+- `exit_nodes`: List of exit node indices
+- `img_contours`: Image with contours
+- `img_marked`: Labeled image
+- `cnts`: List of contours
+- `nodes_meta`: Dictionary with node metadata
 
-## Построение графа
+## Graph construction
 
 ### `create_crack_graph()`
 
-Создает ориентированный граф трещин на основе контуров и метаданных узлов.
+Creates a directed crack graph based on contours and node metadata.
 
 ```python
 G, img_contours_mono = graph.create_crack_graph(
     img_shape,
     cnts,
     nodes_metadata,
-    # Дополнительные параметры...
+    # Additional parameters...
 )
 ```
 
-**Параметры:**
-- `img_shape`: Форма изображения (tuple)
-- `cnts`: Список контуров
-- `nodes_metadata`: Словарь с метаданными узлов
+**Parameters:**
+- `img_shape`: Image shape (tuple)
+- `cnts`: List of contours
+- `nodes_metadata`: Dictionary with node metadata
 
-**Возвращает:**
-- `G`: NetworkX ориентированный граф
-- `img_contours_mono`: Монохромное изображение контуров
+**Returns:**
+- `G`: NetworkX directed graph
+- `img_contours_mono`: Monochrome contour image
 
-**Структура графа:**
-- Узлы содержат атрибуты: координаты, тип узла
-- Ребра содержат атрибуты: тип ребра, длина, энергия (если вычислена)
+**Graph structure:**
+- Nodes contain attributes: coordinates, node type
+- Edges contain attributes: edge type, length, energy (if computed)
 
-## Типы ребер
+## Edge types
 
 ### `get_edge_type()`
 
-Определяет тип ребра между двумя узлами на основе анализа пикселей вдоль линии.
+Determines edge type between two nodes based on pixel analysis along the line.
 
 ```python
 edge_type = graph.get_edge_type(
@@ -146,15 +146,15 @@ edge_type = graph.get_edge_type(
 )
 ```
 
-**Типы ребер:**
-- `0`: Co (кобальт)
-- `1`: WC-Co (граница вольфрама-кобальта)
-- `2`: WC (вольфрам-карбид)
-- `3`: WC-WC (граница вольфрама-вольфрама)
+**Edge types:**
+- `0`: Co (cobalt)
+- `1`: WC-Co (tungsten-cobalt boundary)
+- `2`: WC (tungsten carbide)
+- `3`: WC-WC (tungsten-tungsten boundary)
 
 ### `get_edge_type_labeled()`
 
-Определение типа ребра для размеченных данных.
+Edge type determination for labeled data.
 
 ```python
 edge_type = graph.get_edge_type_labeled(
@@ -165,11 +165,11 @@ edge_type = graph.get_edge_type_labeled(
 )
 ```
 
-## Вычисление энергий
+## Energy computation
 
 ### `get_energies()`
 
-Вычисляет энергии путей в графе для различных конфигураций.
+Computes path energies in the graph for various configurations.
 
 ```python
 energies = graph.get_energies(
@@ -182,20 +182,20 @@ energies = graph.get_energies(
 )
 ```
 
-**Параметры:**
-- `g`: NetworkX граф
-- `cnts`: Список контуров
-- `nodes_metadata`: Метаданные узлов
-- `entry_nodes`: Входные узлы
-- `exit_nodes`: Выходные узлы
-- `workers`: Количество процессов
+**Parameters:**
+- `g`: NetworkX graph
+- `cnts`: List of contours
+- `nodes_metadata`: Node metadata
+- `entry_nodes`: Entry nodes
+- `exit_nodes`: Exit nodes
+- `workers`: Number of processes
 
-**Возвращает:**
-- Словарь с энергиями для различных конфигураций
+**Returns:**
+- Dictionary with energies for various configurations
 
 ### `find_shortest_energy_paths()`
 
-Находит кратчайшие пути в графе на основе вычисленных энергий.
+Finds shortest paths in the graph based on computed energies.
 
 ```python
 paths = graph.find_shortest_energy_paths(
@@ -205,25 +205,25 @@ paths = graph.find_shortest_energy_paths(
 )
 ```
 
-## Визуализация
+## Visualization
 
 ### `graph_plot()`
 
-Визуализирует граф на изображении контуров.
+Visualizes graph on contour image.
 
 ```python
 graph.graph_plot(
     g,
     img_contours,
-    N=50,              # Количество строк в сетке
-    M=50,              # Количество столбцов в сетке
-    name='graph.jpg',  # Имя файла для сохранения
-    border=30,         # Размер границы
-    save=False         # Сохранить изображение
+    N=50,              # Number of rows in grid
+    M=50,              # Number of columns in grid
+    name='graph.jpg',  # Filename for saving
+    border=30,         # Border size
+    save=False         # Save image
 )
 ```
 
-**Пример:**
+**Example:**
 ```python
 graph.graph_plot(
     G,
@@ -238,7 +238,7 @@ graph.graph_plot(
 
 ### `plot_optimized_energies()`
 
-Визуализирует матрицы энергий для различных конфигураций.
+Visualizes energy matrices for various configurations.
 
 ```python
 graph.plot_optimized_energies(
@@ -249,20 +249,20 @@ graph.plot_optimized_energies(
 
 ### `plot_paths()`
 
-Визуализирует пути на выровненном изображении.
+Visualizes paths on aligned image.
 
 ```python
 graph.plot_paths(
     g,
-    df,           # DataFrame с путями
-    img_aligned,  # Выровненное изображение
+    df,           # DataFrame with paths
+    img_aligned,  # Aligned image
     border=30
 )
 ```
 
 ### `plot_optimized_paths()`
 
-Визуализирует оптимизированные пути.
+Visualizes optimized paths.
 
 ```python
 graph.plot_optimized_paths(
@@ -276,30 +276,30 @@ graph.plot_optimized_paths(
 
 ### `draw_tree()`
 
-Визуализирует дерево на изображении.
+Visualizes tree on image.
 
 ```python
 graph.draw_tree(
     img,
-    centres=False,  # Показывать центры
-    leafs=False,    # Показывать листья
-    nodes=False,    # Показывать узлы
-    bones=False     # Показывать кости
+    centres=False,  # Show centers
+    leafs=False,    # Show leaves
+    nodes=False,    # Show nodes
+    bones=False     # Show bones
 )
 ```
 
-## Полный пример
+## Complete example
 
 ```python
 from combra import graph, image, contours
 from skimage import io
 import networkx as nx
 
-# 1. Загрузка и предобработка
+# 1. Load and preprocess
 img = io.imread('crack_image.png')
 processed = image.image_preprocess(img)
 
-# 2. Предобработка для графа
+# 2. Preprocess for graph
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     graph.preprocess_graph_image(
         processed,
@@ -310,20 +310,20 @@ entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     )
 )
 
-# 3. Создание графа
+# 3. Create graph
 G, img_contours_mono = graph.create_crack_graph(
     img_contours.shape,
     cnts,
     nodes_meta
 )
 
-# 4. Анализ графа
-print(f"Узлов: {G.number_of_nodes()}")
-print(f"Ребер: {G.number_of_edges()}")
-print(f"Входных узлов: {len(entry_nodes)}")
-print(f"Выходных узлов: {len(exit_nodes)}")
+# 4. Graph analysis
+print(f"Nodes: {G.number_of_nodes()}")
+print(f"Edges: {G.number_of_edges()}")
+print(f"Entry nodes: {len(entry_nodes)}")
+print(f"Exit nodes: {len(exit_nodes)}")
 
-# 5. Вычисление энергий (опционально)
+# 5. Energy computation (optional)
 energies = graph.get_energies(
     G,
     cnts,
@@ -333,7 +333,7 @@ energies = graph.get_energies(
     workers=4
 )
 
-# 6. Визуализация
+# 6. Visualization
 graph.graph_plot(
     G,
     img_contours_mono,
@@ -343,71 +343,71 @@ graph.graph_plot(
     save=True
 )
 
-# 7. Анализ типов ребер
+# 7. Edge type analysis
 edge_types = {}
 for u, v, data in G.edges(data=True):
     edge_type = data.get('type', 'unknown')
     edge_types[edge_type] = edge_types.get(edge_type, 0) + 1
 
-print("Распределение типов ребер:")
+print("Edge type distribution:")
 for edge_type, count in edge_types.items():
     type_names = {0: 'Co', 1: 'WC-Co', 2: 'WC', 3: 'WC-WC'}
     print(f"  {type_names.get(edge_type, 'Unknown')}: {count}")
 ```
 
-## Работа с NetworkX
+## Working with NetworkX
 
-Поскольку граф является объектом NetworkX, можно использовать все стандартные функции NetworkX:
+Since the graph is a NetworkX object, you can use all standard NetworkX functions:
 
 ```python
 import networkx as nx
 
-# Поиск кратчайших путей
+# Find shortest paths
 if nx.has_path(G, source=entry_nodes[0], target=exit_nodes[0]):
     path = nx.shortest_path(G, source=entry_nodes[0], target=exit_nodes[0])
-    print(f"Кратчайший путь: {path}")
+    print(f"Shortest path: {path}")
 
-# Вычисление центральности
+# Compute centrality
 centrality = nx.degree_centrality(G)
-print(f"Наиболее центральный узел: {max(centrality, key=centrality.get)}")
+print(f"Most central node: {max(centrality, key=centrality.get)}")
 
-# Поиск компонент связности
+# Find connected components
 components = list(nx.weakly_connected_components(G))
-print(f"Компонент связности: {len(components)}")
+print(f"Connected components: {len(components)}")
 ```
 
-## Параметры и настройки
+## Parameters and settings
 
-### Рекомендуемые параметры
+### Recommended parameters
 
-Для большинства случаев подходят следующие параметры:
+For most cases, the following parameters work well:
 
 ```python
-# Предобработка
+# Preprocessing
 processed = image.image_preprocess(img)
 
-# Предобработка для графа
+# Graph preprocessing
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     graph.preprocess_graph_image(
         processed,
-        r=2,                # Стандартное значение
-        border=30,          # Зависит от размера изображения
-        border_node_eps=10, # Стандартное значение
-        tol=5,              # Баланс между точностью и производительностью
-        disk=5              # Стандартное значение
+        r=2,                # Standard value
+        border=30,          # Depends on image size
+        border_node_eps=10, # Standard value
+        tol=5,              # Balance between accuracy and performance
+        disk=5              # Standard value
     )
 )
 ```
 
-### Настройка для разных типов изображений
+### Tuning for different image types
 
-- **Высокое разрешение**: увеличьте `border` и `border_node_eps`
-- **Много шума**: увеличьте `disk` для морфологии
-- **Сложные контуры**: уменьшите `tol` для большей точности
+- **High resolution**: increase `border` and `border_node_eps`
+- **High noise**: increase `disk` for morphology
+- **Complex contours**: decrease `tol` for greater accuracy
 
-## Примечания
+## Notes
 
-- Граф является ориентированным (directed)
-- Узлы на границе изображения автоматически определяются как входные/выходные
-- Типы ребер определяются на основе анализа пикселей вдоль линии между узлами
-- Для больших изображений рекомендуется использовать параллельную обработку (`workers` параметр)
+- Graph is directed
+- Nodes on image border are automatically determined as entry/exit
+- Edge types are determined based on pixel analysis along the line between nodes
+- For large images, parallel processing is recommended (`workers` parameter)

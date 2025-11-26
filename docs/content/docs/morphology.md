@@ -5,11 +5,10 @@ weight: 10
 
 ## kmeans_image(image, n_clusters)
 
-Кластеризует при помощи kmeans и возвращает изображение с нанесенными цветами кластеров
+Clusters using kmeans and returns an image with cluster colors applied
 
-**Параметры:**
+**Parameters:**
 - `image`: ndarray (width, height, channels)
 - `n_clusters`: int
 
-**Возвращает:** (image, colors), colors - list of median colors of the clusters
-
+**Returns:** (image, colors), colors - list of median colors of the clusters

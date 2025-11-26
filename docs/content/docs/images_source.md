@@ -1,9 +1,8 @@
 ---
-title: "Описание снимков"
+title: "Image Description"
 weight: 8
 ---
 
-Полученые шлифы проходили предварительное микроскопическое исследование с помощью оптической микроскопии до и после травления в реактиве Мураками для выявления включений свободного углерода и фазы, а также растровой электронной  микроскопии (РЭМ)  и рентгеновского микроанализа на приборе Tescan Vega TS5130 MM, оборудованном энерго- дисперсионным спектрометром LINK  производства фирмы Oxford Instruments. Размер изображения 100 на 100 мкм. Размер цифрового изображения  3072 на 1680 пикселей, каждый пиксель имеет 256 оттенков серого.
+The obtained samples underwent preliminary microscopic examination using optical microscopy before and after etching in Murakami's reagent to reveal free carbon inclusions and phases, as well as scanning electron microscopy (SEM) and X-ray microanalysis on a Tescan Vega TS5130 MM instrument equipped with an Oxford Instruments LINK energy-dispersive spectrometer. Image size is 100 by 100 μm. Digital image size is 3072 by 1680 pixels, each pixel has 256 shades of gray.
 
-![Пример SEM изображения микроструктуры сплава WC-Co](https://pobedit.s3.us-east-2.amazonaws.com/docs_images/Ultra_Co15.jpg)
-
+![Example SEM image of WC-Co alloy microstructure](https://pobedit.s3.us-east-2.amazonaws.com/docs_images/Ultra_Co15.jpg)

@@ -5,9 +5,9 @@ weight: 18
 
 ## printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r", eta=None)
 
-Вызывает цикл для вывода прогресс бара
+Calls a loop to output a progress bar
 
-**Параметры:**
+**Parameters:**
 - `current iteration`: Int
 - `total iterations`: Int
 - `prefix string`: Str
@@ -16,4 +16,3 @@ weight: 18
 - `character length of bar`: Int
 - `bar fill character`: Str
 - `end character (e.g. "\r", "\r\n")`: Str
-

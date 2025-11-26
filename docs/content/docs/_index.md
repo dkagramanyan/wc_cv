@@ -1,5 +1,5 @@
 ---
-title: "Документация"
+title: "Documentation"
 weight: 1
 ---
 

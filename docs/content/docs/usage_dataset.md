@@ -1,40 +1,40 @@
 ---
-title: "Датасет: SEMDataset"
+title: "Dataset: SEMDataset"
 weight: 2
 ---
 
-Класс `SEMDataset` подготавливает кэш предобработанных изображений в `/tmp/<имя_датасета>` и предоставляет удобный доступ к изображениям и их путям.
+The `SEMDataset` class prepares a cache of preprocessed images in `/tmp/<dataset_name>` and provides convenient access to images and their paths.
 
-## Основные возможности
+## Main features
 
-- Автоматическое кэширование предобработанных изображений
-- Параллельная обработка с использованием всех доступных CPU ядер
-- Проверка целостности кэша и автоматическое обновление при необходимости
-- Поддержка структуры папок с классами изображений
+- Automatic caching of preprocessed images
+- Parallel processing using all available CPU cores
+- Cache integrity checking and automatic update when needed
+- Support for folder structure with image classes
 
-## Создание датасета
+## Creating dataset
 
 ```python
 from combra.data.dataset import SEMDataset
 
-# Создание датасета
-# Путь не должен оканчиваться на '/'
+# Create dataset
+# Path should not end with '/'
 dataset = SEMDataset(
     images_folder_path='data/wc_co',
     max_images_num_per_class=100,
-    workers=None  # По умолчанию: cpu_count()-1
+    workers=None  # Default: cpu_count()-1
 )
 ```
 
-**Параметры:**
+**Parameters:**
 
-- `images_folder_path` (str): Корневая папка с подпапками-классами. **Важно:** путь не должен оканчиваться на `/`
-- `max_images_num_per_class` (int): Лимит изображений на класс. Если `None`, используются все доступные изображения
-- `workers` (int, optional): Количество процессов для параллельной обработки. По умолчанию `cpu_count()-1`
+- `images_folder_path` (str): Root folder with class subfolders. **Important:** path should not end with `/`
+- `max_images_num_per_class` (int): Image limit per class. If `None`, all available images are used
+- `workers` (int, optional): Number of processes for parallel processing. Default is `cpu_count()-1`
 
-## Структура папок
+## Folder structure
 
-Датасет ожидает следующую структуру:
+The dataset expects the following structure:
 
 ```
 data/wc_co/
@@ -49,107 +49,107 @@ data/wc_co/
     └── ...
 ```
 
-## Доступ к данным
+## Data access
 
-### Получение изображения
+### Getting image
 
 ```python
-# Получить изображение и путь по индексам класса и изображения
+# Get image and path by class and image indices
 image, path = dataset.__getitem__(class_idx=0, idx=0)
 
-print(f"Путь к изображению: {path}")
-print(f"Форма изображения: {image.shape}")
+print(f"Image path: {path}")
+print(f"Image shape: {image.shape}")
 ```
 
-### Количество классов
+### Number of classes
 
 ```python
-# Количество классов в датасете
+# Number of classes in dataset
 num_classes = len(dataset)
-print(f"Классов в датасете: {num_classes}")
+print(f"Classes in dataset: {num_classes}")
 ```
 
-### Итерация по датасету
+### Iterating over dataset
 
 ```python
-# Итерация по всем классам и изображениям
+# Iterate over all classes and images
 for class_idx in range(len(dataset)):
     num_images = dataset.images_paths.shape[1]
     for img_idx in range(num_images):
         image, path = dataset.__getitem__(class_idx, img_idx)
-        # Обработка изображения
-        print(f"Класс {class_idx}, Изображение {img_idx}: {path}")
+        # Process image
+        print(f"Class {class_idx}, Image {img_idx}: {path}")
 ```
 
-## Предобработка изображений
+## Image preprocessing
 
-Класс автоматически применяет предобработку к каждому изображению:
+The class automatically applies preprocessing to each image:
 
-1. Конвертация в grayscale (если необходимо)
-2. Медианная фильтрация
-3. Бинаризация методом Otsu
-4. Вычисление градиента
+1. Conversion to grayscale (if necessary)
+2. Median filtering
+3. Otsu binarization
+4. Gradient computation
 
-### Использование метода предобработки отдельно
+### Using preprocessing method separately
 
 ```python
 from combra.data.dataset import SEMDataset
 from skimage import io
 
-# Загрузка изображения
+# Load image
 image = io.imread('path/to/image.jpg')
 
-# Предобработка
+# Preprocessing
 processed = SEMDataset.preprocess_image(
     image,
-    pad=False,      # Добавить границу
-    border=30,      # Размер границы в пикселях
-    disk=3          # Размер диска для медианного фильтра
+    pad=False,      # Add border
+    border=30,       # Border size in pixels
+    disk=3           # Disk size for median filter
 )
 ```
 
-## Кэширование
+## Caching
 
-Датасет автоматически кэширует предобработанные изображения в `/tmp/<имя_датасета>`. 
+The dataset automatically caches preprocessed images in `/tmp/<dataset_name>`. 
 
-### Проверка кэша
+### Cache checking
 
-При создании датасета выполняется проверка:
-- Существования кэша
-- Соответствия структуры папок
-- Количества изображений
+When creating the dataset, the following checks are performed:
+- Cache existence
+- Folder structure match
+- Number of images
 
-Если кэш неполный или устарел, он автоматически пересоздается.
+If the cache is incomplete or outdated, it is automatically recreated.
 
-### Очистка кэша
+### Clearing cache
 
 ```python
 import shutil
 import os
 
-cache_dir = '/tmp/wc_co'  # Замените на имя вашего датасета
+cache_dir = '/tmp/wc_co'  # Replace with your dataset name
 if os.path.exists(cache_dir):
     shutil.rmtree(cache_dir)
-    print("Кэш удален")
+    print("Cache deleted")
 ```
 
-## Примеры использования
+## Usage examples
 
-### Базовый пример
+### Basic example
 
 ```python
 from combra.data.dataset import SEMDataset
 
-# Создание датасета
+# Create dataset
 dataset = SEMDataset('data/wc_co', max_images_num_per_class=50)
 
-# Получение первого изображения первого класса
+# Get first image of first class
 image, path = dataset.__getitem__(0, 0)
-print(f"Загружено: {path}")
-print(f"Размер: {image.shape}")
+print(f"Loaded: {path}")
+print(f"Size: {image.shape}")
 ```
 
-### Обработка всех изображений
+### Processing all images
 
 ```python
 from combra.data.dataset import SEMDataset
@@ -163,26 +163,26 @@ for class_idx in range(len(dataset)):
     for img_idx in range(dataset.images_paths.shape[1]):
         image, path = dataset.__getitem__(class_idx, img_idx)
         
-        # Вычисление углов
+        # Compute angles
         angles_array, _ = angles.get_angles(image, border_eps=5, tol=3)
         all_angles.extend(angles_array)
         
-        print(f"Обработано: {path}")
+        print(f"Processed: {path}")
 
-print(f"Всего углов: {len(all_angles)}")
+print(f"Total angles: {len(all_angles)}")
 ```
 
-### Использование с другими модулями
+### Using with other modules
 
 ```python
 from combra.data.dataset import SEMDataset
 from combra import angles, stats, approx
 import matplotlib.pyplot as plt
 
-# Создание датасета
+# Create dataset
 dataset = SEMDataset('data/wc_co', max_images_num_per_class=50)
 
-# Сбор углов из всех изображений
+# Collect angles from all images
 all_angles = []
 for class_idx in range(len(dataset)):
     for img_idx in range(dataset.images_paths.shape[1]):
@@ -190,56 +190,56 @@ for class_idx in range(len(dataset)):
         angles_array, _ = angles.get_angles(image)
         all_angles.extend(angles_array)
 
-# Статистический анализ
+# Statistical analysis
 x, y = stats.stats_preprocess(all_angles, step=5)
 
-# Аппроксимация
+# Approximation
 (x_gauss, y_gauss), mus, sigmas, amps = approx.bimodal_gauss_approx(x, y)
 
-# Визуализация
-plt.plot(x, y, 'o', label='Данные')
-plt.plot(x_gauss, y_gauss, '-', label='Аппроксимация')
+# Visualization
+plt.plot(x, y, 'o', label='Data')
+plt.plot(x_gauss, y_gauss, '-', label='Approximation')
 plt.legend()
 plt.show()
 ```
 
-## Примечания
+## Notes
 
-- Путь к датасету **не должен** оканчиваться на `/`
-- Кэш создается однократно и переиспользуется при последующих запусках
-- Предобработанные изображения сохраняются в формате PNG
-- Все изображения должны иметь одинаковый размер (проверка не выполняется автоматически)
+- Dataset path **should not** end with `/`
+- Cache is created once and reused on subsequent runs
+- Preprocessed images are saved in PNG format
+- All images should have the same size (check is not performed automatically)
 
-## Методы класса
+## Class methods
 
 ### `__init__(images_folder_path, max_images_num_per_class=100, workers=None)`
 
-Инициализация датасета.
+Initialize dataset.
 
 ### `__getitem__(class_idx, idx)`
 
-Получение изображения и пути.
+Get image and path.
 
-**Параметры:**
-- `class_idx` (int): Индекс класса
-- `idx` (int): Индекс изображения в классе
+**Parameters:**
+- `class_idx` (int): Class index
+- `idx` (int): Image index in class
 
-**Возвращает:**
-- `tuple`: `(image, path)` где `image` - numpy array, `path` - строка с путем
+**Returns:**
+- `tuple`: `(image, path)` where `image` - numpy array, `path` - string with path
 
 ### `__len__()`
 
-Возвращает количество классов в датасете.
+Returns the number of classes in the dataset.
 
 ### `preprocess_image(image, pad=False, border=30, disk=3)` (classmethod)
 
-Статический метод для предобработки одного изображения.
+Static method for preprocessing a single image.
 
-**Параметры:**
-- `image` (ndarray): Входное изображение
-- `pad` (bool): Добавить границу
-- `border` (int): Размер границы
-- `disk` (int): Размер диска для медианного фильтра
+**Parameters:**
+- `image` (ndarray): Input image
+- `pad` (bool): Add border
+- `border` (int): Border size
+- `disk` (int): Disk size for median filter
 
-**Возвращает:**
-- `ndarray`: Предобработанное изображение
+**Returns:**
+- `ndarray`: Preprocessed image

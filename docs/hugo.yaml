@@ -1,6 +1,6 @@
 baseURL: 'http://localhost:1313/'
-languageCode: 'ru'
-title: 'Combra - Документация'
+languageCode: 'en'
+title: 'Combra - Documentation'
 
 # Markup configuration
 markup:
@@ -45,39 +45,39 @@ params:
 # Menu configuration
 menu:
   main:
-    - name: Документация
+    - name: Documentation
       pageRef: /docs
       weight: 1
-    - name: Поиск
+    - name: Search
       weight: 2
       params:
         type: search
   sidebar:
-    - name: Быстрый старт
+    - name: Quick Start
       pageRef: /docs/usage_quickstart
       weight: 1
-    - name: Датасет
+    - name: Dataset
       pageRef: /docs/usage_dataset
       weight: 2
-    - name: Граф трещин
+    - name: Crack Graph
       pageRef: /docs/usage_graph
       weight: 3
-    - name: Углы
+    - name: Angles
       pageRef: /docs/usage_angles
       weight: 4
-    - name: Введение
+    - name: Introduction
       pageRef: /docs/introduction
       weight: 5
-    - name: Установка
+    - name: Installation
       pageRef: /docs/install
       weight: 6
-    - name: Образцы сплава
+    - name: Alloy Samples
       pageRef: /docs/alloy
       weight: 7
-    - name: Описание снимков
+    - name: Image Description
       pageRef: /docs/images_source
       weight: 8
-    - name: Предобработка
+    - name: Preprocessing
       pageRef: /docs/preprocess
       weight: 9
     - name: Morphology
@@ -110,7 +110,7 @@ menu:
     - name: Blender
       pageRef: /docs/blender
       weight: 19
-    - name: Машинное обучение
+    - name: Machine Learning
       pageRef: /docs/nn
       weight: 20
     - name: API Reference

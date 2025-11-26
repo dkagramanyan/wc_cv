@@ -3,15 +3,14 @@ title: "Blender"
 weight: 19
 ---
 
-Для генерации снимков на Windows необходимо установить Blender и загрузить файл GrainGenerator_pobedit.blend. В разделе Scripting в строке 92 указать путь к папке, в которой необходимо сохранить снимки (всё, что до "'blender'+" и так далее), в том же формате и запустить скрипт. Будут созданы три образца, и с каждого будут сделаны три снимка и сохранены по указанному пути.
+To generate images on Windows, you need to install Blender and load the GrainGenerator_pobedit.blend file. In the Scripting section, line 92, specify the path to the folder where images should be saved (everything before "'blender'+" and so on), in the same format, and run the script. Three samples will be created, and three images will be taken from each and saved to the specified path.
 
-Если не сработает, нужно открыть терминал Blender (в левом верхнем углу Window-Toggle System Console), там будут указаны ошибки
+If it doesn't work, you need to open the Blender terminal (in the top left corner Window-Toggle System Console), errors will be indicated there.
 
-Для запуска в Linux предположительно нужно использовать команду:
+To run on Linux, presumably you need to use the command:
 
 ```bash
 blender yourblendfilenameorpath --python drawcar.py
 ```
 
-При запуске на Харизме вставить части кода, помеченные "для генерации на харизме", и удалить строки, помеченные "для генерации локально"
-
+When running on Kharisma, insert code parts marked "for generation on kharisma", and remove lines marked "for local generation"

@@ -5,22 +5,22 @@ weight: 16
 
 ## gaussian_fit(x, y, mu=1, sigma=1, amp=1)
 
-Аппроксимация заданных точек нормальной функцией
+Approximates given points with a normal function
 
-**Параметры:**
+**Parameters:**
 - `x`: list (n,)
 - `y`: list (n,)
 - `mu`: float
 - `sigma`: float
 - `amp`: float
 
-**Возвращает:** mus, sigmas, amps
+**Returns:** mus, sigmas, amps
 
 ## gaussian_fit_bimodal(x, y, mu1=100, mu2=240, sigma1=30, sigma2=30, amp1=1, amp2=1)
 
-Аппроксимация заданных точек бимодальной нормальной функцией
+Approximates given points with a bimodal normal function
 
-**Параметры:**
+**Parameters:**
 - `x`: list (n,)
 - `y`: list (n,)
 - `mu1`: float
@@ -30,13 +30,13 @@ weight: 16
 - `amp1`: float
 - `amp2`: float
 
-**Возвращает:** mus, sigmas, amps
+**Returns:** mus, sigmas, amps
 
 ## gaussian_fit_termodal(x, y, mu1=10, mu2=100, mu3=240, sigma1=10, sigma2=30, sigma3=30, amp1=1, amp2=1, amp3=1)
 
-Аппроксимация заданных точек термодальной нормальной функцией
+Approximates given points with a trimodal normal function
 
-**Параметры:**
+**Parameters:**
 - `x`: list (n,)
 - `y`: list (n,)
 - `mu1`: float
@@ -49,25 +49,24 @@ weight: 16
 - `amp2`: float
 - `amp3`: float
 
-**Возвращает:** mus, sigmas, amps
+**Returns:** mus, sigmas, amps
 
 ## lin_regr_approx(x, y)
 
-Аппроксимация распределения линейной функцией и создание графика по параметрам распределения
+Approximates distribution with a linear function and creates a plot from distribution parameters
 
-**Параметры:**
+**Parameters:**
 - `x`: list (n,)
 - `y`: list (n,)
 
-**Возвращает:** (x_pred, y_pred), k, b, angle, score
+**Returns:** (x_pred, y_pred), k, b, angle, score
 
 ## bimodal_gauss_approx(x, y)
 
-Аппроксимация распределения бимодальным гауссом
+Approximates distribution with a bimodal Gaussian
 
-**Параметры:**
+**Parameters:**
 - `x`: list (n,)
 - `y`: list (n,)
 
-**Возвращает:** (x_gauss, y_gauss), mus, sigmas, amps
-
+**Returns:** (x_gauss, y_gauss), mus, sigmas, amps

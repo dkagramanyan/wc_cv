@@ -1,17 +1,17 @@
 ---
-title: "Быстрый старт"
+title: "Quick Start"
 weight: 1
 ---
 
-Ниже приведены минимальные примеры использования основных функций пакета `combra`.
+Below are minimal examples of using the main functions of the `combra` package.
 
-## Установка
+## Installation
 
 ```bash
 pip install -e .
 ```
 
-## Предобработка одного снимка
+## Preprocessing a single image
 
 ```python
 from combra import image
@@ -21,75 +21,75 @@ image_raw = io.imread('path/to/image.png')
 processed = image.image_preprocess(image_raw)
 ```
 
-Функция `image_preprocess` выполняет:
-- Медианную фильтрацию
-- Бинаризацию методом Otsu
-- Вычисление градиента
+The `image_preprocess` function performs:
+- Median filtering
+- Otsu binarization
+- Gradient computation
 
-## Извлечение контуров
+## Contour extraction
 
 ```python
 from combra import contours
 
 cnts = contours.get_contours(processed, tol=3)
-print(f"Найдено контуров: {len(cnts)}")
+print(f"Found contours: {len(cnts)}")
 ```
 
-## Вычисление углов
+## Angle computation
 
 ```python
 from combra import angles
 
 angles_array, contours = angles.get_angles(processed, border_eps=5, tol=3)
-print(f"Найдено углов: {len(angles_array)}")
-print(f"Средний угол: {angles_array.mean():.2f}°")
+print(f"Found angles: {len(angles_array)}")
+print(f"Mean angle: {angles_array.mean():.2f}°")
 ```
 
-## Работа с датасетом
+## Working with dataset
 
 ```python
 from combra.data.dataset import SEMDataset
 
-# Создание датасета (автоматически кэширует предобработанные изображения в /tmp)
+# Create dataset (automatically caches preprocessed images in /tmp)
 dataset = SEMDataset('data/wc_co', max_images_num_per_class=50)
 
-# Получение изображения и пути
+# Get image and path
 image, path = dataset.__getitem__(0, 0)
-print(f"Загружено изображение: {path}")
+print(f"Loaded image: {path}")
 
-# Количество классов
-print(f"Классов в датасете: {len(dataset)}")
+# Number of classes
+print(f"Classes in dataset: {len(dataset)}")
 ```
 
-## Граф трещин
+## Crack graph
 
-### Создание графа
+### Creating graph
 
 ```python
 from combra import graph, image
 from skimage import io
 
-# Предобработка изображения
+# Image preprocessing
 img = io.imread('crack_image.png')
 processed = image.image_preprocess(img)
 
-# Предобработка для графа
+# Preprocessing for graph
 entry_nodes, exit_nodes, img_contours, img_marked, cnts, nodes_meta = (
     graph.preprocess_graph_image(processed, tol=5)
 )
 
-# Создание графа
+# Create graph
 G, img_contours_mono = graph.create_crack_graph(
     img_contours.shape,
     cnts,
     nodes_meta
 )
 
-print(f"Узлов в графе: {G.number_of_nodes()}")
-print(f"Ребер в графе: {G.number_of_edges()}")
+print(f"Nodes in graph: {G.number_of_nodes()}")
+print(f"Edges in graph: {G.number_of_edges()}")
 ```
 
-### Визуализация графа
+### Graph visualization
 
 ```python
 from combra import graph
@@ -104,17 +104,17 @@ graph.graph_plot(
 )
 ```
 
-## Визуализация контуров
+## Contour visualization
 
 ```python
 from combra import contours
 from PIL import Image
 import numpy as np
 
-# Создание RGB изображения
+# Create RGB image
 img_rgb = Image.fromarray(np.zeros_like(processed, dtype=np.uint8).repeat(3, axis=2))
 
-# Рисование контуров
+# Draw contours
 img_with_contours = contours.draw_contours(
     img_rgb,
     cnts=cnts,
@@ -124,100 +124,100 @@ img_with_contours = contours.draw_contours(
 )
 ```
 
-## Обработка всего датасета углов
+## Processing entire angle dataset
 
 ```python
 from combra import angles, data
 import json
 
-# Путь к датасету
+# Path to dataset
 images_path = data.example_class_path()
 
-# Словарь типов зерен
+# Dictionary of grain types
 types_dict = {
-    'Ultra_Co11': 'средние зерна',
-    'Ultra_Co25': 'мелкие зерна',
-    'Ultra_Co8': 'средне-мелкие зерна',
-    'Ultra_Co6_2': 'крупные зерна',
-    'Ultra_Co15': 'средне-мелкие зерна'
+    'Ultra_Co11': 'medium grains',
+    'Ultra_Co25': 'fine grains',
+    'Ultra_Co8': 'medium-fine grains',
+    'Ultra_Co6_2': 'coarse grains',
+    'Ultra_Co15': 'medium-fine grains'
 }
 
-# Вычисление и сохранение распределений углов
+# Compute and save angle distributions
 angles.angles_approx_save(
     images_path=images_path,
     save_path='angles_results',
     types_dict=types_dict,
-    step=5,  # Шаг в градусах
+    step=5,  # Step in degrees
     max_images_num_per_class=360,
     workers=20
 )
 
-# Загрузка результатов
+# Load results
 with open('angles_results_step_5_degrees.json', 'r', encoding='utf-8') as f:
     results = json.load(f)
 
-# Визуализация
+# Visualization
 angles.angles_plot_base(
     results,
     plot_file_name='angles_plot',
     step=5,
     N=10,
     M=10,
-    indices=[0, 1, 2],  # Индексы классов для отображения
+    indices=[0, 1, 2],  # Class indices to display
     save=True
 )
 ```
 
-## Статистический анализ и аппроксимация
+## Statistical analysis and approximation
 
 ```python
 from combra import stats, approx
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Предобработка данных
+# Data preprocessing
 x, y = stats.stats_preprocess(angles_array, step=5)
 
-# Бимодальная гауссова аппроксимация
+# Bimodal Gaussian approximation
 (x_gauss, y_gauss), mus, sigmas, amps = approx.bimodal_gauss_approx(x, y)
 
-# Визуализация
+# Visualization
 plt.figure(figsize=(10, 6))
-plt.plot(x, y, 'o', label='Данные', markersize=4)
-plt.plot(x_gauss, y_gauss, '-', label='Аппроксимация', linewidth=2)
-plt.xlabel('Угол (градусы)')
-plt.ylabel('Частота')
-plt.title('Распределение углов')
+plt.plot(x, y, 'o', label='Data', markersize=4)
+plt.plot(x_gauss, y_gauss, '-', label='Approximation', linewidth=2)
+plt.xlabel('Angle (degrees)')
+plt.ylabel('Frequency')
+plt.title('Angle Distribution')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
 
-print(f"Мода 1: μ={mus[0]:.2f}°, σ={sigmas[0]:.2f}°")
-print(f"Мода 2: μ={mus[1]:.2f}°, σ={sigmas[1]:.2f}°")
+print(f"Mode 1: μ={mus[0]:.2f}°, σ={sigmas[0]:.2f}°")
+print(f"Mode 2: μ={mus[1]:.2f}°, σ={sigmas[1]:.2f}°")
 ```
 
-## MVEE (Минимальный объемлющий эллипсоид)
+## MVEE (Minimum Volume Enclosing Ellipsoid)
 
 ```python
 from combra import mvee, data
 
 images_path = data.example_class_path()
 types_dict = {
-    'Ultra_Co11': 'средние зерна',
-    'Ultra_Co25': 'мелкие зерна'
+    'Ultra_Co11': 'medium grains',
+    'Ultra_Co25': 'fine grains'
 }
 
-# Вычисление MVEE для датасета
+# Compute MVEE for dataset
 mvee.diametr_approx_save(
     images_path=images_path,
     save_path='mvee_results',
     types_dict=types_dict,
     step=4,
-    pixel=50/1000,  # Размер пикселя в мм
+    pixel=50/1000,  # Pixel size in mm
     max_images_num_per_class=None
 )
 
-# Загрузка и визуализация
+# Load and visualize
 import json
 with open('mvee_results_step_4_beams.json', 'r') as f:
     mvee_data = json.load(f)
@@ -232,10 +232,10 @@ mvee.plot_beam_base(
 )
 ```
 
-## Следующие шаги
+## Next steps
 
-Для более подробной информации см.:
-- [Датасет: SEMDataset](/docs/usage_dataset) - подробнее о работе с датасетами
-- [Граф трещин](/docs/usage_graph) - детали построения графов
-- [Углы](/docs/usage_angles) - анализ углов и распределений
-- [API Reference](/docs/api) - полный справочник API
+For more detailed information see:
+- [Dataset: SEMDataset](/docs/usage_dataset) - more about working with datasets
+- [Crack Graph](/docs/usage_graph) - graph construction details
+- [Angles](/docs/usage_angles) - angle analysis and distributions
+- [API Reference](/docs/api) - complete API reference
