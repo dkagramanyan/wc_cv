@@ -47,6 +47,7 @@ hugo mod tidy
 
 ```bash
 hugo server
+hugo server --noHTTPCache --ignoreCache --disableFastRender
 ```
 
 ## Step 6: Open browser

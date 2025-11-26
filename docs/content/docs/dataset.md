@@ -1,6 +1,6 @@
 ---
 title: "Dataset: SEMDataset"
-weight: 2
+weight: 4
 ---
 
 The `SEMDataset` class prepares a cache of preprocessed images in `/tmp/<dataset_name>` and provides convenient access to images and their paths.

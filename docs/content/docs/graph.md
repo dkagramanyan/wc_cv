@@ -1,6 +1,6 @@
 ---
 title: "Crack Graph"
-weight: 3
+weight: 4
 ---
 
 The `graph` module provides functionality for constructing and analyzing crack graphs on composite alloy images.

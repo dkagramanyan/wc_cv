@@ -1,19 +1,46 @@
 ---
 title: "Angles and their distributions"
-weight: 4
+weight: 2
 ---
 
-The `angles` module provides functionality for computing angles on grain contours and analyzing their distributions.
+### Quick start
 
-## Overview
+```python
+from combra import angles, data
+import json
 
-Angles are computed on simplified grain contours:
-- Contours are simplified using the Douglas-Peucker algorithm
-- For each contour point, the angle between adjacent segments is computed
-- Angles are measured in degrees (0-360°)
-- Contour traversal direction is taken into account (counterclockwise)
 
-## Computing angles for a single image
+step = 5
+
+images_path = data.example_class_path()
+json_save_name = 'test'
+
+types_dict = {'Ultra_Co11': 'средние зерна',
+              'Ultra_Co25': 'мелкие зерна',
+              'Ultra_Co8': 'средне-мелкие зерна',
+              'Ultra_Co6_2': 'крупные зерна',
+              'Ultra_Co15': 'средне-мелкие зерна'}
+
+angles.angles_approx_save(
+                    images_path=images_path,
+                    save_path=json_save_name,
+                    types_dict=types_dict,
+                    step=step,
+                    max_images_num_per_class=360, 
+                    workers = 20
+                )
+
+data = open(json_save_name+f'_step_{step}_degrees.json', encoding='utf-8')
+data = json.load(data)
+```
+
+Angles distribution
+
+```python
+
+angles.angles_plot_base(data, plot_file_name=json_save_name, step=step, N=10, M=10, indices=[2,0,1], save=False)
+```
+
 
 ### `get_angles()`
 

@@ -52,70 +52,18 @@ menu:
       weight: 2
       params:
         type: search
-  sidebar:
-    - name: Quick Start
-      pageRef: /docs/usage_quickstart
-      weight: 1
-    - name: Dataset
-      pageRef: /docs/usage_dataset
-      weight: 2
-    - name: Crack Graph
-      pageRef: /docs/usage_graph
-      weight: 3
-    - name: Angles
-      pageRef: /docs/usage_angles
-      weight: 4
-    - name: Introduction
-      pageRef: /docs/introduction
-      weight: 5
-    - name: Installation
-      pageRef: /docs/install
-      weight: 6
-    - name: Alloy Samples
-      pageRef: /docs/alloy
-      weight: 7
-    - name: Image Description
-      pageRef: /docs/images_source
-      weight: 8
-    - name: Preprocessing
-      pageRef: /docs/preprocess
-      weight: 9
-    - name: Morphology
-      pageRef: /docs/morphology
-      weight: 10
-    - name: Fig
-      pageRef: /docs/fig
-      weight: 11
-    - name: Mark
-      pageRef: /docs/mark
-      weight: 12
-    - name: Show
-      pageRef: /docs/show
-      weight: 13
-    - name: Draw
-      pageRef: /docs/draw
-      weight: 14
-    - name: Stats
-      pageRef: /docs/stats
-      weight: 15
-    - name: Approximation
-      pageRef: /docs/approx
-      weight: 16
-    - name: Generate
-      pageRef: /docs/generate
-      weight: 17
-    - name: Logs
-      pageRef: /docs/logs
-      weight: 18
-    - name: Blender
-      pageRef: /docs/blender
-      weight: 19
-    - name: Machine Learning
-      pageRef: /docs/nn
-      weight: 20
-    - name: API Reference
-      pageRef: /docs/api
-      weight: 21
+  # sidebar:
+  #   - name: Introduction
+  #     pageRef: /docs/introduction
+  #     weight: 1
+  #   - name: Dataset
+  #     pageRef: /docs/usage_dataset
+  #     weight: 2
+  #   - name: Angles
+  #     pageRef: /docs/usage_angles
+  #     weight: 2
+
+
 
 # Module configuration for Hextra theme
 module:
