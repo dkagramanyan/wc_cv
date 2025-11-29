@@ -1,4 +1,4 @@
 [submodule "combra"]
 	path = combra
-	url = git@github.com:dkagramanyan/combra.git
+	url = https://github.com/dkagramanyan/combra.git
 
