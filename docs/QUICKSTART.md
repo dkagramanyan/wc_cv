@@ -46,8 +46,9 @@ hugo mod tidy
 ## Step 5: Start local server
 
 ```bash
-hugo server
-hugo server --noHTTPCache --ignoreCache --disableFastRender
+# Override baseURL from hugo.yaml for local development
+hugo server --baseURL http://localhost:1313/
+hugo server --baseURL http://localhost:1313/ --noHTTPCache --ignoreCache --disableFastRender
 ```
 
 ## Step 6: Open browser

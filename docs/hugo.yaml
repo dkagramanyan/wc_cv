@@ -1,4 +1,6 @@
-baseURL: 'http://localhost:1313/'
+# GitHub Pages base URL (project pages).
+# For local dev use: `hugo server --baseURL http://localhost:1313/`
+baseURL: 'https://dkagramanyan.github.io/combra/'
 languageCode: 'en'
 title: 'Combra'
 
