@@ -1,0 +1,33 @@
+{{- $count := 3 -}}
+{{- with .Get "count" -}}
+  {{- $count = int . -}}
+{{- end -}}
+
+{{- $pages := where site.RegularPages "Section" "news" -}}
+{{- $latest := first $count (sort $pages "Date" "desc") -}}
+
+<div class="latest-news">
+  {{- if gt (len $latest) 0 -}}
+    <ul>
+      {{- range $latest -}}
+        <li>
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{- with .Date -}}
+            <span style="opacity:.7; font-size:.9em;"> — {{ .Format "2006-01-02" }}</span>
+          {{- end -}}
+          {{- $summary := (.Params.summary | default .Summary) -}}
+          {{- with $summary -}}
+            <div style="opacity:.85; margin-top:.25rem;">{{ . }}</div>
+          {{- end -}}
+        </li>
+      {{- end -}}
+    </ul>
+    <div style="margin-top:.5rem;">
+      <a href="{{ relref . "/news" }}">All news →</a>
+    </div>
+  {{- else -}}
+    <p>No news yet.</p>
+  {{- end -}}
+</div>
+
+
