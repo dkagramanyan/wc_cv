@@ -52,6 +52,7 @@ menu:
       weight: 2
       params:
         type: search
+  
   # sidebar:
   #   - name: Introduction
   #     pageRef: /docs/introduction
