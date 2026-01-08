@@ -221,3 +221,5 @@ crack_graph/data/*
 poliamid/data/*
 poliamid/*.parquet
 poliamid/*.jpg
+
+co_angles/*.parquet
