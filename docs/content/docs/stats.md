@@ -1,84 +1,41 @@
 ---
 title: "Stats"
-weight: 15
+weight: 9
 ---
 
-## kernel_points(image, point, step=1)
+The `combra.stats` module exposes parametric distribution functions and the histogram preprocessor used by every distribution-fitting routine in combra. The functions here are pure (no I/O); fit them with `combra.approx`.
 
-Returns coordinates of pixels in a square matrix of width 2*step, whose center is point
+## Distributions
 
-**Parameters:**
-- `image`: ndarray (width, height)
-- `point`: tuple (2,)
-- `step`: int
+### `gaussian(x, mu, sigma, amp=1)`
+Standard Gaussian — useful as a target function for `scipy.optimize.curve_fit`.
 
-**Returns:** tuple (n_points,2)
+### `gaussian_bimodal(x, mu1, mu2, sigma1, sigma2, amp1=1, amp2=1)`
+Sum of two Gaussians.
 
-## stats_preprocess(array, step)
+### `gaussian_termodal(x, mu1, mu2, mu3, sigma1, sigma2, sigma3, amp1=1, amp2=1, amp3=1)`
+Sum of three Gaussians.
 
-Rounding angles to multiples, e.g. 0, step, 2*step, etc.
+### `ellipse(a, b, angle, xc=0, yc=0, num=50)`
+Sample `num` points on the ellipse with semi-axes `(a, b)`, rotation `angle` (radians) and centre `(xc, yc)`. Returns an `(num, 2)` array — handy for overlaying MVEE results on a plot.
 
-**Parameters:**
-- `array`: list, ndarray (n,)
-- `step`: int
+## Histogram preprocessing
 
-**Returns:** array_copy, array_copy_set, dens_curve
+### `stats_preprocess(array, step)`
+Quantize `array` to multiples of `step`, count occurrences via `np.bincount`, and normalise to a probability distribution. Returns `(x_bins, y_density)`.
 
-## gaussian(x, mu, sigma, amp=1)
+```python
+import numpy as np
+from combra import stats, approx
 
-Draws points on the image at locations where there are corners from the corners list
+angles_array = np.array([12, 13, 87, 90, 92, 178, 180])
+x, y = stats.stats_preprocess(angles_array, step=5)
+(x_g, y_g), mus, sigmas, amps = approx.bimodal_gauss_approx(x, y)
+```
 
-**Parameters:**
-- `x`: list (n,)
-- `mu`: float
-- `sigma`: float
-- `amp`: float
+### `legacy_stats_preprocess(array, step)`
+Older variant that also returns the per-bin index dictionary and a non-normalised count. Kept for backwards compatibility.
 
-**Returns:** list (n,)
+## Notes
 
-## gaussian_bimodal(x, mu1, mu2, sigma1, sigma2, amp1=1, amp2=1)
-
-Returns a bimodal normal function with given parameters
-
-**Parameters:**
-- `x`: list (n,)
-- `mu1`: float
-- `mu2`: float
-- `sigma1`: float
-- `sigma2`: float
-- `amp1`: float
-- `amp2`: float
-
-**Returns:** list (n,)
-
-## gaussian_termodal(x, mu1, mu2, mu3, sigma1, sigma2, sigma3, amp1=1, amp2=1, amp3=1)
-
-Returns a trimodal normal function with given parameters
-
-**Parameters:**
-- `x`: list (n,)
-- `mu1`: float
-- `mu2`: float
-- `mu3`: float
-- `sigma1`: float
-- `sigma2`: float
-- `sigma3`: float
-- `amp1`: float
-- `amp2`: float
-- `amp3`: float
-
-**Returns:** list (n,)
-
-## ellipse(a, b, angle, xc=0, yc=0, num=50)
-
-Returns coordinates of an ellipse constructed from given parameters. Center is (0,0) by default. Angle in radians, decreasing the angle denotes clockwise rotation of the ellipse
-
-**Parameters:**
-- `a`: float
-- `b`: float
-- `angle`: float, rad
-- `xc`: float, center coord x
-- `yc`: float, center coord y
-- `num`: int, number of ellipse points
-
-**Returns:** tuple (num, 2)
+`calculate_density` is in `__all__` but is deprecated — it walks hardcoded folder paths from the original notebooks. Don't use it in new code.

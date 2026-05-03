@@ -1,145 +1,88 @@
 ---
 title: "Crack Graph"
-weight: 5
+weight: 8
 ---
 
+The `combra.graph` module turns a binarised crack image into a directed graph (`networkx.DiGraph`) whose nodes are contour vertices and whose edges are short straight segments classified as Co, WC-Co, WC, or WC-WC. From there you can run shortest-path / minimum-energy-path searches.
 
+Edge type encoding:
+- `0` — Co
+- `1` — WC-Co
+- `2` — WC
+- `3` — WC-WC
 
-### Quickstart
-
-**Unlabeled data**
-
-Generate data
+## Build
 
 ```python
 from combra import graph, data
+
+img = data.crack_images()[0][1]
+
+(entry_nodes, exit_nodes,
+ img_contours_o, img_preprocessed,
+ cnts, nodes_metadata) = graph.preprocess_graph_image(
+    img, border=30, disk=5, entry_ellps_w=5, exit_ellps_w=5, r=4)
+
+g, img_contours = graph.create_crack_graph(
+    img_preprocessed.shape, cnts, nodes_metadata, eps=300)
+```
+
+### `preprocess_graph_image(image, r=2, border=30, border_node_eps=10, tol=5, disk=5, labeled_cnts=False, labels=False, entry_ellps_w=1, exit_ellps_w=1)`
+Median-filter, Otsu, and contour-extract the input. Returns `(entry_nodes, exit_nodes, img_contours_o, img_preprocessed, cnts, nodes_metadata)`. Pass `labeled_cnts=True` (and `labels`) when you have hand-annotated contours and want to skip the binarisation.
+
+### `create_crack_graph(img_shape, cnts, nodes_metadata, eps=100, line_eps=3, border=30, border_eps=0, border_number_min=2, border_pixel=255, same_node_eps=5, labels=False, labeled_line_eps=10, workers=10)`
+Build the graph. `eps` is the maximum edge length in pixels; `line_eps` is the perpendicular tolerance used when classifying edges. Returns `(g, img_contours)`.
+
+### `get_edges(start_node_index, nodes_metadata, process_metadata)`
+Compute outgoing edges from one node — used internally by `create_crack_graph`. You normally don't need to call it directly.
+
+### `get_edge_type(node1, node2, cnts, nodes_metadata, wc_eps=30, border_pixel=0)`
+Classify a single edge between two node indices into Co / WC-Co / WC / WC-WC.
+
+### `get_edge_type_labeled(node1, node2, nodes_metadata, line_eps=10)`
+Same as above but uses hand labels carried in `nodes_metadata`.
+
+## Energies and paths
+
+```python
 import numpy as np
-from tqdm.notebook import tqdm
-import pandas as pd
 
-image = data.example_crack_fixed_images()[0][1]
+energy_conf = np.zeros((20, 20)).tolist()
+for i, en1 in enumerate(range(20)):       # Co
+    for j, en2 in enumerate(range(20)):   # WC-Co
+        energy_conf[i][j] = {0: en1, 1: en2, 2: 20, 3: 0}
 
-(entry_nodes,
- exit_nodes,
- img_contours_o,
- img_preprocessed_final,
- cnts,
- nodes_metadata)  = graph.preprocess_graph_image(image, border=30, disk=5,entry_ellps_w=5,exit_ellps_w=5,r=4)
-
-g, img_contours =  graph.create_crack_graph(img_preprocessed_final.shape, cnts, nodes_metadata, eps=300)
-
+energies_paths = graph.get_energies(
+    energy_conf, g, cnts, nodes_metadata,
+    entry_nodes=[0, 1, 3], exit_nodes=[63, 64, 67],
+    first_k_paths=1, parallel=True, workers=20)
 ```
 
-Plot graph
+### `get_energies(energy_conf, g, cnts, nodes_metadata, entry_nodes, exit_nodes, first_k_paths=2, parallel=False, workers=23, recalculate_paths=False)`
+Sweep an `(N, M)` grid of edge-type weights. For every grid cell, set the edge weights and run k-shortest-path between every (entry, exit) pair. Returns a nested list aligned with `energy_conf`.
 
-```python
+### `find_shortest_energy_paths(G, cnts, nodes_metadata, entry_node, exit_node, k, recalculate_paths=False)`
+Find the `k` shortest paths between one entry/exit pair and return a `pandas.DataFrame` with per-path lengths, energies, and per-edge-type breakdowns (Co/WC/WC-Co counts and pixel fractions).
 
-graph.graph_plot(g, img_preprocessed_final,N=10,M=10, name='wc_cv/cv/Ultra_Co6_2-001_cut_graph.jpeg', save=False)
+### `fixed_paths_energies(g, cnts, nodes_metadata, entry_nodes, exit_nodes, workers=23, ...)`
+Compute energies along a fixed set of paths (no optimisation).
 
-```
+### `paths_queues()`
+Internal queue-based path enumerator (no public arguments).
 
-Plot paths (doesnt work)
+## Plot
 
-```python
+### `graph_plot(g, img_contours=None, name='graph.html', save=False, node_size=12, edge_width=2, color_dict=None, edge_width_dict=None)`
+Interactive Plotly plot of the graph overlaid on `img_contours`.
 
-## DOESN'T WORK
+### `plot_optimized_energies(energies_paths, path_index=0, N=5, M=5, y_label='co_e', x_label='wc-co_e', fontsize_h=10, fontsize_axes=50)`
+Heatmap of optimal path energies over the `(Co, WC-Co)` weight grid for path `path_index`.
 
-entry_nodes = np.unique(paths['entry_node'])
-exit_nodes = np.unique(paths['exit_node'])
+### `plot_paths(g, df, img_aligned, border=30)`
+Overlay the paths in `df` (output of `find_shortest_energy_paths`) on the background image.
 
-shortest_entry_paths = []
-for entry_node in tqdm(entry_nodes):
-    row = paths[paths.entry_node==entry_node].sort_values(by='path_len_pixels').iloc[0]
-    shortest_entry_paths.append(row)
+### `plot_optimized_paths(g, energies_paths, img_contours_o, param_1=10, param_2=10)`
+Overlay the energy-optimised paths from `get_energies` on the contour image.
 
-shortest_exit_paths = []
-for exit_node in tqdm(exit_nodes):
-    row = paths[paths.exit_node==exit_node].sort_values(by='path_len_pixels').iloc[0]
-    shortest_exit_paths.append(row)
-
-df_shortest_entry = pd.DataFrame(shortest_entry_paths)
-df_shortest_exit = pd.DataFrame(shortest_exit_paths)
-
-
-graph.plot_paths(g, df, img_aligned, border=30)
-
-```
-
-Generate energies
-
-```python
-entry_nodes = [ 0,1, 3, 9, 10, 13]
-exit_nodes = [ 23, 24, 71, 72, 63, 64, 56, 57, 67, 68]
-
-# WC+8Co_5_fixed_001_cropped.jpg
-# entry_nodes = [ 4, 15, 13, 16, 34, 27]
-# exit_nodes = [ 527, 528, 519, 522]
-
-# WC+8Co_5_crack
-# entry_nodes = [ 4, 11, 16, 61, 62, 66]
-# exit_nodes = [ 307, 308, 515, 529]
-
-param_1_max=20 # Co
-param_2_max=20 # WC-Co
-param_3_const=20 # WC
-param_4_const=0 # WC-WC
-
-energy_conf=np.zeros((param_1_max, param_2_max)).tolist()
-
-for i,en_1 in enumerate(tqdm(range(0,param_1_max))):
-    for j,en_2 in enumerate(range(0,param_2_max)):
-
-        energy_conf[i][j]={
-            0: en_1, # Co
-            1: en_2, # WC-Co
-            2: param_3_const, # WC
-            3: param_4_const # WC-WC
-            } 
-
-energies_paths = graph.get_energies(energy_conf,
-                                    g,
-                                    cnts,
-                                    nodes_metadata,
-                                    entry_nodes,
-                                    exit_nodes,
-                                    first_k_paths=1,
-                                    parallel=True,
-                                    workers=20)
-```
-
-Plot energy optimized paths (doesnt work)
-
-```python 
-# does not work well with large images
-
-graph.plot_optimized_paths(g, energies_paths, img_contours_o)
-```
-
-Plot energies
-
-```python
-path_index=0
-
-graph.plot_optimized_energies(  energies_paths,
-                                path_index=path_index,
-                                N=5,M=5,
-                                y_label ='co_e',
-                                x_label = 'wc-co_e',
-                                fontsize_h=10,
-                                fontsize_axes=50
-                                )
-```
-
-Plot fixed path energy
-```python
-# WC+8Co_5_crack
-# entry_nodes = [ 4, 11, 16, 61, 62, 66]
-# exit_nodes = [ 307, 308, 515, 529]
-
-# WC+8Co_5_fixed_001_cropped.jpg
-entry_nodes = [ 4, 15, 13, 16, 34, 27]
-exit_nodes = [ 527, 528, 519, 522]
-
-fixed_paths_energies = graph.fixed_paths_energies(g, cnts, nodes_metadata, entry_nodes, exit_nodes)
-```
-
+### `draw_tree(img, centres=False, leafs=False, nodes=False, bones=False)`
+Render skeleton landmarks (centres / leaves / nodes / skeleton pixels) onto a binary image.

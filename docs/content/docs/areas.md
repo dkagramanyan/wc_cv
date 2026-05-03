@@ -1,65 +1,40 @@
 ---
 title: "Areas"
-weight: 3
+weight: 7
 ---
 
-### Quickstart
+Plotting helpers for polygon-area and effective-radius distributions. Both expect rows produced by `PobeditDataset.generate_beams` (parquet) or the legacy JSON layout.
 
-
+## Quick start
 
 ```python
-from combra import mvee, data, areas
-import json
+from combra import data, areas
 
-
-pixel = 50 / 1000
-step = 4
-
-
-images_path = data.example_class_path()
-json_save_name = 'test'
-
-types_dict = {'Ultra_Co11': 'средние зерна',
-              'Ultra_Co25': 'мелкие зерна',
-              'Ultra_Co8': 'средне-мелкие зерна',
-              'Ultra_Co6_2': 'крупные зерна',
-              'Ultra_Co15': 'средне-мелкие зерна'}
-
-mvee.diametr_approx_save(
-                        images_path=images_path,
-                        save_path=json_save_name,
-                        types_dict=types_dict,
-                        step=step,
-                        max_images_num_per_class=None, 
-                        pixel = pixel
-    )
-
-generated_data = open(json_save_name+f'_step_{step}_beams.json', encoding='utf-8')
-generated_data = json.load(generated_data)
+ds = data.PobeditDataset(path=data.microstructure_class_path())
+ds.generate_beams(
+    save_path='beams',
+    types_dict={'Ultra_Co11': 'medium', 'Ultra_Co25': 'fine'},
+    step=4, pixel=50/1000,
+)
 ```
 
-Area distribution
+## Reference
+
+### `plot_polygons_area(data, saved_image_name, step, N, M, indices=None, save=False, start=1, end=None, pixel=0.05, font_size=20, s=60, log_min_val=-8, min_area_num=10)`
+Log probability distribution of polygon areas with a linear fit per class on the log-log axes.
+
+- `step`: bin size (in calibrated units).
+- `N`, `M`: grid dimensions when arranging multiple classes.
+- `pixel`: physical size of one pixel (e.g. `50/1000` for 50 nm pixels).
+- `log_min_val`, `min_area_num`: thresholds used to discard low-statistics bins before the linear fit.
+
+### `plot_polygons_effective_radius(data, saved_image_name, step, N, M, indices=None, save=False, start=1, end=None, pixel=0.05, font_size=20, s=60, log_min_val=-8, max_area_val=35)`
+Same idea but plots the effective radius `sqrt(area / π)`.
 
 ```python
-N = 15
-M = 10
-step = 1
+areas.plot_polygons_area(rows, 'areas.png', step=1, N=2, M=2,
+                         indices=[0, 1], save=False, log_min_val=-10, min_area_num=10)
 
-saved_image_name = f'original'
-
-areas.plot_polygons_area(generated_data, saved_image_name, step, N, M, indices=[3,0,2], save=False, start=0, log_min_val=-10,min_area_num=10)
-
-```
-
-Effective radius distribution
-
-```python
-N = 20
-M = 20
-
-step = 2
-
-saved_image_name='test'
-
-areas.plot_polygons_effective_radius(generated_data,saved_image_name, step, N, M, indices=[3,0,2],save=False)
+areas.plot_polygons_effective_radius(rows, 'radii.png', step=2, N=2, M=2,
+                                     indices=[0, 1], save=False)
 ```
