@@ -3,64 +3,172 @@ title: "Angles"
 weight: 5
 ---
 
-The `combra.angles` module extracts polygon angles from preprocessed binary images and provides plotting helpers for the resulting distributions.
-
-## Quick start
-
-Compute angles for one image:
+The `combra.angles` module extracts polygon angles from preprocessed binary images and provides plotting helpers for the resulting distributions. It's the per-image primitive that `PobeditDataset.generate_angles` calls in parallel.
 
 ```python
-from combra import angles, image, data
+from combra import angles
+```
 
-img_name, img = data.microstructure_images()[0]
+## Extraction
+
+### `combra.angles.get_angles`
+
+```python
+get_angles(image, border_eps=5, tol=3, min_segment_len=10.0)
+```
+
+Extract polygon angles from a preprocessed binary image. Each contour is Douglas–Peucker simplified, short segments are pruned, and the angle at every remaining vertex is computed (signed, counter-clockwise traversal — values >180° are preserved).
+
+**Parameters**
+
+| name | type | default | description |
+| --- | --- | --- | --- |
+| `image` | `ndarray` | — | Preprocessed image, shape `(H, W)` or `(H, W, 1)`. Use `combra.image.do_otsu` upstream. |
+| `border_eps` | `int` | `5` | Distance from image edge in pixels — contours whose bounding box sits inside this margin are dropped. |
+| `tol` | `float` | `3` | Douglas–Peucker simplification tolerance. |
+| `min_segment_len` | `float` | `10.0` | Vertices producing shorter neighbouring segments are iteratively removed before angle calculation. Higher → smoother distributions, fewer angles. Recommended: 5–20 px. |
+
+**Returns**
+
+| name | type | description |
+| --- | --- | --- |
+| `angles_array` | `ndarray[float64]` | All extracted vertex angles in degrees, concatenated across contours. |
+| `contours` | `list[ndarray]` | The (simplified) contours that produced the angles — `(N_points, 2)` int arrays. |
+
+**Example**
+
+```python
+from combra import angles, data, image
+
+_, img = data.microstructure_images()[0]
 processed = image.do_otsu(img)
 
-angles_array, contours = angles.get_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
-print(f'{len(angles_array)} angles, mean={angles_array.mean():.2f}°')
+arr, contours = angles.get_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
+print(f'{len(arr)} angles  mean={arr.mean():.1f}°')
 ```
 
-For a whole class folder, drive the dataset:
+---
+
+### `combra.angles.angles_legend`
 
 ```python
-from combra import data
-
-ds = data.PobeditDataset(path=data.microstructure_class_path(),
-                         max_images_num_per_class=360)
-ds.generate_angles('orig.parquet',
-                   types_dict={'Ultra_Co11': 'medium', 'Ultra_Co25': 'fine'},
-                   step=5, workers=20)
+angles_legend(images_amount, name, itype, step, mus, sigmas, amps, norm)
 ```
 
-Then plot from the parquet:
+Format a multi-line legend string from bimodal-Gaussian fit parameters. Useful when overlaying text on a custom plot.
+
+**Parameters**
+
+| name | type | description |
+| --- | --- | --- |
+| `images_amount` | `int` | Number of images contributing to the fit (`meta.n_images`). |
+| `name`, `itype` | `str` | Class name and display type (from `types_dict`). |
+| `step` | `float` | Histogram bin width. |
+| `mus`, `sigmas`, `amps` | `list[float]` | Length-2 bimodal-Gauss parameters. |
+| `norm` | `int` | Total angles count (`raw.angles_count`). |
+
+**Returns** `str` — multi-line label ready to drop into a matplotlib title.
+
+---
+
+## Plotting
+
+### `combra.angles.angles_plot_base`
 
 ```python
-angles.angles_plot_base(parquet_path='orig_step_5_N_360.parquet',
-                        N=2, M=1, save=False, scatter_size=20, font_size=20)
+angles_plot_base(
+    rows=None, save_name=None,
+    N=20, M=20, save=False, indices=None,
+    font_size=20, scatter_size=20, xlim=None, ylim=None,
+    parquet_path=None, step=None, show=True,
+)
 ```
 
-## Reference
+Plot angle density curves and bimodal Gaussian fits in an `N × M` plotly grid. Pass either `rows` (list of dicts) or `parquet_path` (string).
 
-### `get_angles(image, border_eps=5, tol=3, min_segment_len=10.0)`
+**Parameters**
 
-Extract polygon angles from a preprocessed binary image.
+| name | type | default | description |
+| --- | --- | --- | --- |
+| `rows` | `list[dict] \| None` | `None` | Pre-loaded rows from `combra.metrics.load_rows` or `pq.read_table().to_pydict()`. Required if `parquet_path` is not given. |
+| `save_name` | `str \| None` | `None` | Title and filename. Derived from `parquet_path` if absent. |
+| `N`, `M` | `int` | `20` | Grid dimensions. |
+| `save` | `bool` | `False` | Save the figure to `<save_name>.png` / `.html`. |
+| `indices` | `list[int] \| None` | `None` | Subset of rows to draw. |
+| `font_size`, `scatter_size` | `int` | `20` | Plot styling. |
+| `xlim`, `ylim` | `tuple[float, float] \| None` | `None` | Axis limits. |
+| `parquet_path` | `str \| None` | `None` | Alternative to `rows` — loads the file in place. |
+| `step` | `float \| None` | `None` | When the parquet has multiple steps under `prep_per_step`, pick this one. |
+| `show` | `bool` | `True` | If `False`, skip `fig.show()` (useful in batch). |
 
-- `image`: preprocessed image `(H, W)` or `(H, W, 1)`.
-- `border_eps`: distance from image edge — contours closer than this are dropped.
-- `tol`: Douglas–Peucker simplification tolerance.
-- `min_segment_len`: vertices that produce shorter neighbouring segments are iteratively removed before angle calculation. Higher values yield smoother distributions but fewer angles (5–20 px is typical).
+**Example**
 
-Returns `(angles_array, contours)`. Angles are signed and use counter-clockwise traversal so values >180° are preserved.
+```python
+from combra import angles
 
-### `angles_plot_base(rows=None, save_name=None, N=20, M=20, save=False, indices=None, font_size=20, scatter_size=20, xlim=None, ylim=None, parquet_path=None, step=None, show=True)`
+angles.angles_plot_base(
+    parquet_path='./data/angles/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5/angles_n360.parquet',
+    N=2, M=2, step=2.0, save=False, font_size=18,
+)
+```
 
-Plot angle density curves and bimodal Gaussian fits in an `N×M` grid.
+---
 
-Pass either `rows` (list of dicts) or `parquet_path`. When loading a parquet that contains multiple steps under `prep_per_step`, supply `step` to pick one. `indices` filters which rows to draw.
+### `combra.angles.angles_plot_grid`
 
-### `angles_legend(images_amount, name, itype, step, mus, sigmas, amps, norm)`
+```python
+angles_plot_grid(
+    grid, row_titles, col_titles, step,
+    title=None, save=None, show=True,
+    scatter_size=5, cell_width=320, cell_height=300, ylim=None,
+)
+```
 
-Format a multi-line legend string from Gaussian fit parameters. Useful when you want to overlay text on a custom plot.
+Plot a 2-D grid of angle distributions where each cell overlays multiple sources (e.g. original vs SAN-GAN vs DiffiT at one resolution / class).
 
-## Notes
+**Parameters**
 
-`__all__` lists `angles_approx_save` and `angles_approx_modes` but those names are not implemented in the current source — the parquet workflow on `PobeditDataset.generate_angles` replaces them.
+| name | type | description |
+| --- | --- | --- |
+| `grid` | `list[list[list[dict]]]` | `grid[r][c]` lists the overlay traces for the cell at row `r`, column `c`. Each trace is a dict with keys `parquet`, `class_name`, `label`, `color`, `marker`. |
+| `row_titles`, `col_titles` | `list[str]` | Axis labels. |
+| `step` | `float` | Histogram step to filter on. |
+| `title` | `str \| None` | Figure title. |
+| `save` | `str \| None` | If given, save the rendered HTML/PNG to this path. |
+| `show` | `bool` | `True` to call `fig.show()`. |
+| `scatter_size`, `cell_width`, `cell_height` | `int` | Layout knobs. |
+| `ylim` | `tuple[float, float] \| None` | Shared y-axis range across cells. |
+
+**Example** — three-source 3×3 grid (real, SAN-GAN, DiffiT × small/medium/large grains)
+
+```python
+from combra import angles
+
+STYLES = {'orig': dict(color='blue', marker='circle'),
+          'gan':  dict(color='orange', marker='square'),
+          'diffit': dict(color='green', marker='diamond')}
+
+grid = []
+for res in [256, 512, 1024]:
+    row = []
+    for cls in ['class_Ultra_Co11', 'class_Ultra_Co25', 'class_Ultra_Co6_2']:
+        cell = [{'parquet': f'.../o_bc_left_..._{res}x{res}_..._msl5/angles_n360.parquet',
+                 'class_name': cls, 'label': 'orig', **STYLES['orig']}]
+        row.append(cell)
+    grid.append(row)
+
+angles.angles_plot_grid(
+    grid=grid,
+    row_titles=['256×256', '512×512', '1024×1024'],
+    col_titles=['small grain', 'medium grain', 'large grain'],
+    step=2.0,
+)
+```
+
+---
+
+## See also
+
+- [`combra.data.PobeditDataset.generate_angles`]({{< relref "/docs/data#pobeditdatasetgenerate_angles" >}}) — drives `get_angles` across whole class folders and writes parquet.
+- [`combra.contours`]({{< relref "/docs/contours" >}}) — the contour extractor `get_angles` relies on internally.
+- [`combra.metrics.load_rows`]({{< relref "/docs/metrics" >}}) — loads angles parquets into the row shape these plotters expect.
