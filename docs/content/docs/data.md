@@ -13,17 +13,19 @@ from combra import data
 
 Zero-argument helpers that load assets shipped under `combra/data/`. They're meant for smoke tests and minimum-reproducible examples — point them at your own data for real work.
 
-### `combra.data.microstructure_images()`
+### `combra.data.microstructure_images`
+
+```python
+microstructure_images()
+```
 
 Load the five SEM example images shipped with combra (`Ultra_Co{6_2, 8, 11, 15, 25}-001_part_1.jpeg`).
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| (none) | `list[tuple[str, ndarray]]` | One `(filename, BGR uint8 image)` tuple per class. |
+- **samples** (*list[tuple[str, ndarray]]*) — One `(filename, BGR uint8 image)` tuple per class.
 
-**Example**
+**Examples**
 
 ```python
 from combra import data
@@ -38,17 +40,19 @@ for name, img in samples:
 
 ---
 
-### `combra.data.microstructure_class_path()`
+### `combra.data.microstructure_class_path`
+
+```python
+microstructure_class_path()
+```
 
 Return the path to the bundled 5-class WC/Co directory tree (one subfolder per class). Pass it to `PobeditDataset(path=...)` for end-to-end tests.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| (none) | `str` | Absolute path to the class-folder root. |
+- **class_root** (*str*) — Absolute path to the class-folder root.
 
-**Example**
+**Examples**
 
 ```python
 from combra import data
@@ -59,11 +63,21 @@ ds = data.PobeditDataset(path=class_root, max_images_num_per_class=50)
 
 ---
 
-### `combra.data.crack_images()` / `combra.data.crack_labeled_json()`
+### `combra.data.crack_images` / `combra.data.crack_labeled_json`
+
+```python
+crack_images()
+crack_labeled_json()
+```
 
 Load the bundled crack image and matching label-studio annotation. `crack_images()` returns `[(filename, ndarray)]`; `crack_labeled_json()` returns the parsed JSON dict.
 
-**Example**
+**Returns**
+
+- **images** (*list[tuple[str, ndarray]]*) — From `crack_images`.
+- **labels** (*dict*) — From `crack_labeled_json`.
+
+**Examples**
 
 ```python
 from combra import data
@@ -77,7 +91,8 @@ print(name, img.shape, list(labels.keys())[:3])
 ## `combra.data.PobeditDataset`
 
 ```python
-CLASS combra.data.PobeditDataset(path=None, max_images_num_per_class=100, print_depth=3, compression='lzf')
+CLASS combra.data.PobeditDataset(path=None, max_images_num_per_class=100,
+                                 print_depth=3, compression='lzf')
 ```
 
 Manages WC/Co microstructure images. The constructor opens an HDF5 file or converts a folder-of-classes to one; the first call to a `generate_*` method then builds a preprocessed-image cache (`.npy` memmap) that subsequent calls reuse.
@@ -86,14 +101,12 @@ Manages WC/Co microstructure images. The constructor opens an HDF5 file or conve
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `path` | `str \| Path` | `None` | Either a folder containing `class_*/` subfolders of images, or an existing `*.h5` produced by combra. When a folder is passed, the constructor converts it to HDF5 next to the source on first run. |
-| `max_images_num_per_class` | `int \| None` | `100` | Cap per class. `None` uses every available image. Each class is then truncated to the smallest class count to keep the cache rectangular. |
-| `print_depth` | `int` | `3` | Tree-print depth of the source structure at construction time. |
-| `compression` | `str \| None` | `'lzf'` | HDF5 compression used when converting a folder. Pass `None` for uncompressed (faster prep cache builds, larger file). |
+- **path** (*str or Path*, default `None`) — Either a folder containing `class_*/` subfolders of images, or an existing `*.h5` produced by combra. When a folder is passed, the constructor converts it to HDF5 next to the source on first run.
+- **max_images_num_per_class** (*int or None*, default `100`) — Cap per class. `None` uses every available image. Each class is then truncated to the smallest class count to keep the cache rectangular.
+- **print_depth** (*int*, default `3`) — Tree-print depth of the source structure at construction time.
+- **compression** (*str or None*, default `'lzf'`) — HDF5 compression used when converting a folder. Pass `None` for uncompressed (faster prep cache builds, larger file).
 
-**Example**
+**Examples**
 
 ```python
 from combra import data
@@ -129,25 +142,21 @@ The output parquet's `run_meta` struct column carries full provenance — model 
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `save_path` | `str \| Path` | — | Directory for the output. The filename is computed as `angles_n{N}.parquet`. |
-| `types_dict` | `dict[str, str]` | — | Maps class names (e.g. `'Ultra_Co11'`) to display labels used in legends. |
-| `step` | `float \| list[float]` | — | Histogram-binning step(s) in degrees. Pass a list to fit multiple steps in one pass; all are stored under `prep_per_step`. |
-| `workers` | `int` | `20` | Multiprocessing pool size. |
-| `angles_tol` | `float` | `3` | Douglas–Peucker simplification tolerance applied before angle extraction. |
-| `min_segment_len` | `float` | `10.0` | Vertices producing shorter neighbouring segments are iteratively removed before angle calculation. Higher → smoother distributions, fewer angles. Recommended: 5–20 px. |
-| `keep_contours` | `bool` | `False` | If `True`, the heavy `contours_angles` / `contours_angles_per_image` columns are populated. Off by default to keep parquets small. |
-| `chunksize` | `int` | `64` | Worker chunk size for `pool.imap_unordered`. |
-| `run_meta` | `dict \| None` | `None` | Caller-supplied provenance. May set `family`, `resolution`, `tags`, `notes`. Everything else (model_tag, kimg, source_h5, code_commit, generated_at, extraction_params) is filled automatically. |
+- **save_path** (*str or Path*) — Directory for the output. The filename is computed as `angles_n{N}.parquet`.
+- **types_dict** (*dict[str, str]*) — Maps class names (e.g. `'Ultra_Co11'`) to display labels used in legends.
+- **step** (*float or list[float]*) — Histogram-binning step(s) in degrees. Pass a list to fit multiple steps in one pass; all are stored under `prep_per_step`.
+- **workers** (*int*, default `20`) — Multiprocessing pool size.
+- **angles_tol** (*float*, default `3`) — Douglas–Peucker simplification tolerance applied before angle extraction.
+- **min_segment_len** (*float*, default `10.0`) — Vertices producing shorter neighbouring segments are iteratively removed before angle calculation. Higher → smoother distributions, fewer angles. Recommended: 5–20 px.
+- **keep_contours** (*bool*, default `False`) — If `True`, the heavy `contours_angles` / `contours_angles_per_image` columns are populated. Off by default to keep parquets small.
+- **chunksize** (*int*, default `64`) — Worker chunk size for `pool.imap_unordered`.
+- **run_meta** (*dict or None*, default `None`) — Caller-supplied provenance. May set `family`, `resolution`, `tags`, `notes`. Everything else (`model_tag`, `kimg`, `source_h5`, `code_commit`, `generated_at`, `extraction_params`) is filled automatically.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| `out_path` | `Path` | The written parquet path. |
+- **out_path** (*Path*) — The written parquet path.
 
-**Example**
+**Examples**
 
 ```python
 from combra import data
@@ -168,7 +177,7 @@ ds.generate_angles(
 # Saved: .../00017-diffit-256-gpus2-batch192_N10000_msl5/angles_n1000.parquet
 ```
 
-**Inspecting the output**
+Inspecting the output:
 
 ```python
 import pyarrow.parquet as pq
@@ -192,26 +201,22 @@ Compute Minimum Volume Enclosing Ellipse (MVEE) beam parameters for every image 
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `save_path` | `str \| Path` | — | Output directory. Filename is `beams_n{N}.parquet`. |
-| `types_dict` | `dict[str, str]` | — | Class-name to display-label map. |
-| `step` | `float \| list[float]` | — | Histogram-binning step(s) for the beam-length distribution. |
-| `pixel` | `float` | — | Physical pixel size (`pixel2meter` in the output `meta`). Beam lengths are scaled by this. |
-| `start`, `end` | `int` | `2`, `-3` | Slice bounds applied to the binned log-density before the linear fit (trims poorly-sampled extremes). |
-| `workers` | `int` | `20` | Multiprocessing pool size. |
-| `mvee_tol` | `float` | `0.2` | Convergence tolerance for the MVEE solve. Lower → tighter ellipses, slower. |
-| `queue_size` | `int` | `32` | Bound on the writer-process queue. |
-| `keep_contours` | `bool` | `False` | If `True`, populate `contours_mvee`. |
-| `run_meta` | `dict \| None` | `None` | Caller-supplied provenance (`family`, `resolution`, `tags`, `notes`). The rest is filled automatically. The beams-flavour `extraction_params` records `pixel`, `start`, `end`, `mvee_tol`, `keep_contours`. |
+- **save_path** (*str or Path*) — Output directory. Filename is `beams_n{N}.parquet`.
+- **types_dict** (*dict[str, str]*) — Class-name to display-label map.
+- **step** (*float or list[float]*) — Histogram-binning step(s) for the beam-length distribution.
+- **pixel** (*float*) — Physical pixel size (`pixel2meter` in the output `meta`). Beam lengths are scaled by this.
+- **start**, **end** (*int*, default `2`, `-3`) — Slice bounds applied to the binned log-density before the linear fit (trims poorly-sampled extremes).
+- **workers** (*int*, default `20`) — Multiprocessing pool size.
+- **mvee_tol** (*float*, default `0.2`) — Convergence tolerance for the MVEE solve. Lower → tighter ellipses, slower.
+- **queue_size** (*int*, default `32`) — Bound on the writer-process queue.
+- **keep_contours** (*bool*, default `False`) — If `True`, populate `contours_mvee`.
+- **run_meta** (*dict or None*, default `None`) — Caller-supplied provenance (`family`, `resolution`, `tags`, `notes`). The rest is filled automatically. The beams-flavour `extraction_params` records `pixel`, `start`, `end`, `mvee_tol`, `keep_contours`.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| `out_path` | `Path` | The written parquet path. |
+- **out_path** (*Path*) — The written parquet path.
 
-**Example**
+**Examples**
 
 ```python
 from combra import data
@@ -249,10 +254,8 @@ Polyamide fracture-image dataset. Filenames are expected to be plain integers; i
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `images_folder_path` | `str \| Path` | — | Folder of integer-named image files (e.g. `0.png`, `1.png`, …). |
-| `group_size` | `int` | `250` | Consecutive images per group. |
+- **images_folder_path** (*str or Path*) — Folder of integer-named image files (e.g. `0.png`, `1.png`, …).
+- **group_size** (*int*, default `250`) — Consecutive images per group.
 
 ---
 
@@ -266,13 +269,11 @@ For each group, compute contour fractal dimension, image-level fractal dimension
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `out_path` | `str \| Path` | — | Output parquet path. |
-| `n_jobs` | `int` | `20` | Worker count. |
-| `N` | `int` | `500` | Minimum contour length below which a contour is skipped. |
+- **out_path** (*str or Path*) — Output parquet path.
+- **n_jobs** (*int*, default `20`) — Worker count.
+- **N** (*int*, default `500`) — Minimum contour length below which a contour is skipped.
 
-**Example**
+**Examples**
 
 ```python
 from combra import data

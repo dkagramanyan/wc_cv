@@ -21,21 +21,17 @@ Extract polygon angles from a preprocessed binary image. Each contour is Douglas
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `ndarray` | — | Preprocessed image, shape `(H, W)` or `(H, W, 1)`. Use `combra.image.do_otsu` upstream. |
-| `border_eps` | `int` | `5` | Distance from image edge in pixels — contours whose bounding box sits inside this margin are dropped. |
-| `tol` | `float` | `3` | Douglas–Peucker simplification tolerance. |
-| `min_segment_len` | `float` | `10.0` | Vertices producing shorter neighbouring segments are iteratively removed before angle calculation. Higher → smoother distributions, fewer angles. Recommended: 5–20 px. |
+- **image** (*ndarray*) — Preprocessed image, shape `(H, W)` or `(H, W, 1)`. Use `combra.image.do_otsu` upstream.
+- **border_eps** (*int*, default `5`) — Distance from image edge in pixels — contours whose bounding box sits inside this margin are dropped.
+- **tol** (*float*, default `3`) — Douglas–Peucker simplification tolerance.
+- **min_segment_len** (*float*, default `10.0`) — Vertices producing shorter neighbouring segments are iteratively removed before angle calculation. Higher → smoother distributions, fewer angles. Recommended: 5–20 px.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| `angles_array` | `ndarray[float64]` | All extracted vertex angles in degrees, concatenated across contours. |
-| `contours` | `list[ndarray]` | The (simplified) contours that produced the angles — `(N_points, 2)` int arrays. |
+- **angles_array** (*ndarray[float64]*) — All extracted vertex angles in degrees, concatenated across contours.
+- **contours** (*list[ndarray]*) — The (simplified) contours that produced the angles — `(N_points, 2)` int arrays.
 
-**Example**
+**Examples**
 
 ```python
 from combra import angles, data, image
@@ -59,15 +55,15 @@ Format a multi-line legend string from bimodal-Gaussian fit parameters. Useful w
 
 **Parameters**
 
-| name | type | description |
-| --- | --- | --- |
-| `images_amount` | `int` | Number of images contributing to the fit (`meta.n_images`). |
-| `name`, `itype` | `str` | Class name and display type (from `types_dict`). |
-| `step` | `float` | Histogram bin width. |
-| `mus`, `sigmas`, `amps` | `list[float]` | Length-2 bimodal-Gauss parameters. |
-| `norm` | `int` | Total angles count (`raw.angles_count`). |
+- **images_amount** (*int*) — Number of images contributing to the fit (`meta.n_images`).
+- **name**, **itype** (*str*) — Class name and display type (from `types_dict`).
+- **step** (*float*) — Histogram bin width.
+- **mus**, **sigmas**, **amps** (*list[float]*) — Length-2 bimodal-Gauss parameters.
+- **norm** (*int*) — Total angles count (`raw.angles_count`).
 
-**Returns** `str` — multi-line label ready to drop into a matplotlib title.
+**Returns**
+
+- **label** (*str*) — Multi-line label ready to drop into a matplotlib title.
 
 ---
 
@@ -88,20 +84,18 @@ Plot angle density curves and bimodal Gaussian fits in an `N × M` plotly grid. 
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `rows` | `list[dict] \| None` | `None` | Pre-loaded rows from `combra.metrics.load_rows` or `pq.read_table().to_pydict()`. Required if `parquet_path` is not given. |
-| `save_name` | `str \| None` | `None` | Title and filename. Derived from `parquet_path` if absent. |
-| `N`, `M` | `int` | `20` | Grid dimensions. |
-| `save` | `bool` | `False` | Save the figure to `<save_name>.png` / `.html`. |
-| `indices` | `list[int] \| None` | `None` | Subset of rows to draw. |
-| `font_size`, `scatter_size` | `int` | `20` | Plot styling. |
-| `xlim`, `ylim` | `tuple[float, float] \| None` | `None` | Axis limits. |
-| `parquet_path` | `str \| None` | `None` | Alternative to `rows` — loads the file in place. |
-| `step` | `float \| None` | `None` | When the parquet has multiple steps under `prep_per_step`, pick this one. |
-| `show` | `bool` | `True` | If `False`, skip `fig.show()` (useful in batch). |
+- **rows** (*list[dict] or None*, default `None`) — Pre-loaded rows from `combra.metrics.load_rows` or `pq.read_table().to_pydict()`. Required if `parquet_path` is not given.
+- **save_name** (*str or None*, default `None`) — Title and filename. Derived from `parquet_path` if absent.
+- **N**, **M** (*int*, default `20`) — Grid dimensions.
+- **save** (*bool*, default `False`) — Save the figure to `<save_name>.png` / `.html`.
+- **indices** (*list[int] or None*, default `None`) — Subset of rows to draw.
+- **font_size**, **scatter_size** (*int*, default `20`) — Plot styling.
+- **xlim**, **ylim** (*tuple[float, float] or None*, default `None`) — Axis limits.
+- **parquet_path** (*str or None*, default `None`) — Alternative to `rows` — loads the file in place.
+- **step** (*float or None*, default `None`) — When the parquet has multiple steps under `prep_per_step`, pick this one.
+- **show** (*bool*, default `True`) — If `False`, skip `fig.show()` (useful in batch).
 
-**Example**
+**Examples**
 
 ```python
 from combra import angles
@@ -128,18 +122,18 @@ Plot a 2-D grid of angle distributions where each cell overlays multiple sources
 
 **Parameters**
 
-| name | type | description |
-| --- | --- | --- |
-| `grid` | `list[list[list[dict]]]` | `grid[r][c]` lists the overlay traces for the cell at row `r`, column `c`. Each trace is a dict with keys `parquet`, `class_name`, `label`, `color`, `marker`. |
-| `row_titles`, `col_titles` | `list[str]` | Axis labels. |
-| `step` | `float` | Histogram step to filter on. |
-| `title` | `str \| None` | Figure title. |
-| `save` | `str \| None` | If given, save the rendered HTML/PNG to this path. |
-| `show` | `bool` | `True` to call `fig.show()`. |
-| `scatter_size`, `cell_width`, `cell_height` | `int` | Layout knobs. |
-| `ylim` | `tuple[float, float] \| None` | Shared y-axis range across cells. |
+- **grid** (*list[list[list[dict]]]*) — `grid[r][c]` lists the overlay traces for the cell at row `r`, column `c`. Each trace is a dict with keys `parquet`, `class_name`, `label`, `color`, `marker`.
+- **row_titles**, **col_titles** (*list[str]*) — Axis labels.
+- **step** (*float*) — Histogram step to filter on.
+- **title** (*str or None*, default `None`) — Figure title.
+- **save** (*str or None*, default `None`) — If given, save the rendered HTML/PNG to this path.
+- **show** (*bool*, default `True`) — `True` to call `fig.show()`.
+- **scatter_size**, **cell_width**, **cell_height** (*int*, default `5`, `320`, `300`) — Layout knobs.
+- **ylim** (*tuple[float, float] or None*, default `None`) — Shared y-axis range across cells.
 
-**Example** — three-source 3×3 grid (real, SAN-GAN, DiffiT × small/medium/large grains)
+**Examples**
+
+Three-source 3×3 grid (real, SAN-GAN, DiffiT × small/medium/large grains):
 
 ```python
 from combra import angles

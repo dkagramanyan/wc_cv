@@ -61,6 +61,6 @@ The output file's `run_meta` column records who/when/what — including the git 
 | [`combra.areas`]({{< relref "/docs/areas" >}}) | Polygon-area and effective-radius distribution plots. |
 | [`combra.stats`]({{< relref "/docs/stats" >}}) | Parametric distributions + histogram preprocessor. |
 | [`combra.approx`]({{< relref "/docs/approx" >}}) | Fits Gaussian/binomial/poisson/exponential/linear models. |
-| [`combra.metrics`]({{< relref "/docs/metrics" >}}) | FID and per-class Wasserstein comparison. |
+| [`combra.metrics`]({{< relref "/docs/metrics" >}}) | FID, per-class Wasserstein comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
 | [`combra.graph`]({{< relref "/docs/graph" >}}) | Crack-image → graph → shortest-energy-path search. |
 | [`combra.utils`]({{< relref "/docs/utils" >}}) | `NumpyEncoder` for JSON dumps. |

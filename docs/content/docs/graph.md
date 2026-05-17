@@ -32,28 +32,24 @@ Median-filter, Otsu, and contour-extract the input. Pass `labeled_cnts=True` (an
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `ndarray` | — | Source image (any channels). |
-| `r` | `int` | `2` | Marker radius for node visualisation. |
-| `border` | `int` | `30` | Padding added before extraction. |
-| `border_node_eps` | `int` | `10` | Max distance from border for a node to count as an entry/exit candidate. |
-| `tol` | `float` | `5` | Douglas–Peucker tolerance. |
-| `disk` | `int` | `5` | Median-filter footprint radius. |
-| `labeled_cnts` | `bool` | `False` | Skip binarisation; use `labels` directly. |
-| `labels` | `bool` | `False` | Hand-labelled contour data. |
-| `entry_ellps_w`, `exit_ellps_w` | `int` | `1` | Width of the entry/exit ellipse region overlay. |
+- **image** (*ndarray*) — Source image (any channels).
+- **r** (*int*, default `2`) — Marker radius for node visualisation.
+- **border** (*int*, default `30`) — Padding added before extraction.
+- **border_node_eps** (*int*, default `10`) — Max distance from border for a node to count as an entry/exit candidate.
+- **tol** (*float*, default `5`) — Douglas–Peucker tolerance.
+- **disk** (*int*, default `5`) — Median-filter footprint radius.
+- **labeled_cnts** (*bool*, default `False`) — Skip binarisation; use `labels` directly.
+- **labels** (*ndarray or bool*, default `False`) — Hand-labelled contour data.
+- **entry_ellps_w**, **exit_ellps_w** (*int*, default `1`) — Width of the entry/exit ellipse region overlay.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| `entry_nodes` | `list[int]` | Node indices on the entry side. |
-| `exit_nodes` | `list[int]` | Node indices on the exit side. |
-| `img_contours_o` | `ndarray` | RGB visualisation with contours drawn. |
-| `img_preprocessed` | `ndarray` | Binary preprocessed image. |
-| `cnts` | `list[ndarray]` | Simplified contours. |
-| `nodes_metadata` | `pandas.DataFrame` | Per-node metadata (coords, contour index, entry/exit flags, ...). |
+- **entry_nodes** (*list[int]*) — Node indices on the entry side.
+- **exit_nodes** (*list[int]*) — Node indices on the exit side.
+- **img_contours_o** (*ndarray*) — RGB visualisation with contours drawn.
+- **img_preprocessed** (*ndarray*) — Binary preprocessed image.
+- **cnts** (*list[ndarray]*) — Simplified contours.
+- **nodes_metadata** (*pandas.DataFrame*) — Per-node metadata (coords, contour index, entry/exit flags, …).
 
 ---
 
@@ -69,9 +65,28 @@ create_crack_graph(img_shape, cnts, nodes_metadata,
 
 Build the directed graph. `eps` is the maximum edge length in pixels; `line_eps` is the perpendicular tolerance used when classifying edges.
 
-**Returns** `(g, img_contours)` — a `networkx.DiGraph` and the contour-overlay image with graph edges drawn.
+**Parameters**
 
-**Example**
+- **img_shape** (*tuple[int, int]*) — `(H, W)` of the source image.
+- **cnts** (*list[ndarray]*) — Contours from `preprocess_graph_image`.
+- **nodes_metadata** (*pandas.DataFrame*) — Node table from `preprocess_graph_image`.
+- **eps** (*int*, default `100`) — Maximum edge length in pixels.
+- **line_eps** (*int*, default `3`) — Perpendicular tolerance used when classifying edges.
+- **border** (*int*, default `30`) — Image padding (must match `preprocess_graph_image`).
+- **border_eps** (*int*, default `0`) — Margin from image edge that excludes detections.
+- **border_number_min** (*int*, default `2`) — Minimum contour-border pixel count for an edge to count.
+- **border_pixel** (*int*, default `255`) — Pixel value that marks a contour border.
+- **same_node_eps** (*int*, default `5`) — Distance below which two candidate nodes are merged.
+- **labels** (*ndarray or bool*, default `False`) — Hand-labelled contour data.
+- **labeled_line_eps** (*int*, default `10`) — Perpendicular tolerance for the labelled-contour path.
+- **workers** (*int*, default `10`) — Worker count for edge enumeration.
+
+**Returns**
+
+- **g** (*networkx.DiGraph*) — Built crack graph.
+- **img_contours** (*ndarray*) — Contour-overlay image with graph edges drawn.
+
+**Examples**
 
 ```python
 from combra import graph, data
@@ -98,6 +113,16 @@ get_edges(start_node_index, nodes_metadata, process_metadata)
 
 Compute outgoing edges from one node — used internally by `create_crack_graph`. You normally don't need to call it directly.
 
+**Parameters**
+
+- **start_node_index** (*int*) — Source node.
+- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **process_metadata** (*dict*) — Internal builder state.
+
+**Returns**
+
+- **edges** (*list[tuple]*) — Outgoing edges with classification metadata.
+
 ---
 
 ### `combra.graph.get_edge_type`
@@ -108,7 +133,17 @@ get_edge_type(node1, node2, cnts, nodes_metadata, wc_eps=30, border_pixel=0)
 
 Classify a single edge between two node indices into Co / WC-Co / WC / WC-WC.
 
-**Returns** `int` — edge-type code (0–3).
+**Parameters**
+
+- **node1**, **node2** (*int*) — Node indices.
+- **cnts** (*list[ndarray]*) — Contours.
+- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **wc_eps** (*int*, default `30`) — Minimum contour-pixel count below which the edge is reclassified.
+- **border_pixel** (*int*, default `0`) — Pixel value that marks a contour border.
+
+**Returns**
+
+- **edge_type** (*int*) — Edge-type code (0–3).
 
 ---
 
@@ -119,6 +154,16 @@ get_edge_type_labeled(node1, node2, nodes_metadata, line_eps=10)
 ```
 
 Same as `get_edge_type` but uses hand labels carried in `nodes_metadata`. Use when you've labelled contours manually.
+
+**Parameters**
+
+- **node1**, **node2** (*int*) — Node indices.
+- **nodes_metadata** (*pandas.DataFrame*) — Node table including labels.
+- **line_eps** (*int*, default `10`) — Perpendicular tolerance.
+
+**Returns**
+
+- **edge_type** (*int*) — Edge-type code.
 
 ---
 
@@ -135,19 +180,19 @@ Sweep an `(N, M)` grid of edge-type weights. For every grid cell, set the edge w
 
 **Parameters**
 
-| name | type | description |
-| --- | --- | --- |
-| `energy_conf` | `list[list[dict]]` | `(N, M)` grid where each cell is `{0: co_e, 1: wc_co_e, 2: wc_e, 3: wc_wc_e}` — edge-type weights at that grid point. |
-| `g`, `cnts`, `nodes_metadata` | from `create_crack_graph` | Graph + supporting state. |
-| `entry_nodes`, `exit_nodes` | `list[int]` | Endpoint pools. |
-| `first_k_paths` | `int` | `2` | k for Yen's k-shortest-path. |
-| `parallel` | `bool` | `False` | Use multiprocessing pool. |
-| `workers` | `int` | `23` | Pool size when `parallel=True`. |
-| `recalculate_paths` | `bool` | `False` | Force recompute even when a cached result exists. |
+- **energy_conf** (*list[list[dict]]*) — `(N, M)` grid where each cell is `{0: co_e, 1: wc_co_e, 2: wc_e, 3: wc_wc_e}` — edge-type weights at that grid point.
+- **g**, **cnts**, **nodes_metadata** (*from `create_crack_graph`*) — Graph + supporting state.
+- **entry_nodes**, **exit_nodes** (*list[int]*) — Endpoint pools.
+- **first_k_paths** (*int*, default `2`) — `k` for Yen's k-shortest-path.
+- **parallel** (*bool*, default `False`) — Use multiprocessing pool.
+- **workers** (*int*, default `23`) — Pool size when `parallel=True`.
+- **recalculate_paths** (*bool*, default `False`) — Force recompute even when a cached result exists.
 
-**Returns** `list[list[list[DataFrame]]]` — same shape as `energy_conf`; each cell is a list of per-pair `DataFrame`s.
+**Returns**
 
-**Example**
+- **energies_paths** (*list[list[list[DataFrame]]]*) — Same shape as `energy_conf`; each cell is a list of per-pair `DataFrame`s.
+
+**Examples**
 
 ```python
 import numpy as np
@@ -176,7 +221,18 @@ find_shortest_energy_paths(G, cnts, nodes_metadata, entry_node, exit_node, k,
 
 Find the `k` shortest paths between one entry/exit pair and return per-path lengths, energies, and edge-type breakdowns.
 
-**Returns** `pandas.DataFrame` — one row per path with columns for total length, energy, and per-edge-type pixel fractions.
+**Parameters**
+
+- **G** (*networkx.DiGraph*) — Crack graph.
+- **cnts** (*list[ndarray]*) — Contours.
+- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **entry_node**, **exit_node** (*int*) — Single endpoint pair.
+- **k** (*int*) — Number of shortest paths to return.
+- **recalculate_paths** (*bool*, default `False`) — Force recompute.
+
+**Returns**
+
+- **df** (*pandas.DataFrame*) — One row per path with columns for total length, energy, and per-edge-type pixel fractions.
 
 ---
 
@@ -212,7 +268,18 @@ graph_plot(g, img_contours=None, name='graph.html', save=False,
 
 Interactive Plotly plot of the graph overlaid on `img_contours`.
 
-**Example**
+**Parameters**
+
+- **g** (*networkx.DiGraph*) — Graph to plot.
+- **img_contours** (*ndarray or None*, default `None`) — Background image.
+- **name** (*str*, default `'graph.html'`) — Output filename when `save=True`.
+- **save** (*bool*, default `False`) — Write HTML to disk.
+- **node_size** (*int*, default `12`) — Plotly marker size.
+- **edge_width** (*int*, default `2`) — Default edge line width.
+- **color_dict** (*dict or None*, default `None`) — `{edge_type: color}`.
+- **edge_width_dict** (*dict or None*, default `None`) — `{edge_type: width}`.
+
+**Examples**
 
 ```python
 graph.graph_plot(g, img_contours=img_contours, name='crack.html', save=True)
@@ -230,6 +297,14 @@ plot_optimized_energies(energies_paths, path_index=0, N=5, M=5,
 
 Heatmap of optimal path energies over the `(Co, WC-Co)` weight grid for path index `path_index`.
 
+**Parameters**
+
+- **energies_paths** (*list[list[list[DataFrame]]]*) — Output of `get_energies`.
+- **path_index** (*int*, default `0`) — Path rank to plot.
+- **N**, **M** (*int*, default `5`) — Grid dimensions.
+- **y_label**, **x_label** (*str*, default `'co_e'`, `'wc-co_e'`) — Axis labels.
+- **fontsize_h**, **fontsize_axes** (*int*, default `10`, `50`) — Styling.
+
 ---
 
 ### `combra.graph.plot_paths`
@@ -239,6 +314,13 @@ plot_paths(g, df, img_aligned, border=30)
 ```
 
 Overlay the paths in `df` (output of `find_shortest_energy_paths`) on the background image.
+
+**Parameters**
+
+- **g** (*networkx.DiGraph*) — Graph.
+- **df** (*pandas.DataFrame*) — Path table.
+- **img_aligned** (*ndarray*) — Background image.
+- **border** (*int*, default `30`) — Padding to compensate for.
 
 ---
 
@@ -250,6 +332,13 @@ plot_optimized_paths(g, energies_paths, img_contours_o, param_1=10, param_2=10)
 
 Overlay the energy-optimised paths from `get_energies` on the contour image at grid position `(param_1, param_2)`.
 
+**Parameters**
+
+- **g** (*networkx.DiGraph*) — Graph.
+- **energies_paths** (*list[list[list[DataFrame]]]*) — Output of `get_energies`.
+- **img_contours_o** (*ndarray*) — Background image.
+- **param_1**, **param_2** (*int*, default `10`) — Grid coordinates to draw.
+
 ---
 
 ### `combra.graph.draw_tree`
@@ -259,6 +348,15 @@ draw_tree(img, centres=False, leafs=False, nodes=False, bones=False)
 ```
 
 Render skeleton landmarks (centres / leaves / nodes / skeleton pixels) onto a binary image.
+
+**Parameters**
+
+- **img** (*ndarray*) — Binary input.
+- **centres**, **leafs**, **nodes**, **bones** (*bool*, default `False`) — Draw each landmark type.
+
+**Returns**
+
+- **rendered** (*ndarray*) — Annotated image.
 
 ---
 

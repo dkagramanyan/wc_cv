@@ -21,11 +21,11 @@ Extract raw contours via Canny edges + Suzuki contour finding. No simplification
 
 **Parameters**
 
-| name | type | description |
-| --- | --- | --- |
-| `image` | `ndarray` | Preprocessed binary image. |
+- **image** (*ndarray*) — Preprocessed binary image.
 
-**Returns** `list[ndarray]` — one `(N_points, 2)` array per region, every boundary pixel.
+**Returns**
+
+- **contours** (*list[ndarray]*) — One `(N_points, 2)` array per region, every boundary pixel.
 
 ---
 
@@ -39,14 +39,14 @@ Same as `get_row_contours` but applies Douglas–Peucker simplification with tol
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `ndarray` | — | Preprocessed binary image. |
-| `tol` | `float` | `3` | Simplification tolerance in pixels — higher → fewer vertices. |
+- **image** (*ndarray*) — Preprocessed binary image.
+- **tol** (*float*, default `3`) — Simplification tolerance in pixels — higher → fewer vertices.
 
-**Returns** `list[ndarray]` — simplified contours.
+**Returns**
 
-**Example**
+- **contours** (*list[ndarray]*) — Simplified contours.
+
+**Examples**
 
 ```python
 from combra import contours, image, data
@@ -54,7 +54,7 @@ from combra import contours, image, data
 _, img = data.microstructure_images()[0]
 processed = image.do_otsu(img)
 
-raw = contours.get_row_contours(processed)        # ~thousands of vertices per region
+raw = contours.get_row_contours(processed)            # ~thousands of vertices per region
 simplified = contours.get_contours(processed, tol=3)  # ~tens of vertices per region
 print(f'raw[0]: {len(raw[0])} pts   simplified[0]: {len(simplified[0])} pts')
 ```
@@ -69,7 +69,13 @@ skeletons_coords(image)
 
 Morphological skeletonisation + per-component split via `scipy.ndimage.label`. One coordinate array per skeleton component.
 
-**Returns** `list[ndarray]` — `(N_pixels, 2)` int arrays.
+**Parameters**
+
+- **image** (*ndarray*) — Binary image.
+
+**Returns**
+
+- **coords** (*list[ndarray]*) — `(N_pixels, 2)` int arrays, one per connected component.
 
 ---
 
@@ -83,14 +89,14 @@ Render a single contour into a small binary mask.
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `contour` | `ndarray[N, 2]` | — | Polygon vertices. |
-| `eps` | `int` | `1` | Mask quantisation factor (downsamples the bounding box by `eps`). |
-| `thickness` | `int` | `1` | Drawing line thickness. |
-| `pad` | `int` | `2` | Margin added around the contour. |
+- **contour** (*ndarray[N, 2]*) — Polygon vertices.
+- **eps** (*int*, default `1`) — Mask quantisation factor (downsamples the bounding box by `eps`).
+- **thickness** (*int*, default `1`) — Drawing line thickness.
+- **pad** (*int*, default `2`) — Margin added around the contour.
 
-**Returns** `ndarray[bool]` — small mask sized to the contour's bounding box + padding.
+**Returns**
+
+- **mask** (*ndarray[bool]*) — Small mask sized to the contour's bounding box + padding.
 
 ---
 
@@ -101,6 +107,15 @@ scale_contour(contour, factor)
 ```
 
 Multiply contour coordinates by `factor`. Use when rescaling contours for a resized image.
+
+**Parameters**
+
+- **contour** (*ndarray[N, 2]*) — Polygon vertices.
+- **factor** (*float*) — Multiplicative scale.
+
+**Returns**
+
+- **scaled** (*ndarray[N, 2]*) — Rescaled vertices.
 
 ---
 
@@ -118,17 +133,17 @@ Draw simplified contours onto a `PIL.Image`. When `corners=True`, also draws fil
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `PIL.Image` | — | Background to draw on. |
-| `cnts` | `list[ndarray]` | — | Contours from `get_contours`. |
-| `color_corner` | `(R, G, B)` | `(0, 139, 139)` | Vertex marker colour. |
-| `color_line` | `(R, G, B)` | `(255, 140, 0)` | Edge colour. |
-| `r` | `int` | `2` | Vertex marker radius (if `corners=True`). |
-| `e_width`, `l_width` | `int` | `5, 2` | Vertex outline / line widths. |
-| `corners` | `bool` | `False` | Draw filled circles at vertices. |
+- **image** (*PIL.Image*) — Background to draw on.
+- **cnts** (*list[ndarray]*) — Contours from `get_contours`.
+- **color_corner** (*tuple[int, int, int]*, default `(0, 139, 139)`) — Vertex marker colour `(R, G, B)`.
+- **color_line** (*tuple[int, int, int]*, default `(255, 140, 0)`) — Edge colour `(R, G, B)`.
+- **r** (*int*, default `2`) — Vertex marker radius (if `corners=True`).
+- **e_width**, **l_width** (*int*, default `5`, `2`) — Vertex outline / line widths.
+- **corners** (*bool*, default `False`) — Draw filled circles at vertices.
 
-**Returns** `PIL.Image` — modified in place and returned.
+**Returns**
+
+- **image** (*PIL.Image*) — Modified in place and returned.
 
 ---
 
@@ -140,9 +155,19 @@ draw_edges(image, cnts, color=(0, 139, 139), r=4, e_width=5, l_width=4)
 
 Numpy version of `draw_contours` — operates on an `ndarray` instead of `PIL.Image`. Use when the surrounding pipeline already works in numpy.
 
-**Returns** `ndarray` — the modified image.
+**Parameters**
 
-**Example**
+- **image** (*ndarray*) — Background image.
+- **cnts** (*list[ndarray]*) — Contours.
+- **color** (*tuple[int, int, int]*, default `(0, 139, 139)`) — Edge colour.
+- **r** (*int*, default `4`) — Vertex marker radius.
+- **e_width**, **l_width** (*int*, default `5`, `4`) — Vertex outline / line widths.
+
+**Returns**
+
+- **image** (*ndarray*) — Modified image.
+
+**Examples**
 
 ```python
 from PIL import Image

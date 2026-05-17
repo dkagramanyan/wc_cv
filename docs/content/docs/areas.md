@@ -21,19 +21,17 @@ Log probability distribution of polygon areas with a linear fit per class on the
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `data` | `list[dict]` | — | Rows from a beams parquet. |
-| `saved_image_name` | `str` | — | Filename for the figure. |
-| `step` | `float` | — | Bin size in calibrated units. |
-| `N`, `M` | `int` | — | Grid dimensions when arranging multiple classes. |
-| `indices` | `list[int] \| None` | `None` | Class subset to draw. |
-| `save` | `bool` | `False` | Write the figure to disk. |
-| `start`, `end` | `int` | `1`, `None` | Histogram slice bounds for the linear fit. |
-| `pixel` | `float` | `50/1000` | Physical pixel size (e.g. `50/1000` for 50 nm pixels). |
-| `font_size`, `s` | `int` | `20`, `60` | Styling. |
-| `log_min_val` | `float` | `-8` | Log-density floor below which bins are discarded before the fit. |
-| `min_area_num` | `int` | `10` | Minimum count per bin to include in the fit. |
+- **data** (*list[dict]*) — Rows from a beams parquet.
+- **saved_image_name** (*str*) — Filename for the figure.
+- **step** (*float*) — Bin size in calibrated units.
+- **N**, **M** (*int*) — Grid dimensions when arranging multiple classes.
+- **indices** (*list[int] or None*, default `None`) — Class subset to draw.
+- **save** (*bool*, default `False`) — Write the figure to disk.
+- **start**, **end** (*int*, default `1`, `None`) — Histogram slice bounds for the linear fit.
+- **pixel** (*float*, default `50/1000`) — Physical pixel size (e.g. `50/1000` for 50 nm pixels).
+- **font_size**, **s** (*int*, default `20`, `60`) — Styling.
+- **log_min_val** (*float*, default `-8`) — Log-density floor below which bins are discarded before the fit.
+- **min_area_num** (*int*, default `10`) — Minimum count per bin to include in the fit.
 
 ---
 
@@ -47,9 +45,11 @@ plot_polygons_effective_radius(data, saved_image_name, step, N, M, indices=None,
 
 Same idea as `plot_polygons_area` but plots the effective radius `√(area / π)` instead of the area directly.
 
-**Parameters** — identical to `plot_polygons_area`, with `min_area_num` replaced by `max_area_val` (upper bound on radius before the fit).
+**Parameters** — identical to `plot_polygons_area`, with `min_area_num` replaced by:
 
-**Example**
+- **max_area_val** (*float*, default `35`) — Upper bound on radius before the fit.
+
+**Examples**
 
 ```python
 import pyarrow.parquet as pq

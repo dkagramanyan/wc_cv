@@ -23,22 +23,18 @@ Fit MVEE to every contour in a preprocessed image. This is the per-image primiti
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `ndarray` | — | Preprocessed image. |
-| `tol` | `float` | `0.2` | Convergence tolerance. Lower → tighter ellipses, slower. |
+- **image** (*ndarray*) — Preprocessed image.
+- **tol** (*float*, default `0.2`) — Convergence tolerance. Lower → tighter ellipses, slower.
 
 **Returns**
 
-| name | type | description |
-| --- | --- | --- |
-| `a_beams` | `list[float]` | Semi-major axes (in pixels). |
-| `b_beams` | `list[float]` | Semi-minor axes. |
-| `angles` | `list[float]` | Rotation angles in radians. |
-| `centroids` | `list[(x, y)]` | Centre coordinates. |
-| `contours` | `list[ndarray]` | The source contours, in the order MVEEs were fit. |
+- **a_beams** (*list[float]*) — Semi-major axes (in pixels).
+- **b_beams** (*list[float]*) — Semi-minor axes.
+- **angles** (*list[float]*) — Rotation angles in radians.
+- **centroids** (*list[tuple[float, float]]*) — Centre coordinates.
+- **contours** (*list[ndarray]*) — The source contours, in the order MVEEs were fit.
 
-**Example**
+**Examples**
 
 ```python
 from combra import mvee, image, data
@@ -59,6 +55,21 @@ beams_legend(images_amount, name, itype, norm, k, angle, b, score, dist_step, di
 
 Format a multi-line legend string for a beam-distribution plot. Used inside `generate_beams` to populate `prep.beams_legend_a` / `prep.beams_legend_b`.
 
+**Parameters**
+
+- **images_amount** (*int*) — Number of images contributing to the fit.
+- **name**, **itype** (*str*) — Class name and display label.
+- **norm** (*int*) — Total beam count.
+- **k**, **b** (*float*) — Linear-fit slope and intercept of the log-density.
+- **angle** (*float*) — `arctan(k)` in degrees.
+- **score** (*float*) — Fit R².
+- **dist_step** (*float*) — Histogram bin width.
+- **dist_mean** (*float*) — Mean beam length.
+
+**Returns**
+
+- **label** (*str*) — Multi-line legend string.
+
 ---
 
 ## Plotting
@@ -66,24 +77,23 @@ Format a multi-line legend string for a beam-distribution plot. Used inside `gen
 ### `combra.mvee.plot_beam_base`
 
 ```python
-plot_beam_base(rows, save_name, step, N, M, indices=None, save=False, scatter_size=60, font_size=20)
+plot_beam_base(rows, save_name, step, N, M, indices=None, save=False,
+               scatter_size=60, font_size=20)
 ```
 
 Plot the `a_beams` and `b_beams` distributions for each class in an `N × M` grid.
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `rows` | `list[dict]` | — | Rows from a beams parquet (e.g. via `pq.read_table().to_pylist()`). |
-| `save_name` | `str` | — | Title and filename. |
-| `step` | `float` | — | Filter to this histogram step. |
-| `N`, `M` | `int` | — | Grid dimensions. |
-| `indices` | `list[int] \| None` | `None` | Class indices to draw. |
-| `save` | `bool` | `False` | Write to `<save_name>.png`. |
-| `scatter_size`, `font_size` | `int` | `60`, `20` | Styling. |
+- **rows** (*list[dict]*) — Rows from a beams parquet (e.g. via `pq.read_table().to_pylist()`).
+- **save_name** (*str*) — Title and filename.
+- **step** (*float*) — Filter to this histogram step.
+- **N**, **M** (*int*) — Grid dimensions.
+- **indices** (*list[int] or None*, default `None`) — Class indices to draw.
+- **save** (*bool*, default `False`) — Write to `<save_name>.png`.
+- **scatter_size**, **font_size** (*int*, default `60`, `20`) — Styling.
 
-**Example**
+**Examples**
 
 ```python
 import pyarrow.parquet as pq
@@ -110,6 +120,15 @@ plot_angles(data, saved_image_name, step, N, M, indices=None, save=False)
 
 Plot the ellipse rotation-angle distributions across classes.
 
+**Parameters**
+
+- **data** (*list[dict]*) — Rows from a beams parquet.
+- **saved_image_name** (*str*) — Output filename.
+- **step** (*float*) — Histogram step to filter on.
+- **N**, **M** (*int*) — Grid dimensions.
+- **indices** (*list[int] or None*, default `None`) — Class indices to draw.
+- **save** (*bool*, default `False`) — Write the figure.
+
 ---
 
 ### `combra.mvee.plot_beam_compare`
@@ -123,13 +142,17 @@ Side-by-side comparison of two parquet datasets at the same step.
 
 **Parameters**
 
-| name | type | description |
-| --- | --- | --- |
-| `data_1`, `data_2` | `list[dict]` | Rows from two beams parquets. |
-| `beam_types` | `list[str]` | Which fields to compare — e.g. `['a_beams', 'b_beams']`. |
-| `indices_1`, `indices_2` | `list[int]` | Class indices to align between the two sets. |
+- **data_1**, **data_2** (*list[dict]*) — Rows from two beams parquets.
+- **save_name** (*str*) — Output filename.
+- **beam_types** (*list[str]*) — Which fields to compare — e.g. `['a_beams', 'b_beams']`.
+- **N**, **M** (*int*) — Grid dimensions.
+- **indices_1**, **indices_2** (*list[int]*) — Class indices to align between the two sets.
+- **save** (*bool*, default `False`) — Write the figure.
+- **scatter_size**, **font_size** (*int*, default `60`, `20`) — Styling.
 
-**Returns** `dict[str, dict]` — per-class fit metrics for the overlay.
+**Returns**
+
+- **fit_metrics** (*dict[str, dict]*) — Per-class fit metrics for the overlay.
 
 ---
 
@@ -144,13 +167,15 @@ beams_heatmap(data, step, saved_names, indices=None, bin_max=30, N=7, M=7,
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `data` | `list[dict]` | — | Rows from a beams parquet. |
-| `step` | `float` | — | Histogram step to filter on. |
-| `saved_names` | `list[str]` | — | Per-class display names (overrides `meta.name`). |
-| `bin_max` | `float` | `30` | Upper bound on histogram axes. |
-| `N`, `M` | `int` | `7` | Heatmap bin counts. |
+- **data** (*list[dict]*) — Rows from a beams parquet.
+- **step** (*float*) — Histogram step to filter on.
+- **saved_names** (*list[str]*) — Per-class display names (overrides `meta.name`).
+- **indices** (*list[int] or None*, default `None`) — Class indices to draw.
+- **bin_max** (*float*, default `30`) — Upper bound on histogram axes.
+- **N**, **M** (*int*, default `7`) — Heatmap bin counts.
+- **font_size** (*int*, default `20`) — Styling.
+- **save** (*bool*, default `False`) — Write the figure.
+- **scatter_size** (*int*, default `60`) — Styling.
 
 ---
 
@@ -164,14 +189,12 @@ Plot a single polygon (index `pos`) and the ellipse fitted around it. Useful for
 
 **Parameters**
 
-| name | type | default | description |
-| --- | --- | --- | --- |
-| `image` | `ndarray` | — | Source image (raw or preprocessed). |
-| `pos` | `int` | `0` | Index of the contour to inspect. |
-| `tolerance` | `float` | `0.2` | MVEE tolerance. |
-| `N` | `int` | `15` | Number of points sampled on the rendered ellipse. |
+- **image** (*ndarray*) — Source image (raw or preprocessed).
+- **pos** (*int*, default `0`) — Index of the contour to inspect.
+- **tolerance** (*float*, default `0.2`) — MVEE tolerance.
+- **N** (*int*, default `15`) — Number of points sampled on the rendered ellipse.
 
-**Example**
+**Examples**
 
 ```python
 from combra import mvee, data

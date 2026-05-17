@@ -19,14 +19,12 @@ A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it when
 
 **Handles**
 
-| input type | serialised as |
-| --- | --- |
-| `np.float32`, `np.float64` | Python `float` |
-| `np.int32`, `np.int64` | Python `int` |
-| `np.ndarray` | nested `list` (via `tolist()`) |
-| anything else | falls through to the default `json.JSONEncoder` (raises `TypeError` for unsupported types). |
+- **`np.float32`, `np.float64`** — serialised as Python `float`.
+- **`np.int32`, `np.int64`** — serialised as Python `int`.
+- **`np.ndarray`** — serialised as nested `list` (via `tolist()`).
+- **anything else** — falls through to the default `json.JSONEncoder` (raises `TypeError` for unsupported types).
 
-**Example**
+**Examples**
 
 ```python
 import json
