@@ -33,6 +33,19 @@ Log probability distribution of polygon areas with a linear fit per class on the
 - **log_min_val** (*float*, default `-8`) — Log-density floor below which bins are discarded before the fit.
 - **min_area_num** (*int*, default `10`) — Minimum count per bin to include in the fit.
 
+**Examples**
+
+```python
+import pyarrow.parquet as pq
+from combra import areas
+
+rows = pq.read_table('./beams/beams_n100.parquet').to_pylist()
+areas.plot_polygons_area(
+    rows, 'areas.png', step=1, N=2, M=2,
+    indices=[0, 1], save=False, log_min_val=-10, min_area_num=10,
+)
+```
+
 ---
 
 ## `combra.areas.plot_polygons_effective_radius`

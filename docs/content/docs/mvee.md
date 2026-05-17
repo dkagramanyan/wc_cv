@@ -70,6 +70,20 @@ Format a multi-line legend string for a beam-distribution plot. Used inside `gen
 
 - **label** (*str*) — Multi-line legend string.
 
+**Examples**
+
+```python
+from combra import mvee
+
+# Format a per-class legend for a beam-length log-density plot.
+label = mvee.beams_legend(
+    images_amount=360, name='Ultra_Co11', itype='medium grain',
+    norm=4200, k=-1.34, b=2.10, angle=-53.2,
+    score=0.987, dist_step=4.0, dist_mean=18.5,
+)
+print(label)
+```
+
 ---
 
 ## Plotting
@@ -129,6 +143,17 @@ Plot the ellipse rotation-angle distributions across classes.
 - **indices** (*list[int] or None*, default `None`) — Class indices to draw.
 - **save** (*bool*, default `False`) — Write the figure.
 
+**Examples**
+
+```python
+import pyarrow.parquet as pq
+from combra import mvee
+
+rows = pq.read_table('./beams/beams_n100.parquet').to_pylist()
+mvee.plot_angles(rows, saved_image_name='angles.png',
+                 step=4, N=2, M=2, save=False)
+```
+
 ---
 
 ### `combra.mvee.plot_beam_compare`
@@ -154,6 +179,21 @@ Side-by-side comparison of two parquet datasets at the same step.
 
 - **fit_metrics** (*dict[str, dict]*) — Per-class fit metrics for the overlay.
 
+**Examples**
+
+```python
+import pyarrow.parquet as pq
+from combra import mvee
+
+rows_real = pq.read_table('./beams/real_n360.parquet').to_pylist()
+rows_gen  = pq.read_table('./beams/gen_n10000.parquet').to_pylist()
+metrics = mvee.plot_beam_compare(
+    rows_real, rows_gen, save_name='compare.png',
+    beam_types=['a_beams', 'b_beams'], N=2, M=2,
+    indices_1=[0, 1], indices_2=[0, 1],
+)
+```
+
 ---
 
 ### `combra.mvee.beams_heatmap`
@@ -176,6 +216,17 @@ beams_heatmap(data, step, saved_names, indices=None, bin_max=30, N=7, M=7,
 - **font_size** (*int*, default `20`) — Styling.
 - **save** (*bool*, default `False`) — Write the figure.
 - **scatter_size** (*int*, default `60`) — Styling.
+
+**Examples**
+
+```python
+import pyarrow.parquet as pq
+from combra import mvee
+
+rows = pq.read_table('./beams/beams_n100.parquet').to_pylist()
+mvee.beams_heatmap(rows, step=4, saved_names=['small', 'medium', 'large'],
+                   indices=[0, 1, 2], bin_max=30, N=7, M=7)
+```
 
 ---
 

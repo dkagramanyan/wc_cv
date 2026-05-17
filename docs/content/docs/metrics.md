@@ -35,6 +35,15 @@ Build an InceptionV3 feature extractor and move it to the chosen device.
 
 Pass both to `compute_fid` to reuse the model across calls.
 
+**Examples**
+
+```python
+from combra.metrics import load_inception
+
+model, device = load_inception()
+print(device)  # 'cuda' or 'cpu'
+```
+
 ---
 
 ### `combra.metrics.collect_images`
@@ -52,6 +61,15 @@ Recursively walk `folder` and return a sorted list of image paths whose extensio
 **Returns**
 
 - **paths** (*list[Path]*) — Sorted image paths.
+
+**Examples**
+
+```python
+from combra.metrics import collect_images
+
+paths = collect_images('data/real')
+print(f'{len(paths)} images, first = {paths[0].name}')
+```
 
 ---
 
@@ -77,6 +95,18 @@ Compute the activation statistics for every image collected from `folder`.
 - **mu** (*ndarray[dims]*) — Mean activation.
 - **sigma** (*ndarray[dims, dims]*) — Covariance of activations.
 - **n_files** (*int*) — Image count.
+
+**Examples**
+
+Useful when you want to compute FID against many gen folders against the **same** real set without redoing the real-side forward pass each time:
+
+```python
+from combra.metrics import load_inception, compute_stats
+
+model, device = load_inception()
+mu_r, sigma_r, n_real = compute_stats('data/real', model, device)
+# … reuse (mu_r, sigma_r) inside scipy.linalg.sqrtm to compute FID per gen folder.
+```
 
 ---
 
@@ -136,6 +166,15 @@ Read a parquet file and return a flat list of `{'meta': {..., 'step'}, 'prep': {
 
 - **rows** (*list[dict]*) — Each entry has `meta` (with synthesised `step`) and `prep` (single step's fit + density curves).
 
+**Examples**
+
+```python
+from combra.metrics import load_rows
+
+rows = load_rows('./data/angles/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5/angles_n360.parquet')
+print(f'{len(rows)} rows;  first = name={rows[0]["meta"]["name"]} step={rows[0]["meta"]["step"]}')
+```
+
 ---
 
 ### `combra.metrics.index_by_name_step`
@@ -153,6 +192,16 @@ Build a `{(name, step): row}` lookup from rows returned by `load_rows`. Used int
 **Returns**
 
 - **index** (*dict*) — `{(name, step): row}`.
+
+**Examples**
+
+```python
+from combra.metrics import load_rows, index_by_name_step
+
+rows = load_rows('ethalon.parquet')
+idx = index_by_name_step(rows)
+row = idx[('class_Ultra_Co11', 2.0)]   # exact (class, step) lookup
+```
 
 ---
 
@@ -172,6 +221,17 @@ Locate the largest-N parquet inside a sweep folder. Used as the reference distri
 
 - **parquet** (*Path or None*) — Path of the parquet with the largest `meta.n_images`, or `None` if the folder is empty.
 
+**Examples**
+
+From `co_angles/3_metrics_convergence.ipynb`:
+
+```python
+from combra.metrics import find_ethalon
+
+ethalon = find_ethalon('./data/angles/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5')
+print(ethalon)   # …/angles_n360.parquet
+```
+
 ---
 
 ### `combra.metrics.parquet_has_step`
@@ -190,6 +250,16 @@ True iff the parquet exists AND contains rows tagged with `step`. Used to decide
 **Returns**
 
 - **has_step** (*bool*) — Whether the file contains a row at this step.
+
+**Examples**
+
+```python
+from combra.metrics import parquet_has_step
+
+# Skip re-generation if the parquet already has rows at STEP=2.0.
+if not parquet_has_step('out/angles_n1000.parquet', step=2.0):
+    ...  # regenerate
+```
 
 ---
 
@@ -211,6 +281,18 @@ Given a matched `(real, fake)` row pair, compute the per-step Wasserstein distan
 - **mus_m** (*ndarray[2]*) — Relative differences `(fake - real) / real` on the two Gaussian means.
 - **sig_m** (*ndarray[2]*) — Same for the sigmas.
 - **amp_m** (*ndarray[2]*) — Same for the amplitudes.
+
+**Examples**
+
+```python
+from combra.metrics import load_rows, index_by_name_step, compute_metrics
+
+real_idx = index_by_name_step(load_rows('ethalon.parquet'))
+fake_idx = index_by_name_step(load_rows('gen.parquet'))
+real, fake = real_idx[('class_Ultra_Co11', 2.0)], fake_idx[('class_Ultra_Co11', 2.0)]
+w_dist, mus_m, sig_m, amp_m = compute_metrics(real, fake)
+print(f'w_dist={w_dist:.4f}°   |mu1 rel|={abs(mus_m[0])*100:.2f}%')
+```
 
 ---
 
@@ -237,6 +319,26 @@ Walk every parquet under each folder in `folder_paths`, look each row up in `eth
 
 - **records** (*list[dict]*) — `{'kimg', 'class', 'step', 'w_dist', 'mus_m', 'sig_m', 'amp_m'}` per matched row.
 
+**Examples**
+
+Adapted from `co_angles/2_comparison.ipynb` — compare every diffit checkpoint against a shared real ethalon at one step:
+
+```python
+from combra.metrics import compare_folders
+
+ethalon = './grid_results/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5/angles_n360.parquet'
+folder_paths = [
+    './grid_results/00017-diffit-256-gpus2-batch192_kimg_004435_msl5/angles_n1000.parquet',
+    './grid_results/00017-diffit-256-gpus2-batch192_kimg_008064_msl5/angles_n1000.parquet',
+    './grid_results/00017-diffit-256-gpus2-batch192_kimg_016128_msl5/angles_n1000.parquet',
+]
+class_map = {'class_0': 'class_Ultra_Co11',
+             'class_1': 'class_Ultra_Co25',
+             'class_2': 'class_Ultra_Co6_2'}
+recs = compare_folders(folder_paths, ethalon, class_map=class_map,
+                       steps=[2], coef=1)  # coef=1 prints raw degrees
+```
+
 ---
 
 ### `combra.metrics.compare_pairs`
@@ -258,6 +360,26 @@ Like `compare_folders` but accepts a list of explicit `(label, ethalon_pq, fake_
 **Returns**
 
 - **records** (*list[dict]*) — `{'label', 'class', 'step', 'w_dist', 'mus_m', 'sig_m', 'amp_m'}`.
+
+**Examples**
+
+Adapted from `co_angles/4_grid_plot.ipynb` — one row per resolution, each row pairs its own orig + diffit:
+
+```python
+from combra.metrics import compare_pairs
+
+class_map = {'class_Ultra_Co11': 'class_0',
+             'class_Ultra_Co25': 'class_1',
+             'class_Ultra_Co6_2': 'class_2'}
+
+pairs = [
+    ('256', './data/angles/orig_256/angles_n360.parquet',
+            './data/angles/diffit_256/angles_n10000.parquet', class_map),
+    ('512', './data/angles/orig_512/angles_n360.parquet',
+            './data/angles/diffit_512/angles_n10000.parquet', class_map),
+]
+recs = compare_pairs(pairs, step=2, coef=1, label_header='res')
+```
 
 ---
 
@@ -325,6 +447,20 @@ Per `(kind, resolution, class)` curve, compute trend significance, endpoint rela
 - `gain_pct` — sampling-only gain from `N_hi` to infinity, in percent of `|m|@N_hi`.
 - `vs_a_pct` — excess of `|m|@N_lo` over the bias floor `a_hat`, in percent.
 
+**Examples**
+
+From `co_angles/3_metrics_convergence.ipynb`:
+
+```python
+from combra.metrics import convergence_stats
+
+METRICS  = ['w_dist', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']
+ENDPTS   = {'real': (100, 300), 'san': (360, 10000), 'diffit': (360, 10000)}
+result = convergence_stats(df_metrics, METRICS, ENDPTS,
+                           expected_points={'real': 5, 'san': 8, 'diffit': 8})
+result.head(3)
+```
+
 ---
 
 ### `combra.metrics.print_convergence_report`
@@ -354,6 +490,18 @@ Print three human-readable tables from a `convergence_stats` result:
 
 *None* — output goes to stdout.
 
+**Examples**
+
+```python
+from combra.metrics import print_convergence_report
+
+print_convergence_report(
+    result, METRICS, kinds=['san', 'diffit'],
+    endpoints_by_kind={'san': (360, 10000), 'diffit': (360, 10000)},
+    step=2.0, kind_display={'san': 'SAN', 'diffit': 'DiffiT'},
+)
+```
+
 ---
 
 ### `combra.metrics.summarize_metric_distribution`
@@ -374,6 +522,20 @@ Per `(kind, resolution)`, summarise the distribution of one column of a `converg
 **Returns**
 
 - **summary** (*dict[str, str]*) — `{f'{kind}_{res}': 'mean=... median=... std=... n=...'}`.
+
+**Examples**
+
+```python
+from combra.metrics import summarize_metric_distribution
+
+summary = summarize_metric_distribution(result, 'gain_pct',
+                                        kinds=['san', 'diffit'],
+                                        resolutions=[256, 512])
+for tag, line in summary.items():
+    print(f'  {tag}: {line}')
+# san_256:  mean=11.42 median=10.30 std=4.21 n=7
+# diffit_512: mean=15.87 median=14.10 std=5.30 n=7
+```
 
 ---
 
@@ -406,6 +568,23 @@ Plotly grid of W-dist-vs-N curves. Rows are resolutions (or arbitrary `row_keys`
 **Returns**
 
 - **fig** (*plotly.graph_objects.Figure*) — The grid figure.
+
+**Examples**
+
+```python
+from combra.metrics import plot_wdist_convergence_grid
+
+CLASSES = ['class_Ultra_Co11', 'class_Ultra_Co25', 'class_Ultra_Co6_2']
+GRAIN   = {'class_Ultra_Co11': 'small', 'class_Ultra_Co25': 'medium',
+           'class_Ultra_Co6_2': 'large'}
+fig = plot_wdist_convergence_grid(
+    records_by_panel, classes=CLASSES,
+    kind_labels={'real': 'original', 'san': 'SAN', 'diffit': 'DiffiT'},
+    grain_labels=GRAIN, row_keys=[256, 512, 1024],
+    save_path='wdist_convergence.png',
+)
+fig.show()
+```
 
 ---
 

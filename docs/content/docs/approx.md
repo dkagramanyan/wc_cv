@@ -31,6 +31,18 @@ Fit a single Gaussian to `(x, y)` via `scipy.optimize.curve_fit`.
 
 - **mu**, **sigma**, **amp** (*float*) — Fitted parameters.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import stats, approx
+
+samples = np.random.normal(loc=90, scale=15, size=2000)
+x, y = stats.stats_preprocess(samples, step=2)
+mu, sigma, amp = approx.gaussian_fit(x, y, mu=90, sigma=10, amp=1)
+print(f'mu={mu:.2f}  sigma={sigma:.2f}  amp={amp:.4f}')
+```
+
 ---
 
 ### `combra.approx.gaussian_fit_bimodal`
@@ -53,6 +65,19 @@ Bimodal Gaussian fit. Bounded: `sigma > 0`, `amp ≥ 0` (prevents the silent sig
 - **mus** (*list[float, float]*) — Fitted `[mu1, mu2]`.
 - **sigmas** (*list[float, float]*) — Fitted `[sigma1, sigma2]`.
 - **amps** (*list[float, float]*) — Fitted `[amp1, amp2]`.
+
+**Examples**
+
+```python
+import numpy as np
+from combra import stats, approx
+
+arr = np.concatenate([np.random.normal(90, 15, 1000),
+                      np.random.normal(270, 20, 1500)])
+x, y = stats.stats_preprocess(arr, step=2)
+mus, sigmas, amps = approx.gaussian_fit_bimodal(x, y)
+print(f'mus={mus}  sigmas={sigmas}  amps={amps}')
+```
 
 ---
 
@@ -77,6 +102,20 @@ Trimodal Gaussian fit.
 
 - **mus**, **sigmas**, **amps** (*list[float, float, float]*) — Fitted length-3 lists.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import stats, approx
+
+arr = np.concatenate([np.random.normal(20, 5, 800),
+                      np.random.normal(120, 25, 1500),
+                      np.random.normal(260, 20, 1000)])
+x, y = stats.stats_preprocess(arr, step=2)
+mus, sigmas, amps = approx.gaussian_fit_termodal(x, y)
+print(f'mus={mus}')
+```
+
 ---
 
 ### `combra.approx.gauss_approx`
@@ -98,6 +137,19 @@ Single Gaussian fit + sampled curve.
 
 - **curve** (*tuple[ndarray, ndarray]*) — `(x_gauss, y_gauss)` sampled curve.
 - **mu**, **sigma**, **amp** (*float*) — Fitted parameters.
+
+**Examples**
+
+Adapted from `poliamid/data_viz.ipynb` (per-group Gaussian fit on contour-length histograms):
+
+```python
+from combra import stats, approx
+
+x_orig, y_orig = stats.stats_preprocess(len_list, step=1)
+(x_fit, y_fit), mu, sigma, amp = approx.gauss_approx(
+    x_orig, y_orig, mu=3, sigma=3, amp=1, x_lim=[0, 25], N=100,
+)
+```
 
 ---
 
@@ -162,6 +214,19 @@ Binomial fit + sampled curve.
 - **n** (*int*) — Fitted.
 - **p**, **amp** (*float*) — Fitted.
 
+**Examples**
+
+From `poliamid/data_viz.ipynb`:
+
+```python
+from combra import stats, approx
+
+x, y = stats.stats_preprocess(len_list, step=1)
+(x_fit, y_fit), n_fit, p_fit, amp = approx.binomial_approx(
+    x, y, n=25, p=0.2, x_lim=[0, 25], N=100,
+)
+```
+
 ---
 
 ### `combra.approx.poisson_approx`
@@ -184,6 +249,17 @@ Poisson fit + sampled curve.
 
 - **curve** (*tuple[ndarray, ndarray]*) — `(x_pred, y_pred)`.
 - **lam**, **amp** (*float*) — Fitted parameters.
+
+**Examples**
+
+From `poliamid/data_viz.ipynb`:
+
+```python
+from combra import stats, approx
+
+x, y = stats.stats_preprocess(len_list, step=1)
+(x_fit, y_fit), lam, amp = approx.poisson_approx(x, y, x_lim=[-5, 25], N=100)
+```
 
 ---
 
@@ -208,6 +284,19 @@ Exponential decay `amp * exp(-x / a)` fit + sampled curve.
 - **curve** (*tuple[ndarray, ndarray]*) — `(x_pred, y_pred)`.
 - **a**, **amp** (*float*) — Fitted parameters.
 
+**Examples**
+
+From `poliamid/data_viz.ipynb`:
+
+```python
+from combra import stats, approx
+
+x, y = stats.stats_preprocess(len_list, step=1)
+(x_fit, y_fit), a, amp = approx.exponential_approx(
+    x, y, a=5, amp=1, x_lim=[0, 25], N=100,
+)
+```
+
 ---
 
 ## Linear fits
@@ -231,6 +320,18 @@ Least-squares line `y = k*x + b`. Used in `PobeditDataset.generate_beams` to pop
 - **b** (*float*) — Intercept.
 - **angle_deg** (*float*) — `arctan(k)` in degrees.
 - **score** (*float*) — R².
+
+**Examples**
+
+```python
+import numpy as np
+from combra import approx
+
+x = np.linspace(0, 10, 50)
+y = 2.5 * x + 1.0 + np.random.normal(scale=0.5, size=50)
+(x_pred, y_pred), k, b, angle_deg, score = approx.linear_approx(x, y)
+print(f'k={k:.3f}  b={b:.3f}  angle={angle_deg:.2f}°  R²={score:.3f}')
+```
 
 ---
 
@@ -291,6 +392,21 @@ Used by `combra.metrics.convergence_stats` to estimate per-curve plateaus and th
 - **b_hat** (*float*) — Sampling-noise coefficient.
 
 NaN for all three when the fit fails, when fewer than 3 points are supplied, or when all `vals` are identical.
+
+**Examples**
+
+Driven inside `combra.metrics.convergence_stats` over a W-dist curve. Standalone:
+
+```python
+import numpy as np
+from combra import approx
+
+ns = np.array([100, 250, 500, 1000, 2500, 5000, 10000])
+# True asymptote a=0.05; sampling-noise b=0.30; small additive jitter
+vals = 0.05 + 0.30 / np.sqrt(ns) + np.random.normal(scale=0.005, size=len(ns))
+a, a_se, b = approx.fit_plateau(ns, vals)
+print(f'plateau a={a:.4f} ± {a_se:.4f}    b={b:.4f}')
+```
 
 ---
 

@@ -72,6 +72,18 @@ Run contour extraction with Douglas–Peucker tolerance `tol` on a padded binary
 - **visualisation** (*ndarray*) — Drawn-on copy of the input.
 - **contours** (*list[ndarray]*) — Extracted (simplified) contours.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import image, data
+
+_, img = data.microstructure_images()[0]
+padded = np.pad(image.do_otsu(img), 30)
+vis, cnts = image.align_figures(padded, tol=3)
+print(f'{len(cnts)} contours')
+```
+
 ---
 
 ### `combra.image.fill_polygon`
@@ -87,6 +99,18 @@ Rasterize a polygon defined by `corners` into `grid` using a numba point-in-poly
 - **grid** (*ndarray*) — Output grid; mutated in place.
 - **corners** (*ndarray[N, 2]*) — Polygon vertices.
 - **fill_value** (*scalar*, default `1`) — Value written to grid cells inside the polygon.
+
+**Examples**
+
+```python
+import numpy as np
+from combra import image
+
+grid = np.zeros((100, 100), dtype=np.uint8)
+corners = np.array([[20, 20], [80, 20], [80, 80], [20, 80]])  # square
+image.fill_polygon(grid, corners, fill_value=255)
+print(grid.sum())   # ≈ 60*60*255 (interior pixels)
+```
 
 ---
 
@@ -104,6 +128,15 @@ Recursively walk an image tree, resize each image to `target_size`, and convert 
 - **output_root** (*str or Path*) — Destination root.
 - **target_size** (*tuple[int, int]*) — `(width, height)` in pixels.
 
+**Examples**
+
+```python
+from combra import image
+
+# Downsample a folder-of-classes from 1024x1024 to 256x256, preserving subdir layout.
+image.resize('./data/orig_1024', './data/orig_256', target_size=(256, 256))
+```
+
 ---
 
 ### `combra.image.tiff2jpg`
@@ -119,6 +152,14 @@ Convert every 16-bit TIFF in `folder_path` to 8-bit JPEG under `new_folder_path`
 - **folder_path** (*str or Path*) — Folder of TIFFs.
 - **start_name**, **stop_name** (*int*, default `0`, `-4`) — Slice bounds applied to the source filename when deriving the JPEG name.
 - **new_folder_path** (*str*, default `'resized'`) — Destination folder.
+
+**Examples**
+
+```python
+from combra import image
+
+image.tiff2jpg('./raw_tiffs', new_folder_path='./jpegs')
+```
 
 ---
 
@@ -142,6 +183,19 @@ Tools for dual-camera SEM images split at horizontal position `h`. `imdivide` re
 
 - *ndarray* — Combined image (`combine`) or one half (`imdivide`).
 
+**Examples**
+
+```python
+from combra import image, data
+
+_, img = data.microstructure_images()[0]
+h = img.shape[1] // 2
+left  = image.imdivide(img, h=h, side='left')
+right = image.imdivide(img, h=h, side='right')
+blended = image.combine(img, h=h, k=0.5)
+print(left.shape, right.shape, blended.shape)
+```
+
 ---
 
 ## Fractal dimension
@@ -163,6 +217,16 @@ Return adaptive dyadic box sizes for the given image shape. Pass the result as t
 
 - **sizes** (*ndarray[int]*) — Valid box sizes (powers-of-2 trimmed to shape).
 - **n_boxes** (*ndarray[int]*) — Box count at each size.
+
+**Examples**
+
+```python
+from combra import image
+
+sizes, n_boxes = image.valid_box_sizes_from_shape((1024, 1024), min_boxes=6)
+print(sizes)      # [2, 4, 8, 16, 32, 64, 128, ...]
+print(n_boxes)    # box count at each size
+```
 
 ---
 
@@ -216,6 +280,18 @@ Fractal dimension of a single contour.
 
 - **fd** (*float*) — Fractal dimension, or `np.nan` for contours too short to span `max_size_thr` boxes.
 
+**Examples**
+
+```python
+from combra import image, contours, data
+
+_, img = data.microstructure_images()[0]
+processed = image.do_otsu(img)
+cnts = contours.get_contours(processed, tol=3)
+fd = image.contour_fractal_dimension(cnts[0], max_size_thr=64)
+print(f'contour fd = {fd:.3f}')
+```
+
 ---
 
 ## Geometry & line kernels
@@ -238,6 +314,15 @@ Bresenham line rasterisation.
 
 - **xs**, **ys** (*ndarray[int]*) — Pixel coordinates along the line.
 
+**Examples**
+
+```python
+from combra import image
+
+xs, ys = image.bresenham_line(0, 0, 10, 5)
+print(list(zip(xs, ys)))   # all pixel coordinates on the line
+```
+
 ---
 
 ### `combra.image.get_bresenham_eps_pixels`
@@ -258,6 +343,19 @@ Count contour pixels (value `== border_pixel`) that fall on the Bresenham line b
 **Returns**
 
 - **count** (*int*) — Pixel count.
+
+**Examples**
+
+```python
+from combra import image
+
+# img_contours: binary contour mask with contour pixels == 255
+n = image.get_bresenham_eps_pixels(
+    img_contours, start_node_x=10, start_node_y=20, end_node_x=80, end_node_y=60,
+    border_pixel=255,
+)
+print(f'{n} contour pixels lie on the line')
+```
 
 ---
 
@@ -285,6 +383,19 @@ Count contour pixels intersected by a band of width `2*line_eps` perpendicular t
 
 - **count** (*int*) — Pixel count.
 
+**Examples**
+
+```python
+from combra import image
+
+perp_x, perp_y = image.get_perp_v(10, 20, 80, 60, line_eps=10)
+n = image.check_border_pixels_vectorized(
+    img_contours, 10, 20, 80, 60, perp_x, perp_y,
+    line_eps=10, border_pixel=255, border_eps=2,
+)
+print(n)
+```
+
 ---
 
 ### `combra.image.get_perp_v`
@@ -304,6 +415,16 @@ Unit perpendicular vector to the line `(start → end)`, scaled by `line_eps`. U
 
 - **perp_v_x**, **perp_v_y** (*float*) — Components of the scaled perpendicular vector.
 
+**Examples**
+
+```python
+from combra import image
+
+# Perpendicular to a horizontal line; line_eps=10 ⇒ vector points up by 10.
+px, py = image.get_perp_v(0, 0, 100, 0, line_eps=10)
+print(px, py)   # ≈ (0, 10) or (0, -10)
+```
+
 ---
 
 ### `combra.image.find_intersection_2d`
@@ -321,6 +442,16 @@ Test if two line segments intersect.
 **Returns**
 
 - **intersect** (*bool*) — `True` if segments `(p1, p2)` and `(p3, p4)` intersect.
+
+**Examples**
+
+```python
+from combra import image
+
+# Crossing 'X' shape — segments (0,0)→(10,10) and (0,10)→(10,0) cross at (5,5).
+print(image.find_intersection_2d((0, 0), (10, 10), (0, 10), (10, 0)))   # True
+print(image.find_intersection_2d((0, 0), (1, 1), (5, 5), (6, 6)))       # False
+```
 
 ---
 
@@ -340,6 +471,17 @@ Numba point-in-polygon test.
 **Returns**
 
 - **inside** (*bool*) — Whether the point is inside the polygon.
+
+**Examples**
+
+```python
+import numpy as np
+from combra import image
+
+square = np.array([[0, 0], [10, 0], [10, 10], [0, 10]])
+print(image.is_point_in_polygon(5, 5, square))    # True
+print(image.is_point_in_polygon(15, 5, square))   # False
+```
 
 ---
 

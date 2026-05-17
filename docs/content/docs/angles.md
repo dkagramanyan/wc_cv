@@ -65,6 +65,18 @@ Format a multi-line legend string from bimodal-Gaussian fit parameters. Useful w
 
 - **label** (*str*) — Multi-line label ready to drop into a matplotlib title.
 
+**Examples**
+
+```python
+from combra import angles
+
+label = angles.angles_legend(
+    images_amount=360, name='Ultra_Co11', itype='small grain', step=2.0,
+    mus=[90.5, 270.3], sigmas=[18.4, 22.1], amps=[0.012, 0.015], norm=4200,
+)
+print(label)
+```
+
 ---
 
 ## Plotting

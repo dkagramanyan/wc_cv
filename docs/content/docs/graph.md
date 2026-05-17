@@ -51,6 +51,22 @@ Median-filter, Otsu, and contour-extract the input. Pass `labeled_cnts=True` (an
 - **cnts** (*list[ndarray]*) — Simplified contours.
 - **nodes_metadata** (*pandas.DataFrame*) — Per-node metadata (coords, contour index, entry/exit flags, …).
 
+**Examples**
+
+From `crack_graph/graph_unlabeled.ipynb`:
+
+```python
+from combra import graph, data
+
+_, image = data.microstructure_images()[0]
+(entry_nodes, exit_nodes,
+ img_contours_o, img_preprocessed_final,
+ cnts, nodes_metadata) = graph.preprocess_graph_image(
+    image, border=30, disk=5, entry_ellps_w=5, exit_ellps_w=5, r=4,
+)
+print(f'{len(entry_nodes)} entry / {len(exit_nodes)} exit candidates')
+```
+
 ---
 
 ### `combra.graph.create_crack_graph`
@@ -123,6 +139,20 @@ Compute outgoing edges from one node — used internally by `create_crack_graph`
 
 - **edges** (*list[tuple]*) — Outgoing edges with classification metadata.
 
+**Examples**
+
+`get_edges` is called inside `create_crack_graph`; direct invocation is only useful when implementing a custom edge enumerator:
+
+```python
+from combra import graph
+
+# process_metadata is the internal builder state — usually obtained by patching
+# create_crack_graph. For most use cases call create_crack_graph instead.
+edges = graph.get_edges(start_node_index=0,
+                        nodes_metadata=nodes_metadata,
+                        process_metadata=process_metadata)
+```
+
 ---
 
 ### `combra.graph.get_edge_type`
@@ -145,6 +175,17 @@ Classify a single edge between two node indices into Co / WC-Co / WC / WC-WC.
 
 - **edge_type** (*int*) — Edge-type code (0–3).
 
+**Examples**
+
+```python
+from combra import graph
+
+# 0=Co, 1=WC-Co, 2=WC, 3=WC-WC
+edge_type = graph.get_edge_type(node1=0, node2=5,
+                                cnts=cnts, nodes_metadata=nodes_metadata)
+print({0: 'Co', 1: 'WC-Co', 2: 'WC', 3: 'WC-WC'}[edge_type])
+```
+
 ---
 
 ### `combra.graph.get_edge_type_labeled`
@@ -164,6 +205,18 @@ Same as `get_edge_type` but uses hand labels carried in `nodes_metadata`. Use wh
 **Returns**
 
 - **edge_type** (*int*) — Edge-type code.
+
+**Examples**
+
+```python
+from combra import graph
+
+# Same code domain as get_edge_type, but reads contour-class labels from
+# nodes_metadata instead of inferring from pixel values.
+edge_type = graph.get_edge_type_labeled(node1=0, node2=5,
+                                        nodes_metadata=nodes_metadata,
+                                        line_eps=10)
+```
 
 ---
 
@@ -234,6 +287,19 @@ Find the `k` shortest paths between one entry/exit pair and return per-path leng
 
 - **df** (*pandas.DataFrame*) — One row per path with columns for total length, energy, and per-edge-type pixel fractions.
 
+**Examples**
+
+```python
+from combra import graph
+
+# Set edge weights on g first (or it will use defaults), then ask for the top-3.
+df = graph.find_shortest_energy_paths(
+    g, cnts, nodes_metadata,
+    entry_node=entry_nodes[0], exit_node=exit_nodes[0], k=3,
+)
+print(df[['path_len_pixel', 'energy_total']].head())
+```
+
 ---
 
 ### `combra.graph.fixed_paths_energies`
@@ -244,6 +310,19 @@ fixed_paths_energies(g, cnts, nodes_metadata, entry_nodes, exit_nodes, workers=2
 
 Compute energies along a fixed set of paths (no optimisation).
 
+**Examples**
+
+```python
+from combra import graph
+
+# Use when you already have a fixed entry/exit-pair list and want their
+# energies without enumerating k-shortest paths from scratch.
+energies = graph.fixed_paths_energies(
+    g, cnts, nodes_metadata,
+    entry_nodes=[0, 1, 3], exit_nodes=[63, 64, 67], workers=8,
+)
+```
+
 ---
 
 ### `combra.graph.paths_queues`
@@ -253,6 +332,10 @@ paths_queues()
 ```
 
 Internal queue-based path enumerator (no public arguments).
+
+**Examples**
+
+`paths_queues` is an internal helper used by `get_energies` to multiplex (entry, exit) pairs across workers. Call `get_energies` directly — it sets up the queue for you.
 
 ---
 
@@ -305,6 +388,18 @@ Heatmap of optimal path energies over the `(Co, WC-Co)` weight grid for path ind
 - **y_label**, **x_label** (*str*, default `'co_e'`, `'wc-co_e'`) — Axis labels.
 - **fontsize_h**, **fontsize_axes** (*int*, default `10`, `50`) — Styling.
 
+**Examples**
+
+```python
+from combra import graph
+
+# energies_paths from a 20x20 (Co × WC-Co) weight grid
+graph.plot_optimized_energies(
+    energies_paths, path_index=0, N=20, M=20,
+    y_label='co_e', x_label='wc-co_e',
+)
+```
+
 ---
 
 ### `combra.graph.plot_paths`
@@ -322,6 +417,18 @@ Overlay the paths in `df` (output of `find_shortest_energy_paths`) on the backgr
 - **img_aligned** (*ndarray*) — Background image.
 - **border** (*int*, default `30`) — Padding to compensate for.
 
+**Examples**
+
+```python
+from combra import graph
+
+df = graph.find_shortest_energy_paths(
+    g, cnts, nodes_metadata,
+    entry_node=entry_nodes[0], exit_node=exit_nodes[0], k=3,
+)
+graph.plot_paths(g, df, img_aligned=img_contours_o, border=30)
+```
+
 ---
 
 ### `combra.graph.plot_optimized_paths`
@@ -338,6 +445,15 @@ Overlay the energy-optimised paths from `get_energies` on the contour image at g
 - **energies_paths** (*list[list[list[DataFrame]]]*) — Output of `get_energies`.
 - **img_contours_o** (*ndarray*) — Background image.
 - **param_1**, **param_2** (*int*, default `10`) — Grid coordinates to draw.
+
+**Examples**
+
+```python
+from combra import graph
+
+# Cell (10, 10) in a 20x20 (Co × WC-Co) weight grid → draw the best path there.
+graph.plot_optimized_paths(g, energies_paths, img_contours_o, param_1=10, param_2=10)
+```
 
 ---
 
@@ -357,6 +473,16 @@ Render skeleton landmarks (centres / leaves / nodes / skeleton pixels) onto a bi
 **Returns**
 
 - **rendered** (*ndarray*) — Annotated image.
+
+**Examples**
+
+```python
+from combra import graph, image, data
+
+_, img = data.microstructure_images()[0]
+binary = image.do_otsu(img)
+annotated = graph.draw_tree(binary, centres=True, nodes=True, bones=True)
+```
 
 ---
 

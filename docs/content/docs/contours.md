@@ -27,6 +27,17 @@ Extract raw contours via Canny edges + Suzuki contour finding. No simplification
 
 - **contours** (*list[ndarray]*) — One `(N_points, 2)` array per region, every boundary pixel.
 
+**Examples**
+
+```python
+from combra import contours, image, data
+
+_, img = data.microstructure_images()[0]
+processed = image.do_otsu(img)
+raw = contours.get_row_contours(processed)
+print(f'{len(raw)} contours; first has {len(raw[0])} vertices')
+```
+
 ---
 
 ### `combra.contours.get_contours`
@@ -77,6 +88,17 @@ Morphological skeletonisation + per-component split via `scipy.ndimage.label`. O
 
 - **coords** (*list[ndarray]*) — `(N_pixels, 2)` int arrays, one per connected component.
 
+**Examples**
+
+```python
+from combra import contours, image, data
+
+_, img = data.microstructure_images()[0]
+binary = image.do_otsu(img)
+skels = contours.skeletons_coords(binary)
+print(f'{len(skels)} skeleton components')
+```
+
 ---
 
 ### `combra.contours.contour_to_binary_mask`
@@ -98,6 +120,17 @@ Render a single contour into a small binary mask.
 
 - **mask** (*ndarray[bool]*) — Small mask sized to the contour's bounding box + padding.
 
+**Examples**
+
+From `poliamid/fractals.ipynb`:
+
+```python
+from combra.contours import contour_to_binary_mask
+
+mask = contour_to_binary_mask(cnt, eps=1, thickness=1, pad=2)
+print(mask.shape, mask.dtype)
+```
+
 ---
 
 ### `combra.contours.scale_contour`
@@ -116,6 +149,15 @@ Multiply contour coordinates by `factor`. Use when rescaling contours for a resi
 **Returns**
 
 - **scaled** (*ndarray[N, 2]*) — Rescaled vertices.
+
+**Examples**
+
+```python
+from combra import contours
+
+# Contour was extracted at 256x256; rescale up to 1024x1024 coordinates.
+upscaled = contours.scale_contour(cnt, factor=4.0)
+```
 
 ---
 
@@ -144,6 +186,19 @@ Draw simplified contours onto a `PIL.Image`. When `corners=True`, also draws fil
 **Returns**
 
 - **image** (*PIL.Image*) — Modified in place and returned.
+
+**Examples**
+
+```python
+from PIL import Image
+from skimage import color
+from combra import contours, data, image
+
+_, img = data.microstructure_images()[0]
+simplified = contours.get_contours(image.do_otsu(img), tol=3)
+pil = Image.fromarray(color.gray2rgb(image.do_otsu(img)))
+overlay = contours.draw_contours(pil, simplified, corners=True, r=2)
+```
 
 ---
 

@@ -48,17 +48,30 @@ x, y = stats.stats_preprocess(angles_array, step=5)
 legacy_stats_preprocess(array, step)
 ```
 
-Older variant that also returns the per-bin index dictionary and a non-normalised count. Kept for backwards compatibility with pre-parquet code paths; prefer `stats_preprocess` in new code.
+Older variant that returns the snapped array, the unique bin centres, the raw counts, and a per-bin index dictionary. Kept for backwards compatibility with pre-parquet code paths; prefer `stats_preprocess` in new code.
 
 **Parameters**
 
 - **array** (*array_like*) — 1-D input.
-- **step** (*float*) — Bin width.
+- **step** (*int*) — Bin width. Must be non-zero.
 
 **Returns**
 
-- **x_bins**, **y_counts** (*ndarray*) — Bin centres and raw (non-normalised) counts.
-- **index_map** (*dict*) — `{bin_centre: [original_indices…]}`.
+- **new_array** (*ndarray*) — Original entries snapped to multiples of `step`.
+- **bin_centres** (*ndarray*) — Sorted unique snapped values.
+- **counts** (*ndarray*) — Per-bin counts (non-normalised).
+- **index_map** (*dict*) — `{bin_centre: [original_values_in_bin…]}`.
+
+**Examples**
+
+```python
+import numpy as np
+from combra import stats
+
+arr = np.array([1.0, 1.2, 5.1, 5.3, 9.8, 10.2])
+new_arr, centres, counts, idx = stats.legacy_stats_preprocess(arr, step=1)
+print(f'centres={centres}  counts={counts}')
+```
 
 ---
 
@@ -85,6 +98,16 @@ Single Gaussian, `amp * 𝒩(x | mu, sigma)`.
 
 - **y** (*ndarray*) — Function values at `x`.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import stats
+
+x = np.linspace(0, 360, 200)
+y = stats.gaussian(x, mu=180, sigma=30, amp=1.0)
+```
+
 ---
 
 ### `combra.stats.gaussian_bimodal`
@@ -106,6 +129,16 @@ Sum of two Gaussians. Use `combra.approx.bimodal_gauss_approx` to fit it to a hi
 
 - **y** (*ndarray*) — Function values at `x`.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import stats
+
+x = np.linspace(0, 360, 200)
+y = stats.gaussian_bimodal(x, mu1=90, mu2=270, sigma1=20, sigma2=25, amp1=1.0, amp2=0.8)
+```
+
 ---
 
 ### `combra.stats.gaussian_termodal`
@@ -126,6 +159,20 @@ Sum of three Gaussians.
 **Returns**
 
 - **y** (*ndarray*) — Function values at `x`.
+
+**Examples**
+
+```python
+import numpy as np
+from combra import stats
+
+x = np.linspace(0, 360, 200)
+y = stats.gaussian_termodal(
+    x, mu1=30, mu2=180, mu3=300,
+    sigma1=15, sigma2=25, sigma3=20,
+    amp1=0.6, amp2=1.0, amp3=0.5,
+)
+```
 
 ---
 
@@ -182,6 +229,18 @@ One-sided Kendall τ p-value for the null "`|vals|` does not decrease as `ns` gr
 
 - **p** (*float*) — One-sided p-value. NaN when the input has fewer than 3 points or is perfectly flat.
 
+**Examples**
+
+```python
+import numpy as np
+from combra import stats
+
+ns   = np.array([100, 250, 500, 1000, 2500, 5000])
+vals = np.array([0.40, 0.28, 0.21, 0.15, 0.11, 0.09])   # monotonically shrinking
+p = stats.kendall_decreasing_p(ns, vals)
+print(f'p={p:.4f}  (small p ⇒ |vals| really does decrease with N)')
+```
+
 ---
 
 ### `combra.stats.fisher_combine`
@@ -200,6 +259,16 @@ Combine independent one-sided p-values via Fisher's method (`χ²` = `-2 · Σ l
 
 - **combined_p** (*float*) — Fisher's combined p-value. NaN if no valid input remained after filtering.
 - **k** (*int*) — Count of p-values that survived filtering and contributed to `combined_p`.
+
+**Examples**
+
+```python
+from combra import stats
+
+per_class_ps = [0.012, 0.041, 0.087, float('nan')]   # nan is silently dropped
+combined_p, k = stats.fisher_combine(per_class_ps)
+print(f'combined p={combined_p:.4f}   (k={k} of {len(per_class_ps)} curves contributed)')
+```
 
 ---
 
