@@ -15,3 +15,35 @@ dl.py {
   margin: 0;
   font-weight: 600;
 }
+
+/* Structured navigation tree in the left sidebar (rendered from the global
+   toctree). Style the plain <ul>/<li> like a proper sidebar nav. */
+.bd-sidebar-primary .bd-toc-item ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+.bd-sidebar-primary .bd-toc-item ul ul {
+  padding-left: 1rem;
+}
+.bd-sidebar-primary .bd-toc-item li > a {
+  display: block;
+  padding: 0.2rem 0;
+  color: var(--pst-color-text-muted);
+  text-decoration: none;
+}
+.bd-sidebar-primary .bd-toc-item li > a:hover {
+  color: var(--pst-color-primary);
+}
+.bd-sidebar-primary .bd-toc-item li.current > a.current {
+  color: var(--pst-color-primary);
+  font-weight: 600;
+}
+.bd-sidebar-primary .bd-toc-item .caption {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pst-color-text-base);
+}

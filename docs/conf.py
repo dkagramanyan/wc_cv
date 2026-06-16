@@ -73,19 +73,20 @@ html_context = {
 html_theme_options = {
     # Wrench-emoji wordmark stands in for any project logo, in the header…
     "logo": {"text": "🔧 combra"},
-    # …and the navbar layout mirrors the scikit-image header:
-    #   left   — wordmark + version dropdown
-    #   center — section navigation
-    #   right  — theme toggle + GitHub icon (search stays pinned)
+    # Header keeps only the wordmark + version dropdown (left) and the
+    # search / theme-toggle / GitHub controls (right). The section
+    # navigation lives in the left sidebar as a structured tree, not in
+    # the header.
     "navbar_start": ["navbar-logo", "version-switcher"],
-    "navbar_center": ["navbar-nav"],
+    "navbar_center": [],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "navbar_persistent": ["search-button"],
-    "header_links_before_dropdown": 6,
     "show_prev_next": True,
     "use_edit_page_button": True,
     "navigation_with_keys": False,
     "collapse_navigation": False,
+    # Expand the left-sidebar tree down to the per-module API pages.
+    "show_nav_level": 2,
     "icon_links": [
         {
             "name": "GitHub",
@@ -102,6 +103,12 @@ html_theme_options = {
     # Footer: combra wordmark on the left, copyright on the right.
     "footer_start": ["footer-brand"],
     "footer_end": ["copyright"],
+}
+
+# Show the structured navigation tree in the left sidebar on every page —
+# including the landing page, where PyData hides it by default.
+html_sidebars = {
+    "**": ["sidebar-tree"],
 }
 
 # Sphinx domain settings.
