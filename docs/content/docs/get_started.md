@@ -5,13 +5,19 @@ weight: 1
 
 ## Installation
 
-Combra ships as an editable Python package. Install in two steps because `crdp` (Douglas–Peucker accelerator) requires `cython` to be available before its own build kicks in.
+Combra is a standard Python package — all dependencies install automatically. From a clone of the repository:
 
 ```bash
-pip install cython
-pip install --no-build-isolation 'crdp>=0.0.2'
 pip install -e .
 ```
+
+On Linux, OpenCV also needs the system OpenGL libraries:
+
+```bash
+sudo apt-get install -y libgl1 libglib2.0-0
+```
+
+FID metrics work out of the box (the InceptionV3 feature extractor runs on `onnxruntime`, which ships with the default install — no PyTorch required). Point combra at an InceptionV3 ONNX model via the `COMBRA_INCEPTION_ONNX` environment variable or the `model_path` argument; see [`combra.metrics`]({{< relref "/docs/metrics" >}}).
 
 ## Smoke test
 
