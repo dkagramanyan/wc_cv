@@ -1414,5 +1414,29 @@
   "file": "combra/contours/preprocess.py",
   "start": 107,
   "end": 111
+ },
+ {
+  "leaf": "calculate_metrics",
+  "qual": "calculate_metrics",
+  "subpkg": "metrics",
+  "file": "combra/metrics/fid.py",
+  "start": 19,
+  "end": 19
+ },
+ {
+  "leaf": "calculate_fid_given_paths",
+  "qual": "calculate_fid_given_paths",
+  "subpkg": "metrics",
+  "file": "combra/metrics/fid.py",
+  "start": 18,
+  "end": 18
+ },
+ {
+  "leaf": "calculate_frechet_distance",
+  "qual": "calculate_frechet_distance",
+  "subpkg": "metrics",
+  "file": "combra/metrics/fid.py",
+  "start": 18,
+  "end": 18
  }
 ]
