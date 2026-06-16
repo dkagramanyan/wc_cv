@@ -2,16 +2,10 @@
 
 ## Installation
 
-Combra is a standard Python package — all dependencies install automatically. From a clone of the repository:
+Combra is a standard Python package — all dependencies are pure-pip and install automatically, with no system packages required. combra uses the headless OpenCV build (`opencv-python-headless`), so no `libGL`/`libglib` system libraries are needed; it runs out of the box in minimal containers and HPC environments where you can only install Python packages. From a clone of the repository:
 
 ```bash
 pip install -e .
-```
-
-On Linux, OpenCV also needs the system OpenGL libraries:
-
-```bash
-sudo apt-get install -y libgl1 libglib2.0-0
 ```
 
 FID metrics work out of the box. `combra.metrics.fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity), which ship as core dependencies and download/cache their own InceptionV3 weights on first use — no manual model setup. `compute_fid` runs on CUDA when available and falls back to CPU; see {doc}`combra.metrics <api/metrics>`.
