@@ -112,6 +112,55 @@ Recursively walk an image tree, resize each image to `target_size`, and convert 
 ```
 ````
 
+````{py:function} combra.image.split_rotate(input_folder, output_folder, split=3, rotate=False) -> None
+
+```{warning}
+Legacy method — no working guarantee (emits a `DeprecationWarning`).
+```
+
+Walk a folder-of-classes tree and tile every image into quarters (`split=3`) or ninths (`split=9`), writing the tiles to `output_folder` with a `_part_N` suffix while preserving the per-class subdirectory layout.
+
+:param input_folder: Source root (one subfolder per class).
+:type input_folder: str or Path
+:param output_folder: Destination root; created if missing.
+:type output_folder: str or Path
+:param split: `3` → 2×2 tiles, `9` → 3×3 tiles. Default: `3`.
+:type split: int, optional
+:param rotate: Reserved flag for rotation augmentation. Default: `False`.
+:type rotate: bool, optional
+:returns: Nothing. Writes tiled images under `output_folder`.
+:rtype: None
+
+**Example**
+
+```python
+>>> from combra import image
+>>> image.split_rotate('./data/orig', './data/orig_tiles', split=3)
+```
+````
+
+````{py:function} combra.image.do_edt(image) -> None
+
+```{warning}
+Legacy method — no working guarantee (emits a `DeprecationWarning`).
+```
+
+Watershed segmentation driven by a Euclidean distance transform: Otsu-style threshold → `distance_transform_edt` → `peak_local_max` seeds → `watershed`. Renders a 2×2 matplotlib figure (original / binary / distances / separated objects).
+
+:param image: RGB image to segment.
+:type image: ndarray
+:returns: Nothing. Draws a matplotlib figure of the segmentation stages.
+:rtype: None
+
+**Example**
+
+```python
+>>> from combra import image, data
+>>> _, img = data.microstructure_images()[0]
+>>> image.do_edt(img)   # plots the four segmentation stages
+```
+````
+
 ````{py:function} combra.image.tiff2jpg(folder_path, start_name=0, stop_name=-4, new_folder_path='resized') -> None
 
 Convert every 16-bit TIFF in `folder_path` to 8-bit JPEG under `new_folder_path`.

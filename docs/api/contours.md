@@ -71,6 +71,34 @@ Morphological skeletonisation + per-component split via `scipy.ndimage.label`. O
 ```
 ````
 
+````{py:function} combra.contours.mark_corners_and_classes(image, max_num=100000, sens=0.1, max_dist=1) -> tuple[ndarray, ndarray, int]
+
+```{warning}
+Experimental — no working guarantee. Detects corner candidates with OpenCV `goodFeaturesToTrack` and labels gradient-magnitude clusters with `scipy.ndimage.label`.
+```
+
+:param image: Single-channel image.
+:type image: ndarray
+:param max_num: Maximum number of corners to return. Default: `100000`.
+:type max_num: int, optional
+:param sens: Quality level passed to `goodFeaturesToTrack`. Default: `0.1`.
+:type sens: float, optional
+:param max_dist: Minimum allowed distance between corners. Default: `1`.
+:type max_dist: int, optional
+:returns: **corners** (*ndarray*) – `(N, 1, 2)` integer corner coordinates; and **classes** (*ndarray*) – Labelled gradient-cluster image; and **num** (*int*) – Number of labelled clusters.
+:rtype: tuple(ndarray, ndarray, int)
+
+**Example**
+
+```python
+>>> from combra import contours, image, data
+>>> _, img = data.microstructure_images()[0]
+>>> binary = image.do_otsu(img)
+>>> corners, classes, num = contours.mark_corners_and_classes(binary)
+>>> print(f'{len(corners)} corners, {num} gradient clusters')
+```
+````
+
 ````{py:function} combra.contours.contour_to_binary_mask(contour, eps=1, thickness=1, pad=2) -> ndarray
 
 Render a single contour into a small binary mask.

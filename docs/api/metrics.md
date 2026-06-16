@@ -65,9 +65,43 @@ Re-exported from [torch-fidelity](https://github.com/toshas/torch-fidelity) — 
 ```
 ````
 
-```{note}
-For lower-level control, `combra.metrics` also re-exports `calculate_fid_given_paths` and `calculate_frechet_distance` straight from pytorch-fid — `compute_fid` is just a thin convenience wrapper around the former.
-```
+For lower-level control, `combra.metrics` also re-exports the two underlying [pytorch-fid](https://github.com/mseitzer/pytorch-fid) primitives — `compute_fid` is just a thin convenience wrapper around the first.
+
+````{py:function} combra.metrics.calculate_fid_given_paths(paths, batch_size, device, dims, num_workers=1) -> float
+
+Re-exported from [pytorch-fid](https://github.com/mseitzer/pytorch-fid). Computes FID between the two folders in `paths` — the function `compute_fid` wraps with sensible defaults and automatic device selection.
+
+:param paths: Two folder paths `[real, generated]`.
+:type paths: list[str]
+:param batch_size: Forward-pass batch size.
+:type batch_size: int
+:param device: Torch device to run on.
+:type device: str or torch.device
+:param dims: InceptionV3 feature dimensionality (`64`/`192`/`768`/`2048`).
+:type dims: int
+:param num_workers: Dataloader workers. Default: `1`.
+:type num_workers: int, optional
+:returns: **fid** (*float*) – The Fréchet distance.
+:rtype: float
+````
+
+````{py:function} combra.metrics.calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6) -> float
+
+Re-exported from [pytorch-fid](https://github.com/mseitzer/pytorch-fid). The FID formula itself — the Fréchet distance between two multivariate Gaussians described by their activation mean/covariance. Use it when you already hold the InceptionV3 statistics.
+
+:param mu1: Mean activation vector of the first set.
+:type mu1: ndarray
+:param sigma1: Covariance matrix of the first set.
+:type sigma1: ndarray
+:param mu2: Mean activation vector of the second set.
+:type mu2: ndarray
+:param sigma2: Covariance matrix of the second set.
+:type sigma2: ndarray
+:param eps: Diagonal nudge keeping the matrix square root finite when the covariance product is singular. Default: `1e-6`.
+:type eps: float, optional
+:returns: **fid** (*float*) – The Fréchet (FID) distance.
+:rtype: float
+````
 
 ## Distribution comparison
 
