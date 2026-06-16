@@ -24,19 +24,17 @@ A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it when
 - **`np.ndarray`** — serialised as nested `list` (via `tolist()`).
 - **anything else** — falls through to the default `json.JSONEncoder` (raises `TypeError` for unsupported types).
 
-**Examples**
+**Example**
 
 ```python
-import json
-import numpy as np
-from combra.utils import NumpyEncoder
-
-payload = {
-    'mus': np.array([90.5, 270.3]),
-    'count': np.int64(42),
-    'score': np.float32(0.97),
-}
-
-with open('out.json', 'w') as f:
-    json.dump(payload, f, cls=NumpyEncoder)
+>>> import json
+>>> import numpy as np
+>>> from combra.utils import NumpyEncoder
+>>> payload = {
+...     'mus': np.array([90.5, 270.3]),
+...     'count': np.int64(42),
+...     'score': np.float32(0.97),
+... }
+>>> with open('out.json', 'w') as f:
+...     json.dump(payload, f, cls=NumpyEncoder)
 ```
