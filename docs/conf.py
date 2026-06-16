@@ -1,13 +1,11 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# Combra documentation — built with Sphinx and the PyTorch Sphinx theme.
+# combra documentation — built with Sphinx and the PyData Sphinx theme
+# (the same theme family as the scikit-image docs).
 # Full reference: https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import json
 import os
-
-import pytorch_sphinx_theme2
-
-_THEME_DIR = pytorch_sphinx_theme2.get_html_theme_path()
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +21,7 @@ extensions = [
     "myst_parser",
     "sphinx_design",
     "sphinx_copybutton",
-    "pytorch_sphinx_theme2",
+    "sphinx.ext.linkcode",
 ]
 
 # Markdown (MyST) is the source format for every page.
@@ -43,9 +41,7 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 3
 
-templates_path = ["_templates", os.path.join(_THEME_DIR, "templates")]
-# Only the Sphinx sources (index, get_started, api/, examples/) are part of the
-# build — keep the legacy Hugo tree and scaffolding out.
+templates_path = ["_templates"]
 exclude_patterns = [
     "_build",
     "Thumbs.db",
@@ -60,32 +56,36 @@ exclude_patterns = [
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "pytorch_sphinx_theme2"
-html_theme_path = [pytorch_sphinx_theme2.get_html_theme_path()]
+html_theme = "pydata_sphinx_theme"
 html_title = "combra"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 
-# Link the "Edit this page" / "[source]"-style buttons and the GitHub icon
-# back to the repository.
+# Link the "Edit this page" button and the GitHub icon back to the docs repo.
 html_context = {
     "github_user": "dkagramanyan",
     "github_repo": "wc_cv",
     "github_version": "main",
     "doc_path": "docs",
-    "display_github": True,
+    "default_mode": "light",
 }
 
 html_theme_options = {
-    "logo_text": "combra",
-    "collapse_navigation": False,
+    # Wrench-emoji wordmark stands in for any project logo, in the header…
+    "logo": {"text": "🔧 combra"},
+    # …and the navbar layout mirrors the scikit-image header:
+    #   left   — wordmark + version dropdown
+    #   center — section navigation
+    #   right  — theme toggle + GitHub icon (search stays pinned)
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "navbar_persistent": ["search-button"],
+    "header_links_before_dropdown": 6,
     "show_prev_next": True,
     "use_edit_page_button": True,
-    # Drop the PyTorch/Linux-Foundation chrome — this is the combra project site.
-    "show_lf_header": False,
-    "show_lf_footer": False,
-    "show_pytorch_org_link": False,
     "navigation_with_keys": False,
+    "collapse_navigation": False,
     "icon_links": [
         {
             "name": "GitHub",
@@ -93,8 +93,66 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
         },
     ],
+    # Version dropdown in the upper-left corner.
+    "switcher": {
+        "json_url": "_static/switcher.json",
+        "version_match": release,
+    },
+    "show_version_warning_banner": True,
+    # Footer: combra wordmark on the left, copyright on the right.
+    "footer_start": ["footer-brand"],
+    "footer_end": ["copyright"],
 }
 
-# Sphinx domain settings: show typed signatures the way PyTorch docs do.
+# Sphinx domain settings.
 add_module_names = False
 python_use_unqualified_type_names = True
+
+
+# -- Source links ("[source]" next to every object) --------------------------
+#
+# The API pages are hand-authored ``py:`` directives rather than autodoc, so we
+# resolve each object back to its definition in the combra source tree through a
+# pre-built index (``_static/source_index.json``, generated from the package
+# AST). ``sphinx.ext.linkcode`` then renders a GitHub "[source]" link for every
+# function, class, and method — the same affordance the scikit-image API pages
+# offer.
+
+_COMBRA_REPO = "https://github.com/dkagramanyan/combra"
+_COMBRA_REF = "main"
+_SOURCE_INDEX = None
+
+
+def _load_source_index():
+    global _SOURCE_INDEX
+    if _SOURCE_INDEX is None:
+        path = os.path.join(os.path.dirname(__file__), "_static", "source_index.json")
+        try:
+            with open(path, encoding="utf-8") as fh:
+                _SOURCE_INDEX = json.load(fh)
+        except OSError:
+            _SOURCE_INDEX = []
+    return _SOURCE_INDEX
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+    fullname = info.get("fullname") or ""
+    if not fullname:
+        return None
+    leaf = fullname.split(".")[-1]
+    tokens = set((info.get("module") or "").split(".")) | set(fullname.split("."))
+
+    candidates = [rec for rec in _load_source_index() if rec["leaf"] == leaf]
+    if not candidates:
+        return None
+    if len(candidates) > 1:
+        by_subpkg = [rec for rec in candidates if rec["subpkg"] in tokens]
+        candidates = by_subpkg or candidates
+    if len(candidates) > 1:
+        by_class = [rec for rec in candidates if rec["qual"].split(".")[0] in tokens]
+        candidates = by_class or candidates
+
+    rec = candidates[0]
+    return f"{_COMBRA_REPO}/blob/{_COMBRA_REF}/{rec['file']}#L{rec['start']}-L{rec['end']}"

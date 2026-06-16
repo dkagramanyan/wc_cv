@@ -14,7 +14,7 @@ On Linux, OpenCV also needs the system OpenGL libraries:
 sudo apt-get install -y libgl1 libglib2.0-0
 ```
 
-FID metrics work out of the box (the InceptionV3 feature extractor runs on `onnxruntime`, which ships with the default install — no PyTorch required). Point combra at an InceptionV3 ONNX model via the `COMBRA_INCEPTION_ONNX` environment variable or the `model_path` argument; see {doc}`combra.metrics <api/metrics>`.
+FID metrics work out of the box. `combra.metrics.fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity), which ship as core dependencies and download/cache their own InceptionV3 weights on first use — no manual model setup. `compute_fid` runs on CUDA when available and falls back to CPU; see {doc}`combra.metrics <api/metrics>`.
 
 ## Smoke test
 

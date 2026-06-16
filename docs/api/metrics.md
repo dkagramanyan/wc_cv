@@ -2,7 +2,7 @@
 
 The `combra.metrics` module bundles three families of metrics:
 
-- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. **PyTorch-free**: InceptionV3 features run on `onnxruntime` (part of the default install). The InceptionV3 ONNX model is resolved, in order, from an explicit `model_path` argument, the `COMBRA_INCEPTION_ONNX` environment variable, or a download from `COMBRA_INCEPTION_URL` (cached under `~/.cache/combra`).
+- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. combra does not implement FID itself; `combra.metrics.fid` delegates to the two reference libraries [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity). Both ship as core dependencies and download/cache their own InceptionV3 weights on first use, so no manual model setup is required.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -12,108 +12,62 @@ from combra import metrics
 
 ## FID
 
-````{py:function} combra.metrics.frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6) -> float
+`combra.metrics.fid` is a thin wrapper over two reference libraries — it adds a single convenience entry point (`compute_fid`) and re-exports the underlying functions so you can drop down to them when you need more control. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
 
-The FID formula itself — the Fréchet distance between two multivariate Gaussians. Pure numpy/scipy; returns `0` when the two distributions are equal. Use it directly when you already have the activation statistics (e.g. from `compute_stats`).
+````{py:function} combra.metrics.compute_fid(real_folder, gen_folder, batch_size=50, dims=2048, device=None, num_workers=1) -> float
 
-:param mu1: Mean activation vector of the first image set.
-:type mu1: ndarray
-:param sigma1: Covariance matrix of the first image set.
-:type sigma1: ndarray
-:param mu2: Mean activation vector of the second image set.
-:type mu2: ndarray
-:param sigma2: Covariance matrix of the second image set.
-:type sigma2: ndarray
-:param eps: Diagonal nudge applied when the covariance product is singular, so the matrix square root stays finite. Default: `1e-6`.
-:type eps: float, optional
-:returns: **fid** (*float*) – The Fréchet (FID) distance.
+Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mseitzer/pytorch-fid). Walks both folders, runs every image through InceptionV3, and returns the Fréchet distance between the two activation distributions. The weights are downloaded and cached by pytorch-fid on first use.
+
+:param real_folder: Path to the real image folder.
+:type real_folder: str or Path
+:param gen_folder: Path to the generated image folder.
+:type gen_folder: str or Path
+:param batch_size: Forward-pass batch size. Default: `50`.
+:type batch_size: int, optional
+:param dims: Dimensionality of the InceptionV3 feature layer (`64`, `192`, `768`, or `2048`). Default: `2048`.
+:type dims: int, optional
+:param device: Torch device to run on (e.g. `'cuda'` or `'cpu'`). When `None`, picks `'cuda'` if available, otherwise `'cpu'`. Default: `None`.
+:type device: str or torch.device or None, optional
+:param num_workers: Number of dataloader workers. Default: `1`.
+:type num_workers: int, optional
+:returns: **fid** (*float*) – The Fréchet (FID) distance. `0.0` when both folders are identical.
 :rtype: float
 
 **Example**
 
 ```python
->>> from combra.metrics import frechet_distance, compute_stats
->>> from combra.metrics.fid import InceptionExtractor
->>> extractor = InceptionExtractor()
->>> mu_r, sig_r, _ = compute_stats('data/real', extractor)
->>> mu_g, sig_g, _ = compute_stats('data/gen', extractor)
->>> fid = frechet_distance(mu_r, sig_r, mu_g, sig_g)
->>> print(f'FID = {fid:.4f}')
-```
-````
-
-````{py:function} combra.metrics.collect_images(folder) -> list[Path]
-
-Recursively walk `folder` and return a sorted list of image paths with a recognised extension (`png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`). Handles per-class subdirectories.
-
-:param folder: Root folder to walk.
-:type folder: str or Path
-:returns: **paths** (*list[Path]*) – Sorted image paths.
-:rtype: list[Path]
-
-**Example**
-
-```python
->>> from combra.metrics import collect_images
->>> paths = collect_images('data/real')
->>> print(f'{len(paths)} images, first = {paths[0].name}')
-```
-````
-
-````{py:function} combra.metrics.compute_stats(folder, extractor, batch_size=50) -> tuple[ndarray, ndarray, int]
-
-Collect every image under `folder`, run them through `extractor`, and return the InceptionV3 activation statistics. Raises `ValueError` when the folder contains no images.
-
-:param folder: Image folder.
-:type folder: str or Path
-:param extractor: The onnxruntime feature extractor, `combra.metrics.fid.InceptionExtractor`. Build it once (it resolves and loads the ONNX model) and reuse it across folders.
-:type extractor: InceptionExtractor
-:param batch_size: Forward-pass batch size. Default: `50`.
-:type batch_size: int, optional
-:returns: **mu** (*ndarray[2048]*) – Mean activation; and **sigma** (*ndarray[2048, 2048]*) – Covariance of activations; and **n_files** (*int*) – Image count.
-:rtype: tuple(ndarray, ndarray, int)
-
-**Example**
-
-Useful when you want FID against many gen folders against the **same** real set without redoing the real-side forward pass each time:
-
-```python
->>> from combra.metrics import compute_stats, frechet_distance
->>> from combra.metrics.fid import InceptionExtractor
->>> extractor = InceptionExtractor()  # loads the ONNX model once
->>> mu_r, sigma_r, n_real = compute_stats('data/real', extractor)
->>> # … reuse (mu_r, sigma_r) with frechet_distance for each gen folder:
->>> mu_g, sigma_g, _ = compute_stats('data/gen', extractor)
->>> fid = frechet_distance(mu_r, sigma_r, mu_g, sigma_g)
-```
-````
-
-````{py:function} combra.metrics.compute_fid(real_folder, gen_folder, model_path=None, batch_size=50) -> tuple[float, int, int]
-
-End-to-end FID between two folders. Builds an `InceptionExtractor` internally, computes both sides' statistics, and returns the Fréchet distance.
-
-:param real_folder: Path to the real image folder.
-:type real_folder: str
-:param gen_folder: Path to the generated image folder.
-:type gen_folder: str
-:param model_path: Path to an InceptionV3 ONNX model. When `None`, falls back to `COMBRA_INCEPTION_ONNX`, then `COMBRA_INCEPTION_URL`. Default: `None`.
-:type model_path: str or None, optional
-:param batch_size: Forward-pass batch size. Default: `50`.
-:type batch_size: int, optional
-:returns: **fid** (*float*) – Distance value; and **n_real** (*int*) – Number of images contributing on the real side; and **n_gen** (*int*) – Same on the generated side.
-:rtype: tuple(float, int, int)
-
-**Example**
-
-```python
 >>> from combra.metrics import compute_fid
->>> # Resolve the model via COMBRA_INCEPTION_ONNX, or pass model_path=...
->>> fid, n_real, n_gen = compute_fid('data/real', 'data/gen')
->>> print(f'FID = {fid:.4f}  (real={n_real}, gen={n_gen})')
+>>> fid = compute_fid('data/real', 'data/gen')  # CUDA when available, else CPU
+>>> print(f'FID = {fid:.4f}')
 ```
 
 A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`.
 ````
+
+````{py:function} combra.metrics.calculate_metrics(input1, input2, **kwargs)
+
+Re-exported from [torch-fidelity](https://github.com/toshas/torch-fidelity) — the full generative-quality metric suite (FID/KID/IS/PRC) in one call. Pass `fid=True`, `kid=True`, `isc=True`, `prc=True` to select metrics, plus options such as `cuda`, `batch_size`, and `save_cpu_ram`. Returns a `dict` keyed by metric name.
+
+:param input1: First image set — a folder path or a registered dataset name.
+:type input1: str
+:param input2: Second image set.
+:type input2: str
+:returns: **metrics** (*dict*) – Requested metric values keyed by `torch_fidelity.KEY_METRIC_*` names.
+:rtype: dict
+
+**Example**
+
+```python
+>>> from combra.metrics import calculate_metrics
+>>> res = calculate_metrics(input1='data/real', input2='data/gen',
+...                         fid=True, kid=True, cuda=False, batch_size=8)
+>>> print(res['frechet_inception_distance'])
+```
+````
+
+```{note}
+For lower-level control, `combra.metrics` also re-exports `calculate_fid_given_paths` and `calculate_frechet_distance` straight from pytorch-fid — `compute_fid` is just a thin convenience wrapper around the former.
+```
 
 ## Distribution comparison
 
@@ -554,4 +508,4 @@ A full notebook walkthrough is in `co_angles/3_metrics_convergence.ipynb`.
 - {py:func}`combra.angles.angles_plot_grid` — visualise the same comparisons as overlaid grids.
 - {py:func}`combra.approx.fit_plateau` — the plateau fitter used inside `convergence_stats`.
 - {doc}`combra.stats <stats>` — Kendall + Fisher primitives.
-- {doc}`FID example </examples/fid>` — multi-resolution loop using `InceptionExtractor` + `compute_stats` + `frechet_distance`.
+- {doc}`FID example </examples/fid>` — multi-resolution loop using `compute_fid`.
