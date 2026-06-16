@@ -111,14 +111,14 @@ Render a single contour into a small binary mask.
 
 **Parameters**
 
-- **contour** (*ndarray[N, 2]*) — Polygon vertices.
+- **contour** (*ndarray[N, 1, 2]*) — Polygon vertices in raw OpenCV layout (the shape returned by `cv2.findContours`). Reshape `(N, 2)` arrays to `(N, 1, 2)` first.
 - **eps** (*int*, default `1`) — Mask quantisation factor (downsamples the bounding box by `eps`).
 - **thickness** (*int*, default `1`) — Drawing line thickness.
 - **pad** (*int*, default `2`) — Margin added around the contour.
 
 **Returns**
 
-- **mask** (*ndarray[bool]*) — Small mask sized to the contour's bounding box + padding.
+- **mask** (*ndarray[uint8]*) — Small `{0, 1}` mask sized to the contour's bounding box + padding.
 
 **Examples**
 
@@ -143,12 +143,12 @@ Multiply contour coordinates by `factor`. Use when rescaling contours for a resi
 
 **Parameters**
 
-- **contour** (*ndarray[N, 2]*) — Polygon vertices.
+- **contour** (*ndarray[N, 1, 2]*) — Polygon vertices in raw OpenCV layout (as returned by `cv2.findContours`).
 - **factor** (*float*) — Multiplicative scale.
 
 **Returns**
 
-- **scaled** (*ndarray[N, 2]*) — Rescaled vertices.
+- **scaled** (*ndarray[N, 1, 2]*) — Rescaled vertices.
 
 **Examples**
 

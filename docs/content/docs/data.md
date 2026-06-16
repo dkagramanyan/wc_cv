@@ -194,7 +194,7 @@ print(t['run_meta'][0].as_py()['code_commit'])  # '9cdd1d6b...'
 ```python
 generate_beams(save_path, types_dict, step, pixel,
                start=2, end=-3, workers=20, mvee_tol=0.2,
-               queue_size=32, keep_contours=False, run_meta=None)
+               keep_contours=False, run_meta=None)
 ```
 
 Compute Minimum Volume Enclosing Ellipse (MVEE) beam parameters for every image and write them as parquet. One row per `(class, step)`; the per-step linear-fit results live alongside the raw beam/centroid arrays.
@@ -208,7 +208,6 @@ Compute Minimum Volume Enclosing Ellipse (MVEE) beam parameters for every image 
 - **start**, **end** (*int*, default `2`, `-3`) — Slice bounds applied to the binned log-density before the linear fit (trims poorly-sampled extremes).
 - **workers** (*int*, default `20`) — Multiprocessing pool size.
 - **mvee_tol** (*float*, default `0.2`) — Convergence tolerance for the MVEE solve. Lower → tighter ellipses, slower.
-- **queue_size** (*int*, default `32`) — Bound on the writer-process queue.
 - **keep_contours** (*bool*, default `False`) — If `True`, populate `contours_mvee`.
 - **run_meta** (*dict or None*, default `None`) — Caller-supplied provenance (`family`, `resolution`, `tags`, `notes`). The rest is filled automatically. The beams-flavour `extraction_params` records `pixel`, `start`, `end`, `mvee_tol`, `keep_contours`.
 
@@ -281,6 +280,52 @@ from combra import data
 pa_ds = data.PoliamidDataset('/path/to/poliamid', group_size=250)
 pa_ds.generate('poliamid.parquet', n_jobs=20, N=500)
 ```
+
+---
+
+## `combra.data.generate_angles_sweep`
+
+```python
+generate_angles_sweep(h5_path, out_dir, ns, step, types_dict,
+                      tag='', run_meta=None, **gen_kwargs)
+```
+
+Batch helper that builds an angle-convergence sweep: for each `N` in `ns` it instantiates a `PobeditDataset` capped at `N` images per class and calls `generate_angles`, writing one `angles_n{N}.parquet` per sample size into `out_dir`. A parquet is only (re)generated when it is missing **or** exists but lacks rows at `step` (`generate_angles` overwrites, it does not append), so reruns are cheap. One status line is printed per call.
+
+**Parameters**
+
+- **h5_path** (*str or Path*) — Source HDF5 (or class-folder) passed to each `PobeditDataset`.
+- **out_dir** (*str or Path*) — Directory for the per-N parquets.
+- **ns** (*Iterable[int]*) — Sample sizes to sweep — one parquet per value.
+- **step** (*float*) — Histogram step used both for generation and for the "already present" check.
+- **types_dict** (*dict[str, str]*) — Class-name to display-label map, forwarded to `generate_angles`.
+- **tag** (*str*, default `''`) — Prefix shown in brackets in the printed status lines (e.g. the generator family).
+- **run_meta** (*dict or None*, default `None`) — Provenance forwarded to each `generate_angles` call.
+- **gen_kwargs** — Extra keyword arguments forwarded verbatim to `PobeditDataset.generate_angles` (e.g. `workers`, `min_segment_len`, `keep_contours`).
+
+**Returns**
+
+- *None* — parquets are written to `out_dir` as a side effect.
+
+**Examples**
+
+```python
+from combra import data
+
+data.generate_angles_sweep(
+    h5_path='./data/h5/00017-diffit-256_N10000.h5',
+    out_dir='./sweeps/diffit_256_msl5',
+    ns=[100, 250, 1000, 10000],
+    step=2.0,
+    types_dict={'Ultra_Co11': 'small grain',
+                'Ultra_Co25': 'medium grain',
+                'Ultra_Co6_2': 'large grain'},
+    tag='diffit', min_segment_len=5.0, workers=20,
+)
+# Writes ./sweeps/diffit_256_msl5/angles_n{100,250,1000,10000}.parquet
+```
+
+The output sweep folder is exactly the shape [`combra.metrics.metrics_vs_n`]({{< relref "/docs/metrics" >}}) and [`combra.metrics.find_ethalon`]({{< relref "/docs/metrics" >}}) expect.
 
 ---
 

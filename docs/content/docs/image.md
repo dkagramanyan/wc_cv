@@ -176,7 +176,7 @@ Tools for dual-camera SEM images split at horizontal position `h`. `imdivide` re
 
 - **image** (*ndarray*) — Composite SEM image.
 - **h** (*int*) — Horizontal split coordinate.
-- **k** (*float*, default `0.5*) — Blending weight (`combine` only).
+- **k** (*float*, default `0.5`) — Blending weight (`combine` only).
 - **side** (*str*) — `'left'` or `'right'` (`imdivide` only).
 
 **Returns**
@@ -215,17 +215,17 @@ Return adaptive dyadic box sizes for the given image shape. Pass the result as t
 
 **Returns**
 
-- **sizes** (*ndarray[int]*) — Valid box sizes (powers-of-2 trimmed to shape).
-- **n_boxes** (*ndarray[int]*) — Box count at each size.
+- **sizes** (*ndarray[int]*) — Valid box sizes (powers-of-2 trimmed to shape). `None` when the image is too small (`min(H, W) < 4`).
+- **scale** (*int*) — Adaptive integer scale factor derived from the shape (the upsampling factor applied when too few dyadic levels fit; `1` when no upscaling is needed). `None` alongside `sizes` when the image is too small.
 
 **Examples**
 
 ```python
 from combra import image
 
-sizes, n_boxes = image.valid_box_sizes_from_shape((1024, 1024), min_boxes=6)
+sizes, scale = image.valid_box_sizes_from_shape((1024, 1024), min_boxes=6)
 print(sizes)      # [2, 4, 8, 16, 32, 64, 128, ...]
-print(n_boxes)    # box count at each size
+print(scale)      # 1 (no upscaling needed at this size)
 ```
 
 ---
@@ -487,7 +487,7 @@ print(image.is_point_in_polygon(15, 5, square))   # False
 
 ## Notes
 
-`mean_pixel`, `do_edt`, and `split_rotate` are in `__all__` but rely on stale helpers or hardcoded paths. Treat them as legacy.
+`do_edt` and `split_rotate` are in `__all__` but rely on stale helpers or hardcoded paths. Treat them as legacy.
 
 ## See also
 

@@ -46,10 +46,10 @@ Median-filter, Otsu, and contour-extract the input. Pass `labeled_cnts=True` (an
 
 - **entry_nodes** (*list[int]*) — Node indices on the entry side.
 - **exit_nodes** (*list[int]*) — Node indices on the exit side.
-- **img_contours_o** (*ndarray*) — RGB visualisation with contours drawn.
-- **img_preprocessed** (*ndarray*) — Binary preprocessed image.
+- **img_preprocessed** (*ndarray*) — Binary preprocessed image (a copy used as the edge-drawing canvas). Returned third.
+- **img_contours_o** (*ndarray*) — RGB visualisation with contours and entry/exit nodes drawn. Returned fourth.
 - **cnts** (*list[ndarray]*) — Simplified contours.
-- **nodes_metadata** (*pandas.DataFrame*) — Per-node metadata (coords, contour index, entry/exit flags, …).
+- **nodes_metadata** (*dict*) — Per-node lookup tables (global node coords, global/local contour indices, coord→index maps, and `labels`/`contour_index2label` when labelled).
 
 **Examples**
 
@@ -60,7 +60,7 @@ from combra import graph, data
 
 _, image = data.microstructure_images()[0]
 (entry_nodes, exit_nodes,
- img_contours_o, img_preprocessed_final,
+ img_preprocessed, img_contours_o,
  cnts, nodes_metadata) = graph.preprocess_graph_image(
     image, border=30, disk=5, entry_ellps_w=5, exit_ellps_w=5, r=4,
 )
@@ -85,7 +85,7 @@ Build the directed graph. `eps` is the maximum edge length in pixels; `line_eps`
 
 - **img_shape** (*tuple[int, int]*) — `(H, W)` of the source image.
 - **cnts** (*list[ndarray]*) — Contours from `preprocess_graph_image`.
-- **nodes_metadata** (*pandas.DataFrame*) — Node table from `preprocess_graph_image`.
+- **nodes_metadata** (*dict*) — Node lookup tables from `preprocess_graph_image`.
 - **eps** (*int*, default `100`) — Maximum edge length in pixels.
 - **line_eps** (*int*, default `3`) — Perpendicular tolerance used when classifying edges.
 - **border** (*int*, default `30`) — Image padding (must match `preprocess_graph_image`).
@@ -110,7 +110,7 @@ from combra import graph, data
 img = data.crack_images()[0][1]
 
 (entry_nodes, exit_nodes,
- img_contours_o, img_preprocessed,
+ img_preprocessed, img_contours_o,
  cnts, nodes_metadata) = graph.preprocess_graph_image(
     img, border=30, disk=5, entry_ellps_w=5, exit_ellps_w=5, r=4)
 
@@ -132,7 +132,7 @@ Compute outgoing edges from one node — used internally by `create_crack_graph`
 **Parameters**
 
 - **start_node_index** (*int*) — Source node.
-- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **nodes_metadata** (*dict*) — Node lookup tables.
 - **process_metadata** (*dict*) — Internal builder state.
 
 **Returns**
@@ -167,7 +167,7 @@ Classify a single edge between two node indices into Co / WC-Co / WC / WC-WC.
 
 - **node1**, **node2** (*int*) — Node indices.
 - **cnts** (*list[ndarray]*) — Contours.
-- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **nodes_metadata** (*dict*) — Node lookup tables.
 - **wc_eps** (*int*, default `30`) — Minimum contour-pixel count below which the edge is reclassified.
 - **border_pixel** (*int*, default `0`) — Pixel value that marks a contour border.
 
@@ -199,7 +199,7 @@ Same as `get_edge_type` but uses hand labels carried in `nodes_metadata`. Use wh
 **Parameters**
 
 - **node1**, **node2** (*int*) — Node indices.
-- **nodes_metadata** (*pandas.DataFrame*) — Node table including labels.
+- **nodes_metadata** (*dict*) — Node lookup tables including `labels`.
 - **line_eps** (*int*, default `10`) — Perpendicular tolerance.
 
 **Returns**
@@ -278,7 +278,7 @@ Find the `k` shortest paths between one entry/exit pair and return per-path leng
 
 - **G** (*networkx.DiGraph*) — Crack graph.
 - **cnts** (*list[ndarray]*) — Contours.
-- **nodes_metadata** (*pandas.DataFrame*) — Node table.
+- **nodes_metadata** (*dict*) — Node lookup tables.
 - **entry_node**, **exit_node** (*int*) — Single endpoint pair.
 - **k** (*int*) — Number of shortest paths to return.
 - **recalculate_paths** (*bool*, default `False`) — Force recompute.
@@ -328,10 +328,16 @@ energies = graph.fixed_paths_energies(
 ### `combra.graph.paths_queues`
 
 ```python
-paths_queues()
+paths_queues(g, entry_nodes, exit_nodes, workers=23)
 ```
 
-Internal queue-based path enumerator (no public arguments).
+Internal queue-based path enumerator — enumerates all simple paths for every `(entry, exit)` pair across a worker pool.
+
+**Parameters**
+
+- **g** (*networkx.DiGraph*) — Crack graph.
+- **entry_nodes**, **exit_nodes** (*list[int]*) — Endpoint pools to pair up.
+- **workers** (*int*, default `23`) — Pool size.
 
 **Examples**
 
@@ -373,20 +379,24 @@ graph.graph_plot(g, img_contours=img_contours, name='crack.html', save=True)
 ### `combra.graph.plot_optimized_energies`
 
 ```python
-plot_optimized_energies(energies_paths, path_index=0, N=5, M=5,
-                        y_label='co_e', x_label='wc-co_e',
-                        fontsize_h=10, fontsize_axes=50)
+plot_optimized_energies(energies, path_index=0, N=6, M=6,
+                        name='test.jpg', y_label='co_co_e', x_label='wc_co_e',
+                        save=False, fixed_paths=False,
+                        fontsize_h=10, fontsize_axes=30)
 ```
 
 Heatmap of optimal path energies over the `(Co, WC-Co)` weight grid for path index `path_index`.
 
 **Parameters**
 
-- **energies_paths** (*list[list[list[DataFrame]]]*) — Output of `get_energies`.
+- **energies** (*list[list[list[DataFrame]]]*) — Output of `get_energies`.
 - **path_index** (*int*, default `0`) — Path rank to plot.
-- **N**, **M** (*int*, default `5`) — Grid dimensions.
-- **y_label**, **x_label** (*str*, default `'co_e'`, `'wc-co_e'`) — Axis labels.
-- **fontsize_h**, **fontsize_axes** (*int*, default `10`, `50`) — Styling.
+- **N**, **M** (*int*, default `6`) — Grid dimensions.
+- **name** (*str*, default `'test.jpg'`) — Output filename when `save=True`.
+- **y_label**, **x_label** (*str*, default `'co_co_e'`, `'wc_co_e'`) — Axis labels.
+- **save** (*bool*, default `False`) — Write the figure to `name`.
+- **fixed_paths** (*bool*, default `False`) — Read cells as fixed-path results (output of `fixed_paths_energies`) instead of optimised k-shortest paths.
+- **fontsize_h**, **fontsize_axes** (*int*, default `10`, `30`) — Styling.
 
 **Examples**
 
@@ -396,7 +406,7 @@ from combra import graph
 # energies_paths from a 20x20 (Co × WC-Co) weight grid
 graph.plot_optimized_energies(
     energies_paths, path_index=0, N=20, M=20,
-    y_label='co_e', x_label='wc-co_e',
+    y_label='co_co_e', x_label='wc_co_e',
 )
 ```
 

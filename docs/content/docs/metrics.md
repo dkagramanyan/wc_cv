@@ -5,7 +5,7 @@ weight: 11
 
 The `combra.metrics` module bundles three families of metrics:
 
-- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set, on top of `pytorch_fid`.
+- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. **PyTorch-free**: InceptionV3 features run on `onnxruntime` (part of the default install). The InceptionV3 ONNX model is resolved, in order, from an explicit `model_path` argument, the `COMBRA_INCEPTION_ONNX` environment variable, or a download from `COMBRA_INCEPTION_URL` (cached under `~/.cache/combra`).
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -15,33 +15,35 @@ from combra import metrics
 
 ## FID
 
-### `combra.metrics.load_inception`
+### `combra.metrics.frechet_distance`
 
 ```python
-load_inception(dims=2048, device=None)
+frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6)
 ```
 
-Build an InceptionV3 feature extractor and move it to the chosen device.
+The FID formula itself — the Fréchet distance between two multivariate Gaussians. Pure numpy/scipy; returns `0` when the two distributions are equal. Use it directly when you already have the activation statistics (e.g. from `compute_stats`).
 
 **Parameters**
 
-- **dims** (*int*, default `2048`) — Feature dimension. `2048` is the standard FID setting.
-- **device** (*str or None*, default `None`) — Torch device string. When `None`, uses CUDA if available.
+- **mu1**, **mu2** (*ndarray*) — Mean activation vectors of the two image sets.
+- **sigma1**, **sigma2** (*ndarray*) — Covariance matrices of the two image sets.
+- **eps** (*float*, default `1e-6`) — Diagonal nudge applied when the covariance product is singular, so the matrix square root stays finite.
 
 **Returns**
 
-- **model** (*nn.Module*) — InceptionV3 feature extractor.
-- **device** (*str*) — The device the model lives on.
-
-Pass both to `compute_fid` to reuse the model across calls.
+- **fid** (*float*) — The Fréchet (FID) distance.
 
 **Examples**
 
 ```python
-from combra.metrics import load_inception
+from combra.metrics import frechet_distance, compute_stats
+from combra.metrics.fid import InceptionExtractor
 
-model, device = load_inception()
-print(device)  # 'cuda' or 'cpu'
+extractor = InceptionExtractor()
+mu_r, sig_r, _ = compute_stats('data/real', extractor)
+mu_g, sig_g, _ = compute_stats('data/gen', extractor)
+fid = frechet_distance(mu_r, sig_r, mu_g, sig_g)
+print(f'FID = {fid:.4f}')
 ```
 
 ---
@@ -52,7 +54,7 @@ print(device)  # 'cuda' or 'cpu'
 collect_images(folder)
 ```
 
-Recursively walk `folder` and return a sorted list of image paths whose extensions are recognised by `pytorch_fid` (handles per-class subdirectories).
+Recursively walk `folder` and return a sorted list of image paths with a recognised extension (`png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`). Handles per-class subdirectories.
 
 **Parameters**
 
@@ -76,36 +78,36 @@ print(f'{len(paths)} images, first = {paths[0].name}')
 ### `combra.metrics.compute_stats`
 
 ```python
-compute_stats(folder, model, device, dims=2048, batch_size=50, num_workers=8)
+compute_stats(folder, extractor, batch_size=50)
 ```
 
-Compute the activation statistics for every image collected from `folder`.
+Collect every image under `folder`, run them through `extractor`, and return the InceptionV3 activation statistics. Raises `ValueError` when the folder contains no images.
 
 **Parameters**
 
 - **folder** (*str or Path*) — Image folder.
-- **model** (*nn.Module*) — InceptionV3 from `load_inception`.
-- **device** (*str*) — Torch device.
-- **dims** (*int*, default `2048`) — Feature dimension.
+- **extractor** (*InceptionExtractor*) — The onnxruntime feature extractor, `combra.metrics.fid.InceptionExtractor`. Build it once (it resolves and loads the ONNX model) and reuse it across folders.
 - **batch_size** (*int*, default `50`) — Forward-pass batch size.
-- **num_workers** (*int*, default `8`) — `DataLoader` worker count.
 
 **Returns**
 
-- **mu** (*ndarray[dims]*) — Mean activation.
-- **sigma** (*ndarray[dims, dims]*) — Covariance of activations.
+- **mu** (*ndarray[2048]*) — Mean activation.
+- **sigma** (*ndarray[2048, 2048]*) — Covariance of activations.
 - **n_files** (*int*) — Image count.
 
 **Examples**
 
-Useful when you want to compute FID against many gen folders against the **same** real set without redoing the real-side forward pass each time:
+Useful when you want FID against many gen folders against the **same** real set without redoing the real-side forward pass each time:
 
 ```python
-from combra.metrics import load_inception, compute_stats
+from combra.metrics import compute_stats, frechet_distance
+from combra.metrics.fid import InceptionExtractor
 
-model, device = load_inception()
-mu_r, sigma_r, n_real = compute_stats('data/real', model, device)
-# … reuse (mu_r, sigma_r) inside scipy.linalg.sqrtm to compute FID per gen folder.
+extractor = InceptionExtractor()  # loads the ONNX model once
+mu_r, sigma_r, n_real = compute_stats('data/real', extractor)
+# … reuse (mu_r, sigma_r) with frechet_distance for each gen folder:
+mu_g, sigma_g, _ = compute_stats('data/gen', extractor)
+fid = frechet_distance(mu_r, sigma_r, mu_g, sigma_g)
 ```
 
 ---
@@ -113,18 +115,16 @@ mu_r, sigma_r, n_real = compute_stats('data/real', model, device)
 ### `combra.metrics.compute_fid`
 
 ```python
-compute_fid(real_folder, gen_folder, model=None, device=None,
-            dims=2048, batch_size=50, num_workers=8)
+compute_fid(real_folder, gen_folder, model_path=None, batch_size=50)
 ```
 
-End-to-end FID between two folders.
+End-to-end FID between two folders. Builds an `InceptionExtractor` internally, computes both sides' statistics, and returns the Fréchet distance.
 
 **Parameters**
 
 - **real_folder**, **gen_folder** (*str*) — Paths to the real and generated image folders.
-- **model**, **device** (*from `load_inception`*, default `None`) — Pre-built InceptionV3 / device pair. If omitted, a fresh one is created on each call — pass them in when looping over many folder pairs.
-- **dims** (*int*, default `2048`) — Feature dimension.
-- **batch_size**, **num_workers** (*int*, default `50`, `8`) — Forwarded to the `pytorch_fid` data loader.
+- **model_path** (*str or None*, default `None`) — Path to an InceptionV3 ONNX model. When `None`, falls back to `COMBRA_INCEPTION_ONNX`, then `COMBRA_INCEPTION_URL`.
+- **batch_size** (*int*, default `50`) — Forward-pass batch size.
 
 **Returns**
 
@@ -135,10 +135,10 @@ End-to-end FID between two folders.
 **Examples**
 
 ```python
-from combra.metrics import load_inception, compute_fid
+from combra.metrics import compute_fid
 
-model, device = load_inception()
-fid, n_real, n_gen = compute_fid('data/real', 'data/gen', model=model, device=device)
+# Resolve the model via COMBRA_INCEPTION_ONNX, or pass model_path=...
+fid, n_real, n_gen = compute_fid('data/real', 'data/gen')
 print(f'FID = {fid:.4f}  (real={n_real}, gen={n_gen})')
 ```
 
@@ -546,14 +546,16 @@ plot_wdist_convergence_grid(records_by_panel, classes,
                             kind_labels=None, grain_labels=None,
                             row_keys=None, col_label_fn=None,
                             title_fn=None, save_path=None, png_meta=None,
-                            fonts=None, height_per_row=380, width_per_col=560)
+                            fonts=None, height_per_row=560, width_per_col=720,
+                            metric='w_dist', y_label='W-dist', zero_line=False,
+                            panel_annotations=None, annot_kind_labels=None)
 ```
 
-Plotly grid of W-dist-vs-N curves. Rows are resolutions (or arbitrary `row_keys`), columns are classes. Curves on the same axes share a kind color/legend group; the legend is shown only once.
+Plotly grid of metric-vs-N curves. Rows are resolutions (or arbitrary `row_keys`), columns are classes. Curves on the same axes share a kind color/legend group; the legend is shown only once. Despite the name it plots any per-record metric, not just W-dist (see `metric`).
 
 **Parameters**
 
-- **records_by_panel** (*dict[tuple, list[dict]]*) — `{(row_key, kind): [records]}` where each record carries `n_images`, `class`, `w_dist` (as emitted by `metrics_vs_n`).
+- **records_by_panel** (*dict[tuple, list[dict]]*) — `{(row_key, kind): [records]}` where each record carries `n_images`, `class`, and the chosen `metric` (as emitted by `metrics_vs_n`).
 - **classes** (*list[str]*) — Column ordering.
 - **kind_labels** (*dict[str, str] or None*, default `None`) — `{kind: legend_label}`.
 - **grain_labels** (*dict[str, str] or None*, default `None`) — `{class: column_label}`.
@@ -563,7 +565,12 @@ Plotly grid of W-dist-vs-N curves. Rows are resolutions (or arbitrary `row_keys`
 - **save_path** (*str or None*, default `None`) — PNG output path. `None` skips saving.
 - **png_meta** (*dict or None*, default `None`) — `{key: value}` written as PNG tEXt chunks.
 - **fonts** (*dict or None*, default `None`) — Override the `title/axis/tick/legend` font sizes.
-- **height_per_row**, **width_per_col** (*int*, default `380`, `560`) — Per-cell dimensions.
+- **height_per_row**, **width_per_col** (*int*, default `560`, `720`) — Per-cell dimensions.
+- **metric** (*str*, default `'w_dist'`) — Record key to plot on the y-axis.
+- **y_label** (*str*, default `'W-dist'`) — Y-axis title.
+- **zero_line** (*bool*, default `False`) — Draw a horizontal reference line at `y = 0`.
+- **panel_annotations** (*dict or None*, default `None`) — `{(row_key, kind): text}` annotations drawn inside the matching panel.
+- **annot_kind_labels** (*dict[str, str] or None*, default `None`) — Display labels used when rendering `panel_annotations`.
 
 **Returns**
 
@@ -652,4 +659,4 @@ A full notebook walkthrough is in `co_angles/3_metrics_convergence.ipynb`.
 - [`combra.angles.angles_plot_grid`]({{< relref "/docs/angles" >}}) — visualise the same comparisons as overlaid grids.
 - [`combra.approx.fit_plateau`]({{< relref "/docs/approx" >}}) — the plateau fitter used inside `convergence_stats`.
 - [`combra.stats.inference`]({{< relref "/docs/stats" >}}) — Kendall + Fisher primitives.
-- [FID example]({{< relref "/examples/fid" >}}) — multi-resolution loop using `load_inception` + `compute_fid`.
+- [FID example]({{< relref "/examples/fid" >}}) — multi-resolution loop using `InceptionExtractor` + `compute_stats` + `frechet_distance`.

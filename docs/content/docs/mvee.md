@@ -256,10 +256,6 @@ mvee.enclosing_ellipse_show(img, pos=0, tolerance=0.2, N=200)
 
 ---
 
-## Notes
-
-`__all__` lists `diametr_approx_save` but it is not implemented in the current source — the parquet workflow on `PobeditDataset.generate_beams` replaces it. `plot_beam_compare` is listed twice in `__all__`; the duplicate is harmless.
-
 ## See also
 
 - [`combra.data.PobeditDataset.generate_beams`]({{< relref "/docs/data#pobeditdatasetgenerate_beams" >}}) — drives `get_mvee_params` across whole class folders and writes parquet.

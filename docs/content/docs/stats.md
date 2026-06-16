@@ -193,7 +193,7 @@ Sample `num` points on the ellipse with semi-axes `(a, b)`, rotation `angle` (ra
 
 **Returns**
 
-- **points** (*ndarray[num, 2]*) — `(x, y)` points along the ellipse.
+- **x**, **y** (*tuple[ndarray, ndarray]*) — Two length-`num` 1-D arrays of the `x` and `y` coordinates along the ellipse.
 
 **Examples**
 
@@ -201,8 +201,8 @@ Sample `num` points on the ellipse with semi-axes `(a, b)`, rotation `angle` (ra
 import matplotlib.pyplot as plt
 from combra import stats
 
-xy = stats.ellipse(a=20, b=8, angle=0.4, xc=0, yc=0, num=200)
-plt.plot(xy[:, 0], xy[:, 1])
+x, y = stats.ellipse(a=20, b=8, angle=0.4, xc=0, yc=0, num=200)
+plt.plot(x, y)
 plt.gca().set_aspect('equal'); plt.show()
 ```
 
@@ -271,10 +271,6 @@ print(f'combined p={combined_p:.4f}   (k={k} of {len(per_class_ps)} curves contr
 ```
 
 ---
-
-## Notes
-
-`calculate_density` is in `__all__` but is deprecated — it walks hardcoded folder paths from the original notebooks. Don't use it in new code.
 
 ## See also
 
