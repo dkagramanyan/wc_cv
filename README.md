@@ -24,78 +24,30 @@ pip install -e .
 Build docs
 ----------
 
-# Быстрый старт - Запуск документации
+The documentation is built with [Sphinx](https://www.sphinx-doc.org/) and the
+[PyTorch Sphinx theme](https://github.com/pytorch/pytorch_sphinx_theme2). Pages are
+written in Markdown (MyST).
 
-## Шаг 1: Установите Hugo
-
-### macOS (через Homebrew)
-```bash
-brew install hugo
-```
-
-### Linux
-```bash
-# Ubuntu/Debian
-sudo apt-get install hugo
-
-# или скачайте бинарник с https://github.com/gohugoio/hugo/releases
-```
-
-### Windows
-Скачайте установщик с [официального сайта Hugo](https://gohugo.io/installation/)
-
-## Шаг 2: Установите Go (если еще не установлен)
-
-Go необходим для работы Hugo Modules.
-
-### macOS
-```bash
-brew install go
-```
-
-### Linux/Windows
-Скачайте с [официального сайта Go](https://golang.org/dl/)
-
-## Шаг 3: Перейдите в директорию документации
+Install the docs toolchain:
 
 ```bash
-cd docs
+pip install -r docs/requirements.txt
 ```
 
-## Шаг 4: Установите тему Hextra
+Build the static site into `public/`:
 
 ```bash
-hugo mod get github.com/imfing/hextra
-hugo mod tidy
+python -m sphinx -b html docs public
 ```
 
-## Шаг 5: Запустите локальный сервер
+Live-reloading local preview (optional, needs `sphinx-autobuild`):
 
 ```bash
-hugo server
-hugo server --ignoreCache
+pip install sphinx-autobuild
+sphinx-autobuild docs public
+# open http://127.0.0.1:8000/
 ```
 
-## Шаг 6: Откройте браузер
-
-Перейдите по адресу: **http://localhost:1313/**
-
----
-
-## Альтернативные команды
-
-
-### Сборка статического сайта
-```bash
-hugo
-```
-Результат будет в папке `public/`
-
-### Сборка с минификацией (для продакшена)
-```bash
-hugo --minify
-```
-
----
-
+The site is published to GitHub Pages automatically on every push to `main`
+(`.github/workflows/pages.yaml`).
 

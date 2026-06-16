@@ -1,7 +1,4 @@
----
-title: "Utils"
-weight: 13
----
+# combra.utils
 
 Small helpers shared across combra.
 
@@ -9,11 +6,9 @@ Small helpers shared across combra.
 from combra import utils
 ```
 
-## `combra.utils.NumpyEncoder`
+## NumpyEncoder
 
-```python
-CLASS combra.utils.NumpyEncoder(json.JSONEncoder)
-```
+````{py:class} combra.utils.NumpyEncoder(json.JSONEncoder)
 
 A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it whenever you need to dump combra outputs to JSON without converting types by hand.
 
@@ -38,3 +33,4 @@ A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it when
 >>> with open('out.json', 'w') as f:
 ...     json.dump(payload, f, cls=NumpyEncoder)
 ```
+````

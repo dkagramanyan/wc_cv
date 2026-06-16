@@ -1,9 +1,8 @@
----
-title: "Angles"
-weight: 1
----
+# Angles
 
-##  Usage
+End-to-end angle extraction on the bundled dataset, then a grid plot of the per-class
+distributions. See {py:func}`combra.angles.get_angles` and
+{py:meth}`combra.data.PobeditDataset.generate_angles` for the underlying primitives.
 
 ```python
 >>> from combra import data, angles
