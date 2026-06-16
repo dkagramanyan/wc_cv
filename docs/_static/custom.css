@@ -1,0 +1,11 @@
+/* combra docs tweaks on top of the PyTorch Sphinx theme */
+
+/* Keep long return-type annotations from overflowing the signature box. */
+dt[id] {
+  white-space: normal;
+}
+
+/* A little more breathing room between API entries. */
+dl.py {
+  margin-bottom: 1.75rem;
+}

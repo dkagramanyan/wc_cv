@@ -1,11 +1,8 @@
----
-title: "FID"
-weight: 2
----
-
-## Usage
+# FID
 
 Compute FID between generated diffusion images and real images for several resolutions.
+See {py:func}`combra.metrics.compute_fid`, {py:func}`combra.metrics.compute_stats`, and
+{py:func}`combra.metrics.frechet_distance`.
 
 FID is **PyTorch-free** — InceptionV3 features run on `onnxruntime`, which ships with the default install. You only need an InceptionV3 ONNX model that outputs the 2048-d pooled features; point combra at it with the `COMBRA_INCEPTION_ONNX` environment variable (or `COMBRA_INCEPTION_URL` to download and cache it):
 
