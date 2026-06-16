@@ -1,4 +1,4 @@
-/* combra docs tweaks on top of the PyTorch Sphinx theme */
+/* combra docs tweaks on top of the PyData Sphinx theme */
 
 /* Keep long return-type annotations from overflowing the signature box. */
 dt[id] {
@@ -8,4 +8,10 @@ dt[id] {
 /* A little more breathing room between API entries. */
 dl.py {
   margin-bottom: 1.75rem;
+}
+
+/* Wrench wordmark in the footer. */
+.combra-footer-brand {
+  margin: 0;
+  font-weight: 600;
 }
