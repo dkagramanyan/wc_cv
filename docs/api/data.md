@@ -102,7 +102,7 @@ When an h5 lives at `<data>/h5/<stem>.h5`, the cache is written to
 ... )
 ```
 
-````{py:method} generate_angles(save_path, types_dict, step, workers=20, angles_tol=3, min_segment_len=10.0, keep_contours=False, chunksize=64, run_meta=None) -> Path
+````{py:method} generate_angles(save_path, types_dict, step, workers=20, angles_tol=3, min_segment_len=10.0, keep_contours=False, chunksize=64, run_meta=None, force_rebuild_cache=False) -> Path
 
 Compute angle distributions for every image and write them as parquet. One row per
 class; per-step Gaussian-fit results are stored as a list under `prep_per_step`.
@@ -128,6 +128,8 @@ source h5, code commit, generation timestamp, and the exact extraction params us
 :type chunksize: int, optional
 :param run_meta: Caller-supplied provenance. May set `family`, `resolution`, `tags`, `notes`. Everything else (`model_tag`, `kimg`, `source_h5`, `code_commit`, `generated_at`, `extraction_params`) is filled automatically. Default: `None`.
 :type run_meta: dict or None, optional
+:param force_rebuild_cache: If `True`, rebuild the preprocessed-image cache from scratch instead of reusing an existing `.npy` memmap. The reuse check only validates shape and dtype, not the preprocessing version, so a stale cache from older preprocessing is otherwise reused silently — pass `True` to rule that out. Default: `False`.
+:type force_rebuild_cache: bool, optional
 :returns: **out_path** – the written parquet path.
 :rtype: Path
 
