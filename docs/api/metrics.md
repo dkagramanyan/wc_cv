@@ -376,16 +376,16 @@ True iff the parquet exists AND contains rows tagged with `step`. Used to decide
 ```
 ````
 
-````{py:function} combra.metrics.compute_metrics(real, fake) -> tuple[float, ndarray, ndarray, ndarray]
+````{py:function} combra.metrics.compute_metrics(real, fake) -> tuple[dict, ndarray, ndarray, ndarray]
 
-Given a matched `(real, fake)` row pair, compute the per-step Wasserstein distance and bimodal-Gauss parameter deltas.
+Given a matched `(real, fake)` row pair, compute the per-step Wasserstein distances and bimodal-Gauss parameter deltas.
 
 :param real: Single row from `load_rows` for the reference distribution.
 :type real: dict
 :param fake: Single row from `load_rows`, expected to have matching `meta.step`.
 :type fake: dict
-:returns: **w_dist** (*float*) – Wasserstein distance between the angle density curves, in degrees; and **mus_m** (*ndarray[2]*) – Relative differences `(fake - real) / real` on the two Gaussian means; and **sig_m** (*ndarray[2]*) – Same for the sigmas; and **amp_m** (*ndarray[2]*) – Same for the amplitudes.
-:rtype: tuple(float, ndarray, ndarray, ndarray)
+:returns: **wass** (*dict*) – Wasserstein distances between the angle density curves, in degrees, keyed `w_dist`, `w1`, `w2`, `circular_w1`, `circular_w2` (see {py:func}`combra.metrics.wasserstein_density_metrics`); and **mus_m** (*ndarray[2]*) – Relative differences `(fake - real) / real` on the two Gaussian means; and **sig_m** (*ndarray[2]*) – Same for the sigmas; and **amp_m** (*ndarray[2]*) – Same for the amplitudes.
+:rtype: tuple(dict, ndarray, ndarray, ndarray)
 
 **Example**
 
@@ -394,8 +394,8 @@ Given a matched `(real, fake)` row pair, compute the per-step Wasserstein distan
 >>> real_idx = index_by_name_step(load_rows('ethalon.parquet'))
 >>> fake_idx = index_by_name_step(load_rows('gen.parquet'))
 >>> real, fake = real_idx[('class_Ultra_Co11', 2.0)], fake_idx[('class_Ultra_Co11', 2.0)]
->>> w_dist, mus_m, sig_m, amp_m = compute_metrics(real, fake)
->>> print(f'w_dist={w_dist:.4f}°   |mu1 rel|={abs(mus_m[0])*100:.2f}%')
+>>> wass, mus_m, sig_m, amp_m = compute_metrics(real, fake)
+>>> print(f'w_dist={wass["w_dist"]:.4f}°   |mu1 rel|={abs(mus_m[0])*100:.2f}%')
 ```
 ````
 
@@ -417,7 +417,7 @@ Walk every parquet under each folder in `folder_paths`, look each row up in `eth
 :type verbose: bool, optional
 :param fid_by_kimg: Optional `{kimg_key: fid}` map — prints a `[kimg=… FID=…]` header above each checkpoint's rows. Default: `None`.
 :type fid_by_kimg: dict[str, float] or None, optional
-:returns: **records** (*list[dict]*) – `{'kimg', 'class', 'step', 'w_dist', 'mus_m', 'sig_m', 'amp_m'}` per matched row.
+:returns: **records** (*list[dict]*) – `{'kimg', 'class', 'step', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` per matched row (the `w_dist`/`w*`/`circular_w*` keys are the distances from {py:func}`combra.metrics.wasserstein_density_metrics`).
 :rtype: list[dict]
 
 **Example**
@@ -454,7 +454,7 @@ Like `compare_folders` but accepts a list of explicit `(label, ethalon_pq, fake_
 :type verbose: bool, optional
 :param label_header: Column header used in the printed table for the first column. Default: `'label'`.
 :type label_header: str, optional
-:returns: **records** (*list[dict]*) – `{'label', 'class', 'step', 'w_dist', 'mus_m', 'sig_m', 'amp_m'}`.
+:returns: **records** (*list[dict]*) – `{'label', 'class', 'step', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` (the `w_dist`/`w*`/`circular_w*` keys are the distances from {py:func}`combra.metrics.wasserstein_density_metrics`).
 :rtype: list[dict]
 
 **Example**
@@ -478,7 +478,7 @@ Adapted from `co_angles/4_grid_plot.ipynb` — one row per resolution, each row 
 
 ````{py:function} combra.metrics.metrics_vs_n(folder, ethalon_path, class_map=None, step=5.0, allowed_ns=None) -> list[dict]
 
-Walk every parquet under `folder` (each assumed to be the same generator at a different sample size) and emit one record per `(parquet, class)` with all seven metrics: `w_dist` plus the Gaussian-fit relative errors `(mu1, mu2, sigma1, sigma2, amp1, amp2)`. N is read from `meta.n_images`, so the filename convention does not matter.
+Walk every parquet under `folder` (each assumed to be the same generator at a different sample size) and emit one record per `(parquet, class)` with every metric: the Wasserstein distances (`w_dist`, `w1`, `w2`, `circular_w1`, `circular_w2`) plus the Gaussian-fit relative errors `(mu1, mu2, sigma1, sigma2, amp1, amp2)`. N is read from `meta.n_images`, so the filename convention does not matter.
 
 :param folder: Sweep folder containing one parquet per N.
 :type folder: str or Path
@@ -490,7 +490,7 @@ Walk every parquet under `folder` (each assumed to be the same generator at a di
 :type step: float, optional
 :param allowed_ns: If given, restrict N values to this set — stray parquets at other sample sizes are skipped. Default: `None`.
 :type allowed_ns: set[int] or None, optional
-:returns: **records** (*list[dict]*) – Sorted by `(class, n_images)`. Each entry: `{'n_images', 'class', 'w_dist', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2'}`.
+:returns: **records** (*list[dict]*) – Sorted by `(class, n_images)`. Each entry: `{'n_images', 'class', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2'}`.
 :rtype: list[dict]
 
 **Example**
