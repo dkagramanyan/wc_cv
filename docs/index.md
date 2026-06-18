@@ -40,6 +40,7 @@ api/tests
 examples/angles
 examples/fid
 examples/san_v2
+examples/diffit
 ```
 
 ## Module map
