@@ -340,64 +340,64 @@
   "qual": "load_rows",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 8,
-  "end": 22
+  "start": 9,
+  "end": 23
  },
  {
   "leaf": "index_by_name_step",
   "qual": "index_by_name_step",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 25,
-  "end": 26
+  "start": 26,
+  "end": 27
  },
  {
   "leaf": "find_ethalon",
   "qual": "find_ethalon",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 29,
-  "end": 38
+  "start": 30,
+  "end": 39
  },
  {
   "leaf": "parquet_has_step",
   "qual": "parquet_has_step",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 41,
-  "end": 52
+  "start": 42,
+  "end": 53
  },
  {
   "leaf": "compute_metrics",
   "qual": "compute_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 55,
-  "end": 87
+  "start": 56,
+  "end": 76
  },
  {
   "leaf": "compare_folders",
   "qual": "compare_folders",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 90,
-  "end": 198
+  "start": 79,
+  "end": 187
  },
  {
   "leaf": "compare_pairs",
   "qual": "compare_pairs",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 201,
-  "end": 267
+  "start": 190,
+  "end": 256
  },
  {
   "leaf": "metrics_vs_n",
   "qual": "metrics_vs_n",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 270,
-  "end": 327
+  "start": 259,
+  "end": 316
  },
  {
   "leaf": "_save_png",
@@ -438,14 +438,6 @@
   "file": "combra/metrics/plot.py",
   "start": 244,
   "end": 358
- },
- {
-  "leaf": "compute_fid",
-  "qual": "compute_fid",
-  "subpkg": "metrics",
-  "file": "combra/metrics/fid.py",
-  "start": 16,
-  "end": 37
  },
  {
   "leaf": "imdivide",
@@ -640,12 +632,28 @@
   "end": 173
  },
  {
+  "leaf": "_disk_offsets",
+  "qual": "_disk_offsets",
+  "subpkg": "image",
+  "file": "combra/image/utils.py",
+  "start": 8,
+  "end": 14
+ },
+ {
+  "leaf": "_median_disk_u8",
+  "qual": "_median_disk_u8",
+  "subpkg": "image",
+  "file": "combra/image/utils.py",
+  "start": 18,
+  "end": 39
+ },
+ {
   "leaf": "_bin_grad_u8",
   "qual": "_bin_grad_u8",
   "subpkg": "image",
   "file": "combra/image/utils.py",
-  "start": 6,
-  "end": 14
+  "start": 43,
+  "end": 51
  },
  {
   "leaf": "_load_angles_parquet",
@@ -885,7 +893,7 @@
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
   "start": 230,
-  "end": 953
+  "end": 965
  },
  {
   "leaf": "__init__",
@@ -965,71 +973,71 @@
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
   "start": 479,
-  "end": 511
+  "end": 516
  },
  {
   "leaf": "_build_prep_cache_cpu",
   "qual": "PobeditDataset._build_prep_cache_cpu",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 513,
-  "end": 529
+  "start": 518,
+  "end": 534
  },
  {
   "leaf": "_class_meta",
   "qual": "PobeditDataset._class_meta",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 531,
-  "end": 545
+  "start": 536,
+  "end": 550
  },
  {
   "leaf": "_parquet_path",
   "qual": "PobeditDataset._parquet_path",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 548,
-  "end": 553
+  "start": 553,
+  "end": 558
  },
  {
   "leaf": "_begin_generate",
   "qual": "PobeditDataset._begin_generate",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 555,
-  "end": 569
+  "start": 560,
+  "end": 576
  },
  {
   "leaf": "_write_class_row",
   "qual": "PobeditDataset._write_class_row",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 572,
-  "end": 590
+  "start": 579,
+  "end": 597
  },
  {
   "leaf": "generate_angles",
   "qual": "PobeditDataset.generate_angles",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 592,
-  "end": 793
+  "start": 599,
+  "end": 805
  },
  {
   "leaf": "generate_beams",
   "qual": "PobeditDataset.generate_beams",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 795,
-  "end": 953
+  "start": 807,
+  "end": 965
  },
  {
   "leaf": "generate_angles_sweep",
   "qual": "generate_angles_sweep",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 956,
-  "end": 991
+  "start": 968,
+  "end": 1003
  },
  {
   "leaf": "_parse_kimg",
@@ -1416,75 +1424,179 @@
   "end": 111
  },
  {
+  "leaf": "_cached",
+  "qual": "_cached",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 60,
+  "end": 71
+ },
+ {
+  "leaf": "_kw_key",
+  "qual": "_kw_key",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 74,
+  "end": 75
+ },
+ {
+  "leaf": "_as_numpy_batch",
+  "qual": "_as_numpy_batch",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 78,
+  "end": 92
+ },
+ {
   "leaf": "images_to_angle_density",
   "qual": "images_to_angle_density",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 84,
-  "end": 102
+  "start": 95,
+  "end": 113
  },
  {
-  "leaf": "compute_w1",
-  "qual": "compute_w1",
+  "leaf": "_as_density",
+  "qual": "_as_density",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 115,
-  "end": 119
+  "start": 116,
+  "end": 128
  },
  {
-  "leaf": "compute_w2",
-  "qual": "compute_w2",
+  "leaf": "compute_wasserstein_metrics",
+  "qual": "compute_wasserstein_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 122,
-  "end": 126
+  "start": 131,
+  "end": 143
  },
  {
-  "leaf": "compute_circular_w1",
-  "qual": "compute_circular_w1",
+  "leaf": "compute_gauss_metrics",
+  "qual": "compute_gauss_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 129,
-  "end": 135
+  "start": 146,
+  "end": 159
  },
  {
-  "leaf": "compute_circular_w2",
-  "qual": "compute_circular_w2",
+  "leaf": "_to_uint8_rgb",
+  "qual": "_to_uint8_rgb",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 138,
-  "end": 144
+  "start": 165,
+  "end": 185
+ },
+ {
+  "leaf": "_resolve_device",
+  "qual": "_resolve_device",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 188,
+  "end": 193
+ },
+ {
+  "leaf": "_load_clip",
+  "qual": "_load_clip",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 197,
+  "end": 201
+ },
+ {
+  "leaf": "_load_dinov2",
+  "qual": "_load_dinov2",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 205,
+  "end": 208
+ },
+ {
+  "leaf": "_load_inception",
+  "qual": "_load_inception",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 212,
+  "end": 216
  },
  {
   "leaf": "compute_cmmd",
   "qual": "compute_cmmd",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 204,
-  "end": 257
+  "start": 219,
+  "end": 272
+ },
+ {
+  "leaf": "_mu_sigma",
+  "qual": "_mu_sigma",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 275,
+  "end": 276
+ },
+ {
+  "leaf": "_require_image_set",
+  "qual": "_require_image_set",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 279,
+  "end": 289
  },
  {
   "leaf": "compute_fd_dinov2",
   "qual": "compute_fd_dinov2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 264,
-  "end": 315
+  "start": 292,
+  "end": 344
+ },
+ {
+  "leaf": "compute_fid",
+  "qual": "compute_fid",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 347,
+  "end": 383
  },
  {
   "leaf": "compute_all_metrics",
   "qual": "compute_all_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 354,
-  "end": 411
+  "start": 389,
+  "end": 451
+ },
+ {
+  "leaf": "_resample_to_grid",
+  "qual": "_resample_to_grid",
+  "subpkg": "metrics",
+  "file": "combra/metrics/wasserstein.py",
+  "start": 19,
+  "end": 39
  },
  {
   "leaf": "wasserstein_density_metrics",
   "qual": "wasserstein_density_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/wasserstein.py",
+  "start": 42,
+  "end": 68
+ },
+ {
+  "leaf": "gauss_relative_errors",
+  "qual": "gauss_relative_errors",
+  "subpkg": "metrics",
+  "file": "combra/metrics/gauss.py",
+  "start": 19,
+  "end": 43
+ },
+ {
+  "leaf": "gauss_density_metrics",
+  "qual": "gauss_density_metrics",
+  "subpkg": "metrics",
+  "file": "combra/metrics/gauss.py",
   "start": 46,
-  "end": 74
+  "end": 61
  }
 ]
