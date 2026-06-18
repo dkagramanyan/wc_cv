@@ -39,6 +39,7 @@ api/tests
 
 examples/angles
 examples/fid
+examples/san_v2
 ```
 
 ## Module map
