@@ -28,12 +28,17 @@ Training can also be launched via Hydra (`train_hydra.py`), which shares the sam
 `build_config()` logic as the click CLI.
 
 During training, at each evaluation tick the loop generates a batch from `G_ema`
-and runs `compute_all_metrics(reals, fakes)` (when combra is installed). All
-returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`
-and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
-TensorBoard under `Metrics/combra_*` and printed to the run log. Metrics whose
-optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
-recorded as `nan`; the angle metrics always come back.
+and runs `compute_all_metrics(reals, fakes)` (when combra is installed). `G_ema`
+emits float images in `[-1, 1]`, while the reals are `uint8` `[0, 255]`; the loop
+denormalizes the fakes to `uint8` first so both sides are scored explicitly on the
+same scale. (combra also rescales float inputs internally — both the image-feature
+and the angle-density metrics now map `[-1, 1]`/`[0, 1]` to `uint8` the same way —
+but denormalizing in the loop keeps the comparison unambiguous.) All returned
+metrics — angle-Wasserstein `w1`, `w2`,
+`circular_w1`, `circular_w2` and the image-feature metrics `fid`, `cmmd`,
+`fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*` and printed to
+the run log. Metrics whose optional backends are unavailable (e.g. no network to
+fetch DINOv2 weights) are recorded as `nan`; the angle metrics always come back.
 
 ## Evaluation
 
@@ -57,7 +62,11 @@ To score arbitrary real/generated image batches with the combra metrics directly
 ```
 
 Batches may be numpy arrays or torch tensors in `NCHW`/`NHWC`, with pixel values
-in `uint8`, `[0, 1]`, or `[-1, 1]`.
+in `uint8`, `[0, 1]`, or `[-1, 1]`; combra rescales each side to `uint8` by
+inferring the range (any negative ⇒ `[-1, 1]`, else max ≤ 1 ⇒ `[0, 1]`). Because
+that inference is per-batch, prefer passing `uint8` (or an explicit, consistent
+scale) when you can — as the training loop does — so an unusual batch (e.g. a
+generated batch that happens to be all-positive) cannot be misread.
 
 ## Inference
 
