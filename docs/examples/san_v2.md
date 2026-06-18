@@ -21,7 +21,7 @@ from the previous stage's `best_model.pkl`:
 
 ```bash
 python train.py --outdir=./training-runs/wc --cfg=stylegan3-r --data=./data/wc64.zip \
-        --gpus=8 --batch=256 --mirror=1 --snap 10 --batch-gpu 8 --syn_layers 6
+        --gpus=8 --mirror=1 --snap 10 --batch-gpu 8 --syn_layers 6
 ```
 
 Training can also be launched via Hydra (`train_hydra.py`), which shares the same
