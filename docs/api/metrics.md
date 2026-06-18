@@ -2,7 +2,7 @@
 
 The `combra.metrics` module bundles three families of metrics:
 
-- **Training-loop / batch metrics** — score an in-memory batch of generated images on the fly (no parquet round-trip): classic InceptionV3 FID, CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two batches' angle densities (`compute_wasserstein_metrics`). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* batch first, then the *generated* batch. The folder-vs-folder FID convenience wrapper `compute_fid` lives here too.
+- **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID, CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`). Each side may be a **single image or a batch** (Wasserstein and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*. The folder-vs-folder FID convenience wrapper `compute_fid` lives here too.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -12,10 +12,24 @@ from combra import metrics
 
 ## Training-loop metrics
 
-These score an **in-memory batch of images** (a numpy array or torch tensor) and
-return a scalar, so generated samples can be evaluated on the fly during training
-without writing them to disk. They live in `combra.metrics.training` and accept a
-batch shaped `(H, W)`, `(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`.
+These score **in-memory images** (a numpy array or torch tensor) and return a
+scalar, so generated samples can be evaluated on the fly during training without
+writing them to disk. They live in `combra.metrics.training`.
+
+**Batches vs single data points.** Every metric accepts both a **single image**
+(`(H, W)`) and a **batch** (`(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`), but
+they differ in what a single image *means*:
+
+- `compute_wasserstein_metrics` and `compute_cmmd` are valid on a **single
+  image** — Wasserstein reduces each side to an angle density, and CMMD uses
+  kernel means, neither of which needs a sample of images.
+- The **Fréchet-distance** metrics — `compute_fd_dinov2` and the InceptionV3 FID
+  inside `compute_all_metrics` — estimate a per-side **covariance**, which is
+  undefined for one image, so they require **≥ 2 images per side** and raise
+  `ValueError` otherwise (inside `compute_all_metrics` this surfaces as a `nan`
+  for that metric).
+- `compute_wasserstein_metrics` additionally accepts a precomputed `(x, y)`
+  angle density in place of images on either side.
 
 The backbone models (CLIP / DINOv2 / InceptionV3) are loaded once per process and
 memoised with `functools.cache`. Each two-input metric also takes an optional
@@ -71,7 +85,7 @@ A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`.
 
 ````{py:function} combra.metrics.compute_cmmd(reference_images, generated_images, model_name='ViT-L-14-336', pretrained='openai', device=None, batch_size=64, sigma=10.0, scale=1000.0, reference_cache=None) -> float
 
-CLIP-MMD (CMMD) between a reference and a generated image batch. Features come from a ready CLIP model loaded with [open_clip](https://github.com/mlfoundations/open_clip); the distance is the Gaussian-RBF Maximum Mean Discrepancy of [Google's CMMD](https://github.com/google-research/google-research/tree/master/cmmd) (`sigma=10`, `scale=1000`).
+CLIP-MMD (CMMD) between a reference and a generated image set. Features come from a ready CLIP model loaded with [open_clip](https://github.com/mlfoundations/open_clip); the distance is the Gaussian-RBF Maximum Mean Discrepancy of [Google's CMMD](https://github.com/google-research/google-research/tree/master/cmmd) (`sigma=10`, `scale=1000`). CMMD uses kernel means (no covariance), so each side may be a **single image or a batch**.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -105,7 +119,7 @@ CLIP-MMD (CMMD) between a reference and a generated image batch. Features come f
 
 ````{py:function} combra.metrics.compute_fd_dinov2(reference_images, generated_images, model_name='dinov2_vitb14', device=None, batch_size=64, image_size=224, reference_cache=None) -> float
 
-Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov2) features of two image batches. The backbone is loaded from `torch.hub` (`facebookresearch/dinov2`); the Fréchet distance itself is computed with pytorch-fid's `calculate_frechet_distance`.
+Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov2) features of two image sets. The backbone is loaded from `torch.hub` (`facebookresearch/dinov2`); the Fréchet distance itself is computed with pytorch-fid's `calculate_frechet_distance`. Like FID, it estimates a per-side covariance, so it needs **≥ 2 images per side** and raises `ValueError` on a single image.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -127,21 +141,24 @@ Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov
 
 ### Angle-Wasserstein metrics
 
-A single entry point, `compute_wasserstein_metrics`, reduces *both* a reference
-and a generated batch to their angle densities (the same image → angles →
+A single entry point, `compute_wasserstein_metrics`, reduces *both* the reference
+and the generated sample to their angle densities (the same image → angles →
 histogram pipeline used to build the parquet datasets) and returns all four
 Wasserstein distances at once — the linear `w1`/`w2` and the circular
-`circular_w1`/`circular_w2` (which treat 359° and 1° as neighbours).
+`circular_w1`/`circular_w2` (which treat 359° and 1° as neighbours). Each side
+may be a single image, a batch, or a precomputed `(x, y)` angle density.
 
-````{py:function} combra.metrics.compute_wasserstein_metrics(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> dict
+````{py:function} combra.metrics.compute_wasserstein_metrics(reference, generated, step=None, reference_cache=None, **angle_kw) -> dict
 
-All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1', 'w2', 'circular_w1', 'circular_w2'}` (all in degrees). Each batch is reduced to its angle density once, so the four distances share that work rather than recomputing it per metric.
+All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1', 'w2', 'circular_w1', 'circular_w2'}` (all in degrees). Each side is reduced to its angle density once, so the four distances share that work rather than recomputing it per metric.
 
-:param reference_images: Reference image batch.
-:type reference_images: ndarray or torch.Tensor
-:param generated_images: Generated image batch to score.
-:type generated_images: ndarray or torch.Tensor
-:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
+`reference` and `generated` may each be **a single `(H, W)` image**, **a batch of images**, or **a precomputed `(x, y)` angle density** (a length-2 pair of 1-D arrays) — image input is reduced to a density, a density is used as-is.
+
+:param reference: Reference sample — image, image batch, or `(x, y)` density.
+:type reference: ndarray or torch.Tensor or tuple
+:param generated: Generated sample to score — image, image batch, or `(x, y)` density.
+:type generated: ndarray or torch.Tensor or tuple
+:param step: Histogram bin width in degrees (image input only). Defaults to `5.0`. Default: `None`.
 :type step: float or None, optional
 :param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
 :type reference_cache: dict or None, optional
@@ -153,9 +170,12 @@ All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1'
 
 ```python
 >>> from combra.metrics import compute_wasserstein_metrics
->>> dists = compute_wasserstein_metrics(real_batch, generated_batch)
+>>> dists = compute_wasserstein_metrics(real_batch, generated_batch)   # batches
+>>> one   = compute_wasserstein_metrics(real_image, generated_image)   # single images
 >>> dists['w1'], dists['circular_w2']
 ```
+
+The density-level core (used by the parquet comparison path) lives at `combra.metrics.wasserstein.wasserstein_density_metrics` if you need to call it on `(x, y)` densities directly.
 ````
 
 ````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, ndarray]
@@ -176,27 +196,11 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :rtype: tuple(ndarray, ndarray)
 ````
 
-````{py:function} combra.metrics.wasserstein_density_metrics(x_reference, y_reference, x_generated, y_generated) -> dict
-
-Linear and circular Wasserstein distances between two angle densities (in degrees). Both densities are resampled onto a shared dense grid and normalised to unit mass; the four distances are delegated to [POT](https://pythonot.github.io/) (linear via `ot.wasserstein_1d`, circular via `ot.wasserstein_circle`), with `w_dist` kept as the historical scipy value for backwards compatibility.
-
-:param x_reference: Reference angle-bin locations (degrees).
-:type x_reference: ndarray
-:param y_reference: Reference densities at `x_reference`.
-:type y_reference: ndarray
-:param x_generated: Generated angle-bin locations (degrees).
-:type x_generated: ndarray
-:param y_generated: Generated densities at `x_generated`.
-:type y_generated: ndarray
-:returns: **metrics** (*dict*) – Keys `w_dist`, `w1`, `w2`, `circular_w1`, `circular_w2`, all in degrees.
-:rtype: dict
-````
-
 ### Unified entry point
 
 ````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
 
-Run every batch metric for a (reference, generated) batch pair in parallel and return one flat dict. The angle-Wasserstein metrics (`w1`, `w2`, `circular_w1`, `circular_w2`) compare the two batches' angle densities; `fid` (classic InceptionV3 FID on the in-memory batches), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency or no network) is recorded as `nan` and logged, so the angle metrics still come back.
+Run every batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-Wasserstein metrics (`w1`, `w2`, `circular_w1`, `circular_w2`) compare the two samples' angle densities; `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back. A single image therefore yields real `w*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -256,13 +260,13 @@ Walk every parquet under each folder in `folder_paths`, look each row up in `eth
 :type class_map: dict[str, str] or None, optional
 :param steps: Subset of steps to keep — others are skipped. Default: `None`.
 :type steps: Iterable[float] or None, optional
-:param coef: Multiplier applied to `w_dist` in the printed table only (records keep raw values). Default: `1000`.
+:param coef: Multiplier applied to `w1` in the printed table only (records keep raw values). Default: `1000`.
 :type coef: float, optional
 :param verbose: Print a per-row table. Default: `True`.
 :type verbose: bool, optional
 :param fid_by_kimg: Optional `{kimg_key: fid}` map — prints a `[kimg=… FID=…]` header above each checkpoint's rows. Default: `None`.
 :type fid_by_kimg: dict[str, float] or None, optional
-:returns: **records** (*list[dict]*) – `{'kimg', 'class', 'step', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` per matched row (the `w_dist`/`w*`/`circular_w*` keys are the distances from {py:func}`combra.metrics.wasserstein_density_metrics`).
+:returns: **records** (*list[dict]*) – `{'kimg', 'class', 'step', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` per matched row (the `w*`/`circular_w*` keys are the angle-Wasserstein distances, as in {py:func}`combra.metrics.compute_wasserstein_metrics`).
 :rtype: list[dict]
 
 **Example**
@@ -293,13 +297,13 @@ Like `compare_folders` but accepts a list of explicit `(label, ethalon_pq, fake_
 :type pairs: list[tuple]
 :param step: The single step to compare at.
 :type step: float
-:param coef: Multiplier applied to `w_dist` in the printed table only. Default: `1000`.
+:param coef: Multiplier applied to `w1` in the printed table only. Default: `1000`.
 :type coef: float, optional
 :param verbose: Print a per-row table. Default: `True`.
 :type verbose: bool, optional
 :param label_header: Column header used in the printed table for the first column. Default: `'label'`.
 :type label_header: str, optional
-:returns: **records** (*list[dict]*) – `{'label', 'class', 'step', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` (the `w_dist`/`w*`/`circular_w*` keys are the distances from {py:func}`combra.metrics.wasserstein_density_metrics`).
+:returns: **records** (*list[dict]*) – `{'label', 'class', 'step', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mus_m', 'sig_m', 'amp_m'}` (the `w*`/`circular_w*` keys are the angle-Wasserstein distances, as in {py:func}`combra.metrics.compute_wasserstein_metrics`).
 :rtype: list[dict]
 
 **Example**
@@ -323,7 +327,7 @@ Adapted from `co_angles/4_grid_plot.ipynb` — one row per resolution, each row 
 
 ````{py:function} combra.metrics.metrics_vs_n(folder, ethalon_path, class_map=None, step=5.0, allowed_ns=None) -> list[dict]
 
-Walk every parquet under `folder` (each assumed to be the same generator at a different sample size) and emit one record per `(parquet, class)` with every metric: the Wasserstein distances (`w_dist`, `w1`, `w2`, `circular_w1`, `circular_w2`) plus the Gaussian-fit relative errors `(mu1, mu2, sigma1, sigma2, amp1, amp2)`. N is read from `meta.n_images`, so the filename convention does not matter.
+Walk every parquet under `folder` (each assumed to be the same generator at a different sample size) and emit one record per `(parquet, class)` with every metric: the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) plus the Gaussian-fit relative errors `(mu1, mu2, sigma1, sigma2, amp1, amp2)`. N is read from `meta.n_images`, so the filename convention does not matter.
 
 :param folder: Sweep folder containing one parquet per N.
 :type folder: str or Path
@@ -335,7 +339,7 @@ Walk every parquet under `folder` (each assumed to be the same generator at a di
 :type step: float, optional
 :param allowed_ns: If given, restrict N values to this set — stray parquets at other sample sizes are skipped. Default: `None`.
 :type allowed_ns: set[int] or None, optional
-:returns: **records** (*list[dict]*) – Sorted by `(class, n_images)`. Each entry: `{'n_images', 'class', 'w_dist', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2'}`.
+:returns: **records** (*list[dict]*) – Sorted by `(class, n_images)`. Each entry: `{'n_images', 'class', 'w1', 'w2', 'circular_w1', 'circular_w2', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2'}`.
 :rtype: list[dict]
 
 **Example**
@@ -360,7 +364,7 @@ Per `(kind, resolution, class)` curve, compute trend significance, endpoint rela
 
 :param df_metrics: Long-form table with columns `kind`, `resolution`, `class`, `n_images`, and one column per metric in `metrics`.
 :type df_metrics: pd.DataFrame
-:param metrics: Metric column names to analyse (e.g. `['w_dist', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']`).
+:param metrics: Metric column names to analyse (e.g. `['w1', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']`).
 :type metrics: list[str]
 :param endpoints_by_kind: `{kind: (n_lo, n_hi)}` used for the `rel_err_abs_%` computation.
 :type endpoints_by_kind: dict[str, tuple[int, int]]
@@ -388,7 +392,7 @@ From `co_angles/3_metrics_convergence.ipynb`:
 
 ```python
 >>> from combra.metrics import convergence_stats
->>> METRICS  = ['w_dist', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']
+>>> METRICS  = ['w1', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']
 >>> ENDPTS   = {'real': (100, 300), 'san': (360, 10000), 'diffit': (360, 10000)}
 >>> PRE      = {'san': (360, 1000), 'diffit': (360, 1000)}
 >>> result = convergence_stats(df_metrics, METRICS, ENDPTS,
@@ -467,7 +471,7 @@ Per `(kind, resolution)`, summarise the distribution of one column of a `converg
 ```
 ````
 
-````{py:function} combra.metrics.plot_wdist_convergence_grid(records_by_panel, classes, kind_labels=None, grain_labels=None, row_keys=None, col_label_fn=None, title_fn=None, save_path=None, png_meta=None, fonts=None, height_per_row=560, width_per_col=720, metric='w_dist', y_label='W-dist', zero_line=False, panel_annotations=None, annot_kind_labels=None) -> plotly.graph_objects.Figure
+````{py:function} combra.metrics.plot_wdist_convergence_grid(records_by_panel, classes, kind_labels=None, grain_labels=None, row_keys=None, col_label_fn=None, title_fn=None, save_path=None, png_meta=None, fonts=None, height_per_row=560, width_per_col=720, metric='w1', y_label='W-dist', zero_line=False, panel_annotations=None, annot_kind_labels=None) -> plotly.graph_objects.Figure
 
 Plotly grid of metric-vs-N curves. Rows are resolutions (or arbitrary `row_keys`), columns are classes. Curves on the same axes share a kind color/legend group; the legend is shown only once. Despite the name it plots any per-record metric, not just W-dist (see `metric`).
 
@@ -495,7 +499,7 @@ Plotly grid of metric-vs-N curves. Rows are resolutions (or arbitrary `row_keys`
 :type height_per_row: int, optional
 :param width_per_col: Per-cell width in pixels. Default: `720`.
 :type width_per_col: int, optional
-:param metric: Record key to plot on the y-axis. Default: `'w_dist'`.
+:param metric: Record key to plot on the y-axis. Default: `'w1'`.
 :type metric: str, optional
 :param y_label: Y-axis title. Default: `'W-dist'`.
 :type y_label: str, optional
