@@ -2,7 +2,7 @@
 
 The `combra.metrics` module bundles four families of metrics:
 
-- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. combra does not implement FID itself; `combra.metrics.fid` delegates to the two reference libraries [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity). Both ship as core dependencies and download/cache their own InceptionV3 weights on first use, so no manual model setup is required.
+- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. combra does not implement FID itself; `combra.metrics.fid` delegates to the reference library [pytorch-fid](https://github.com/mseitzer/pytorch-fid), which ships as a core dependency and downloads/caches its own InceptionV3 weights on first use, so no manual model setup is required.
 - **Training-loop / batch metrics** — score an in-memory batch of generated images on the fly (no parquet round-trip): CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and angle-Wasserstein distances against a fixed reference distribution (`compute_w1`/`compute_w2`/circular variants).
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
@@ -13,7 +13,7 @@ from combra import metrics
 
 ## FID
 
-`combra.metrics.fid` is a thin wrapper over two reference libraries — it adds a single convenience entry point (`compute_fid`) and re-exports the underlying functions so you can drop down to them when you need more control. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
+`combra.metrics.fid` is a thin wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid) — it adds a single convenience entry point (`compute_fid`) and re-exports the underlying function so you can drop down to it when you need more control. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
 
 ````{py:function} combra.metrics.compute_fid(real_folder, gen_folder, batch_size=50, dims=2048, device=None, num_workers=1) -> float
 
@@ -43,27 +43,6 @@ Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mse
 ```
 
 A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`.
-````
-
-````{py:function} combra.metrics.calculate_metrics(input1, input2, **kwargs)
-
-Re-exported from [torch-fidelity](https://github.com/toshas/torch-fidelity) — the full generative-quality metric suite (FID/KID/IS/PRC) in one call. Pass `fid=True`, `kid=True`, `isc=True`, `prc=True` to select metrics, plus options such as `cuda`, `batch_size`, and `save_cpu_ram`. Returns a `dict` keyed by metric name.
-
-:param input1: First image set — a folder path or a registered dataset name.
-:type input1: str
-:param input2: Second image set.
-:type input2: str
-:returns: **metrics** (*dict*) – Requested metric values keyed by `torch_fidelity.KEY_METRIC_*` names.
-:rtype: dict
-
-**Example**
-
-```python
->>> from combra.metrics import calculate_metrics
->>> res = calculate_metrics(input1='data/real', input2='data/gen',
-...                         fid=True, kid=True, cuda=False, batch_size=8)
->>> print(res['frechet_inception_distance'])
-```
 ````
 
 For lower-level control, `combra.metrics` also re-exports the underlying [pytorch-fid](https://github.com/mseitzer/pytorch-fid) folder-level primitive — `compute_fid` is just a thin convenience wrapper around it. FID is always computed from images; combra does not expose the raw mean/covariance (`mu`/`sigma`) form of the Fréchet distance.
