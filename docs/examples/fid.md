@@ -1,9 +1,9 @@
 # FID
 
 Compute FID between generated diffusion images and real images for several resolutions.
-See {py:func}`combra.metrics.compute_fid` and {py:func}`combra.metrics.calculate_metrics`.
+See {py:func}`combra.metrics.compute_fid`.
 
-combra does not implement FID itself — `combra.metrics.fid` delegates to the reference libraries [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity). Both ship as core dependencies and download/cache their own InceptionV3 weights on first use, so there is no manual model setup. `compute_fid` runs on CUDA when it is available and falls back to CPU otherwise.
+combra does not implement FID itself — `combra.metrics.fid` delegates to the reference library [pytorch-fid](https://github.com/mseitzer/pytorch-fid). It ships as a core dependency and downloads/caches its own InceptionV3 weights on first use, so there is no manual model setup. `compute_fid` runs on CUDA when it is available and falls back to CPU otherwise.
 
 A multi-resolution sweep is just a loop over folder pairs:
 
@@ -23,12 +23,3 @@ A multi-resolution sweep is just a loop over folder pairs:
 ```
 
 The InceptionV3 weights are downloaded once and cached by pytorch-fid, so subsequent calls reuse them.
-
-For the full generative-quality suite (FID/KID/IS/PRC) in a single call, use `calculate_metrics`, re-exported from torch-fidelity:
-
-```python
->>> from combra.metrics import calculate_metrics
->>> res = calculate_metrics(input1='data/real', input2='data/gen',
-...                         fid=True, kid=True, cuda=False, batch_size=50)
->>> print(f"FID = {res['frechet_inception_distance']:.4f}")
-```
