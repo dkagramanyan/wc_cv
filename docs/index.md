@@ -53,7 +53,7 @@ examples/fid
 | {doc}`combra.areas <api/areas>` | Polygon-area and effective-radius distribution plots. |
 | {doc}`combra.stats <api/stats>` | Parametric distributions + histogram preprocessor. |
 | {doc}`combra.approx <api/approx>` | Fits Gaussian/binomial/poisson/exponential/linear models. |
-| {doc}`combra.metrics <api/metrics>` | FID, per-class Wasserstein comparison, and convergence-vs-N analysis. |
+| {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, and convergence-vs-N analysis. |
 | {doc}`combra.graph <api/graph>` | Crack-image → graph → shortest-energy-path search. |
 | {doc}`combra.utils <api/utils>` | `NumpyEncoder` for JSON dumps. |
 | {doc}`combra.tests <api/tests>` | Self-validation helpers (fractal-dimension sanity check). |
