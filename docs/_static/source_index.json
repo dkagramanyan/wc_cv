@@ -1430,13 +1430,5 @@
   "file": "combra/metrics/fid.py",
   "start": 18,
   "end": 18
- },
- {
-  "leaf": "calculate_frechet_distance",
-  "qual": "calculate_frechet_distance",
-  "subpkg": "metrics",
-  "file": "combra/metrics/fid.py",
-  "start": 18,
-  "end": 18
  }
 ]
