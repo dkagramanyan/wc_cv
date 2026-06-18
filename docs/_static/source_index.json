@@ -1480,92 +1480,140 @@
   "end": 159
  },
  {
+  "leaf": "compute_mu1",
+  "qual": "compute_mu1",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 167,
+  "end": 177
+ },
+ {
+  "leaf": "compute_mu2",
+  "qual": "compute_mu2",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 180,
+  "end": 188
+ },
+ {
+  "leaf": "compute_sigma1",
+  "qual": "compute_sigma1",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 191,
+  "end": 199
+ },
+ {
+  "leaf": "compute_sigma2",
+  "qual": "compute_sigma2",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 202,
+  "end": 210
+ },
+ {
+  "leaf": "compute_amp1",
+  "qual": "compute_amp1",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 213,
+  "end": 221
+ },
+ {
+  "leaf": "compute_amp2",
+  "qual": "compute_amp2",
+  "subpkg": "metrics",
+  "file": "combra/metrics/training.py",
+  "start": 224,
+  "end": 232
+ },
+ {
   "leaf": "_to_uint8_rgb",
   "qual": "_to_uint8_rgb",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 165,
-  "end": 185
+  "start": 238,
+  "end": 258
  },
  {
   "leaf": "_resolve_device",
   "qual": "_resolve_device",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 188,
-  "end": 193
+  "start": 261,
+  "end": 266
  },
  {
   "leaf": "_load_clip",
   "qual": "_load_clip",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 197,
-  "end": 201
+  "start": 270,
+  "end": 274
  },
  {
   "leaf": "_load_dinov2",
   "qual": "_load_dinov2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 205,
-  "end": 208
+  "start": 278,
+  "end": 281
  },
  {
   "leaf": "_load_inception",
   "qual": "_load_inception",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 212,
-  "end": 216
+  "start": 285,
+  "end": 289
  },
  {
   "leaf": "compute_cmmd",
   "qual": "compute_cmmd",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 219,
-  "end": 272
+  "start": 292,
+  "end": 345
  },
  {
   "leaf": "_mu_sigma",
   "qual": "_mu_sigma",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 275,
-  "end": 276
+  "start": 348,
+  "end": 349
  },
  {
   "leaf": "_require_image_set",
   "qual": "_require_image_set",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 279,
-  "end": 289
+  "start": 352,
+  "end": 362
  },
  {
   "leaf": "compute_fd_dinov2",
   "qual": "compute_fd_dinov2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 292,
-  "end": 344
+  "start": 365,
+  "end": 417
  },
  {
   "leaf": "compute_fid",
   "qual": "compute_fid",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 347,
-  "end": 383
+  "start": 420,
+  "end": 456
  },
  {
   "leaf": "compute_all_metrics",
   "qual": "compute_all_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 389,
-  "end": 451
+  "start": 462,
+  "end": 524
  },
  {
   "leaf": "_resample_to_grid",
