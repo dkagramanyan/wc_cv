@@ -294,7 +294,7 @@ reruns are cheap. One status line is printed per call.
 ```
 
 The output sweep folder is exactly the shape {py:func}`combra.metrics.metrics_vs_n` and
-{py:func}`combra.metrics.find_ethalon` expect.
+`combra.metrics.compare.find_ethalon` expect.
 ````
 
 ## See also

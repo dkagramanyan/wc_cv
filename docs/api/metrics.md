@@ -1,9 +1,8 @@
 # combra.metrics
 
-The `combra.metrics` module bundles four families of metrics:
+The `combra.metrics` module bundles three families of metrics:
 
-- **FID (Fréchet Inception Distance)** — image-level distance between a real and a generated set. combra does not implement FID itself; `combra.metrics.fid` delegates to the reference library [pytorch-fid](https://github.com/mseitzer/pytorch-fid), which ships as a core dependency and downloads/caches its own InceptionV3 weights on first use, so no manual model setup is required.
-- **Training-loop / batch metrics** — score an in-memory batch of generated images on the fly (no parquet round-trip): CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and angle-Wasserstein distances between two batches' angle densities (`compute_w1`/`compute_w2`/circular variants). Every two-input metric takes the *reference* batch first, then the *generated* batch.
+- **Training-loop / batch metrics** — score an in-memory batch of generated images on the fly (no parquet round-trip): classic InceptionV3 FID, CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two batches' angle densities (`compute_wasserstein_metrics`). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* batch first, then the *generated* batch. The folder-vs-folder FID convenience wrapper `compute_fid` lives here too.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -11,13 +10,38 @@ The `combra.metrics` module bundles four families of metrics:
 from combra import metrics
 ```
 
-## FID
+## Training-loop metrics
 
-`combra.metrics.fid` is a thin wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid) — it exposes a single convenience entry point, `compute_fid`. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
+These score an **in-memory batch of images** (a numpy array or torch tensor) and
+return a scalar, so generated samples can be evaluated on the fly during training
+without writing them to disk. They live in `combra.metrics.training` and accept a
+batch shaped `(H, W)`, `(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`.
+
+The backbone models (CLIP / DINOv2 / InceptionV3) are loaded once per process and
+memoised with `functools.cache`. Each two-input metric also takes an optional
+`reference_cache` dict: pass the **same** dict across calls that share one fixed
+reference batch and the reference-side work (CLIP embedding, DINOv2 / Inception
+`(mu, sigma)`, angle density) runs only once. The cache is keyed by metric and
+parameters, **not** by the reference content — use one cache per reference batch.
+
+```python
+from combra import metrics
+```
+
+### Image-feature metrics
+
+These compare the deep-feature distributions of a *reference* and a *generated*
+image set: classic InceptionV3 **FID**, CLIP-MMD (`compute_cmmd`), and the
+Fréchet distance on DINOv2 features (`compute_fd_dinov2`). FID is just one of
+these feature metrics — `compute_all_metrics` computes it in-memory alongside the
+others, and `compute_fid` is the standalone folder-vs-folder convenience wrapper.
+`compute_cmmd` and `compute_fd_dinov2` need the `gen-metrics` extra
+(`pip install ".[gen-metrics]"`); the DINOv2 backbone is fetched from `torch.hub`
+on first use.
 
 ````{py:function} combra.metrics.compute_fid(reference_folder, generated_folder, batch_size=50, dims=2048, device=None, num_workers=1) -> float
 
-Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mseitzer/pytorch-fid). Walks both folders, runs every image through InceptionV3, and returns the Fréchet distance between the two activation distributions. The weights are downloaded and cached by pytorch-fid on first use.
+Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mseitzer/pytorch-fid) (a core dependency, so no `gen-metrics` extra needed). Walks both folders, runs every image through InceptionV3, and returns the Fréchet distance between the two activation distributions. The weights are downloaded and cached by pytorch-fid on first use. For the in-memory batch form of the same metric, use `compute_all_metrics`, whose result includes a `fid` key. Runs on PyTorch, selecting CUDA automatically when available.
 
 :param reference_folder: Path to the reference (real) image folder.
 :type reference_folder: str or Path
@@ -42,35 +66,8 @@ Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mse
 >>> print(f'FID = {fid:.4f}')
 ```
 
-A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`.
+A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`. FID is always computed from images; combra does not expose the raw mean/covariance (`mu`/`sigma`) form of the Fréchet distance.
 ````
-
-`compute_fid` is a thin convenience wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid)'s folder-level primitive, adding sensible defaults and automatic device selection. FID is always computed from images; combra does not expose the raw mean/covariance (`mu`/`sigma`) form of the Fréchet distance.
-
-## Training-loop metrics
-
-These score an **in-memory batch of images** (a numpy array or torch tensor) and
-return a scalar, so generated samples can be evaluated on the fly during training
-without writing them to disk. They live in `combra.metrics.training` and accept a
-batch shaped `(H, W)`, `(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`.
-
-The backbone models (CLIP / DINOv2 / InceptionV3) are loaded once per process and
-memoised with `functools.cache`. Each two-input metric also takes an optional
-`reference_cache` dict: pass the **same** dict across calls that share one fixed
-reference batch and the reference-side work (CLIP embedding, DINOv2 / Inception
-`(mu, sigma)`, angle density) runs only once. The cache is keyed by metric and
-parameters, **not** by the reference content — use one cache per reference batch.
-
-```python
-from combra import metrics
-```
-
-### Image-feature metrics
-
-`compute_cmmd` and `compute_fd_dinov2` take a *reference* and a *generated* image
-batch and compare deep-feature distributions. Both need the `gen-metrics` extra
-(`pip install ".[gen-metrics]"`); the DINOv2 backbone is fetched from `torch.hub`
-on first use.
 
 ````{py:function} combra.metrics.compute_cmmd(reference_images, generated_images, model_name='ViT-L-14-336', pretrained='openai', device=None, batch_size=64, sigma=10.0, scale=1000.0, reference_cache=None) -> float
 
@@ -130,13 +127,15 @@ Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov
 
 ### Angle-Wasserstein metrics
 
-These reduce *both* a reference and a generated batch to their angle densities
-(the same image → angles → histogram pipeline used to build the parquet datasets)
-and compare them.
+A single entry point, `compute_wasserstein_metrics`, reduces *both* a reference
+and a generated batch to their angle densities (the same image → angles →
+histogram pipeline used to build the parquet datasets) and returns all four
+Wasserstein distances at once — the linear `w1`/`w2` and the circular
+`circular_w1`/`circular_w2` (which treat 359° and 1° as neighbours).
 
-````{py:function} combra.metrics.compute_w1(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
+````{py:function} combra.metrics.compute_wasserstein_metrics(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> dict
 
-1-Wasserstein distance (in degrees) between the reference and generated angle densities. `compute_w2`, `compute_circular_w1`, and `compute_circular_w2` share this exact signature (`reference_images, generated_images, step=None, reference_cache=None, **angle_kw`) and differ only in the distance returned.
+All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1', 'w2', 'circular_w1', 'circular_w2'}` (all in degrees). Each batch is reduced to its angle density once, so the four distances share that work rather than recomputing it per metric.
 
 :param reference_images: Reference image batch.
 :type reference_images: ndarray or torch.Tensor
@@ -147,31 +146,16 @@ and compare them.
 :param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
 :type reference_cache: dict or None, optional
 :param angle_kw: Extra keyword args forwarded to `images_to_angle_density` (`border_eps`, `tol`, `min_segment_len`).
-:returns: **dist** (*float*) – The Wasserstein distance in degrees.
-:rtype: float
+:returns: **metrics** (*dict*) – Keys `w1`, `w2`, `circular_w1`, `circular_w2`, all in degrees.
+:rtype: dict
 
 **Example**
 
 ```python
->>> from combra.metrics import compute_w1, compute_circular_w2
->>> w1  = compute_w1(real_batch, generated_batch)
->>> cw2 = compute_circular_w2(real_batch, generated_batch)
+>>> from combra.metrics import compute_wasserstein_metrics
+>>> dists = compute_wasserstein_metrics(real_batch, generated_batch)
+>>> dists['w1'], dists['circular_w2']
 ```
-````
-
-````{py:function} combra.metrics.compute_w2(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
-
-2-Wasserstein distance (in degrees) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
-````
-
-````{py:function} combra.metrics.compute_circular_w1(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
-
-Circular 1-Wasserstein distance (angles wrap at 360°) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
-````
-
-````{py:function} combra.metrics.compute_circular_w2(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
-
-Circular 2-Wasserstein distance (angles wrap at 360°) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
 ````
 
 ````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, ndarray]
@@ -240,7 +224,7 @@ Run every batch metric for a (reference, generated) batch pair in parallel and r
 
 ## Distribution comparison
 
-These helpers compare angle-distribution parquet files (as produced by {py:meth}`combra.data.PobeditDataset.generate_angles`) against an "ethalon" reference.
+These helpers compare angle-distribution parquet files (as produced by {py:meth}`combra.data.PobeditDataset.generate_angles`) against an "ethalon" reference. The lower-level plumbing they build on — `index_by_name_step`, `find_ethalon`, `parquet_has_step`, and the row-pair `compute_metrics` — is not part of the public surface; import it from `combra.metrics.compare` if you need it directly.
 
 ````{py:function} combra.metrics.load_rows(parquet_path) -> list[dict]
 
@@ -257,89 +241,6 @@ Read a parquet file and return a flat list of `{'meta': {..., 'step'}, 'prep': {
 >>> from combra.metrics import load_rows
 >>> rows = load_rows('./data/angles/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5/angles_n360.parquet')
 >>> print(f'{len(rows)} rows;  first = name={rows[0]["meta"]["name"]} step={rows[0]["meta"]["step"]}')
-```
-````
-
-````{py:function} combra.metrics.index_by_name_step(rows) -> dict
-
-Build a `{(name, step): row}` lookup from rows returned by `load_rows`. Used internally to align generated rows with their ethalon counterparts.
-
-:param rows: Output of `load_rows`.
-:type rows: list[dict]
-:returns: **index** (*dict*) – `{(name, step): row}`.
-:rtype: dict
-
-**Example**
-
-```python
->>> from combra.metrics import load_rows, index_by_name_step
->>> rows = load_rows('ethalon.parquet')
->>> idx = index_by_name_step(rows)
->>> row = idx[('class_Ultra_Co11', 2.0)]   # exact (class, step) lookup
-```
-````
-
-````{py:function} combra.metrics.find_ethalon(sweep_dir) -> Path
-
-Locate the largest-N parquet inside a sweep folder. Used as the reference distribution for convergence comparisons (each `metrics_vs_n` curve compares smaller-N parquets against this file).
-
-:param sweep_dir: Folder containing `angles_n*.parquet` files.
-:type sweep_dir: str or Path
-:returns: **parquet** (*Path or None*) – Path of the parquet with the largest `meta.n_images`, or `None` if the folder is empty.
-:rtype: Path
-
-**Example**
-
-From `co_angles/3_metrics_convergence.ipynb`:
-
-```python
->>> from combra.metrics import find_ethalon
->>> ethalon = find_ethalon('./data/angles/o_bc_left_4x_1536_1024x1024_256x256_rgb_N360_msl5')
->>> print(ethalon)   # …/angles_n360.parquet
-```
-````
-
-````{py:function} combra.metrics.parquet_has_step(parquet_path, step) -> bool
-
-True iff the parquet exists AND contains rows tagged with `step`. Used to decide whether a previously-generated sweep parquet is still usable when `STEP` changes (`generate_angles` overwrites, does not append).
-
-:param parquet_path: Parquet to inspect.
-:type parquet_path: str or Path
-:param step: Step value to look for.
-:type step: float
-:returns: **has_step** (*bool*) – Whether the file contains a row at this step.
-:rtype: bool
-
-**Example**
-
-```python
->>> from combra.metrics import parquet_has_step
->>> # Skip re-generation if the parquet already has rows at STEP=2.0.
->>> if not parquet_has_step('out/angles_n1000.parquet', step=2.0):
-...     ...  # regenerate
-```
-````
-
-````{py:function} combra.metrics.compute_metrics(real, fake) -> tuple[dict, ndarray, ndarray, ndarray]
-
-Given a matched `(real, fake)` row pair, compute the per-step Wasserstein distances and bimodal-Gauss parameter deltas.
-
-:param real: Single row from `load_rows` for the reference distribution.
-:type real: dict
-:param fake: Single row from `load_rows`, expected to have matching `meta.step`.
-:type fake: dict
-:returns: **wass** (*dict*) – Wasserstein distances between the angle density curves, in degrees, keyed `w_dist`, `w1`, `w2`, `circular_w1`, `circular_w2` (see {py:func}`combra.metrics.wasserstein_density_metrics`); and **mus_m** (*ndarray[2]*) – Relative differences `(fake - real) / real` on the two Gaussian means; and **sig_m** (*ndarray[2]*) – Same for the sigmas; and **amp_m** (*ndarray[2]*) – Same for the amplitudes.
-:rtype: tuple(dict, ndarray, ndarray, ndarray)
-
-**Example**
-
-```python
->>> from combra.metrics import load_rows, index_by_name_step, compute_metrics
->>> real_idx = index_by_name_step(load_rows('ethalon.parquet'))
->>> fake_idx = index_by_name_step(load_rows('gen.parquet'))
->>> real, fake = real_idx[('class_Ultra_Co11', 2.0)], fake_idx[('class_Ultra_Co11', 2.0)]
->>> wass, mus_m, sig_m, amp_m = compute_metrics(real, fake)
->>> print(f'w_dist={wass["w_dist"]:.4f}°   |mu1 rel|={abs(mus_m[0])*100:.2f}%')
 ```
 ````
 
@@ -440,7 +341,8 @@ Walk every parquet under `folder` (each assumed to be the same generator at a di
 **Example**
 
 ```python
->>> from combra.metrics import metrics_vs_n, find_ethalon
+>>> from combra.metrics import metrics_vs_n
+>>> from combra.metrics.compare import find_ethalon
 >>> ethalon = find_ethalon('./sweeps/real_msl5')
 >>> recs = metrics_vs_n('./sweeps/diffit_msl5', str(ethalon),
 ...                     class_map={'class_0': 'class_Ultra_Co11'},
@@ -662,10 +564,11 @@ End-to-end: drive `metrics_vs_n` over every sweep folder, run `convergence_stats
 
 ```python
 >>> from combra.metrics import (
-...     metrics_vs_n, find_ethalon, convergence_stats,
+...     metrics_vs_n, convergence_stats,
 ...     print_convergence_report, summarize_metric_distribution,
 ...     plot_wdist_convergence_grid, plot_metric_distribution,
 ... )
+>>> from combra.metrics.compare import find_ethalon
 >>> # … walk SOURCES → records_by_panel and df_metrics …
 >>> result = convergence_stats(df_metrics, METRICS, ENDPOINTS_BY_KIND,
 ...                            expected_points={'real': 5, 'san': 8, 'diffit': 8})
