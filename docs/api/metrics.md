@@ -13,7 +13,7 @@ from combra import metrics
 
 ## FID
 
-`combra.metrics.fid` is a thin wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid) — it adds a single convenience entry point (`compute_fid`) and re-exports the underlying function so you can drop down to it when you need more control. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
+`combra.metrics.fid` is a thin wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid) — it exposes a single convenience entry point, `compute_fid`. Everything runs on PyTorch; `compute_fid` selects CUDA automatically when available and falls back to CPU.
 
 ````{py:function} combra.metrics.compute_fid(real_folder, gen_folder, batch_size=50, dims=2048, device=None, num_workers=1) -> float
 
@@ -45,25 +45,7 @@ Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mse
 A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`.
 ````
 
-For lower-level control, `combra.metrics` also re-exports the underlying [pytorch-fid](https://github.com/mseitzer/pytorch-fid) folder-level primitive — `compute_fid` is just a thin convenience wrapper around it. FID is always computed from images; combra does not expose the raw mean/covariance (`mu`/`sigma`) form of the Fréchet distance.
-
-````{py:function} combra.metrics.calculate_fid_given_paths(paths, batch_size, device, dims, num_workers=1) -> float
-
-Re-exported from [pytorch-fid](https://github.com/mseitzer/pytorch-fid). Computes FID between the two image folders in `paths` — the function `compute_fid` wraps it with sensible defaults and automatic device selection.
-
-:param paths: Two image-folder paths `[real, generated]`.
-:type paths: list[str]
-:param batch_size: Forward-pass batch size.
-:type batch_size: int
-:param device: Torch device to run on.
-:type device: str or torch.device
-:param dims: InceptionV3 feature dimensionality (`64`/`192`/`768`/`2048`).
-:type dims: int
-:param num_workers: Dataloader workers. Default: `1`.
-:type num_workers: int, optional
-:returns: **fid** (*float*) – The Fréchet distance.
-:rtype: float
-````
+`compute_fid` is a thin convenience wrapper over [pytorch-fid](https://github.com/mseitzer/pytorch-fid)'s folder-level primitive, adding sensible defaults and automatic device selection. FID is always computed from images; combra does not expose the raw mean/covariance (`mu`/`sigma`) form of the Fréchet distance.
 
 ## Training-loop metrics
 
