@@ -2,7 +2,7 @@
 
 The `combra.metrics` module bundles three families of metrics:
 
-- **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID, CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`). Each side may be a **single image or a batch** (Wasserstein and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*. The folder-vs-folder FID convenience wrapper `compute_fid` lives here too.
+- **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID (`compute_fid`), CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`). Every metric takes **in-memory images** (a numpy array or torch tensor), not a folder of files. Each side may be a **single image or a batch** (Wasserstein and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -24,10 +24,10 @@ they differ in what a single image *means*:
   image** — Wasserstein reduces each side to an angle density, and CMMD uses
   kernel means, neither of which needs a sample of images.
 - The **Fréchet-distance** metrics — `compute_fd_dinov2` and the InceptionV3 FID
-  inside `compute_all_metrics` — estimate a per-side **covariance**, which is
-  undefined for one image, so they require **≥ 2 images per side** and raise
-  `ValueError` otherwise (inside `compute_all_metrics` this surfaces as a `nan`
-  for that metric).
+  (`compute_fid`, also computed inside `compute_all_metrics`) — estimate a
+  per-side **covariance**, which is undefined for one image, so they require
+  **≥ 2 images per side** and raise `ValueError` otherwise (inside
+  `compute_all_metrics` this surfaces as a `nan` for that metric).
 - `compute_wasserstein_metrics` additionally accepts a precomputed `(x, y)`
   angle density in place of images on either side.
 
@@ -38,45 +38,41 @@ reference batch and the reference-side work (CLIP embedding, DINOv2 / Inception
 `(mu, sigma)`, angle density) runs only once. The cache is keyed by metric and
 parameters, **not** by the reference content — use one cache per reference batch.
 
-```python
-from combra import metrics
-```
-
 ### Image-feature metrics
 
 These compare the deep-feature distributions of a *reference* and a *generated*
-image set: classic InceptionV3 **FID**, CLIP-MMD (`compute_cmmd`), and the
-Fréchet distance on DINOv2 features (`compute_fd_dinov2`). FID is just one of
-these feature metrics — `compute_all_metrics` computes it in-memory alongside the
-others, and `compute_fid` is the standalone folder-vs-folder convenience wrapper.
+image set: classic InceptionV3 **FID** (`compute_fid`), CLIP-MMD (`compute_cmmd`),
+and the Fréchet distance on DINOv2 features (`compute_fd_dinov2`). FID is just one
+of these feature metrics — `compute_fid` scores two in-memory image batches, and
+`compute_all_metrics` computes the same FID alongside the others.
 `compute_cmmd` and `compute_fd_dinov2` need the `gen-metrics` extra
 (`pip install ".[gen-metrics]"`); the DINOv2 backbone is fetched from `torch.hub`
 on first use.
 
-````{py:function} combra.metrics.compute_fid(reference_folder, generated_folder, batch_size=50, dims=2048, device=None, num_workers=1) -> float
+````{py:function} combra.metrics.compute_fid(reference_images, generated_images, device=None, batch_size=50, dims=2048, reference_cache=None) -> float
 
-Classic folder-vs-folder FID, computed with [pytorch-fid](https://github.com/mseitzer/pytorch-fid) (a core dependency, so no `gen-metrics` extra needed). Walks both folders, runs every image through InceptionV3, and returns the Fréchet distance between the two activation distributions. The weights are downloaded and cached by pytorch-fid on first use. For the in-memory batch form of the same metric, use `compute_all_metrics`, whose result includes a `fid` key. Runs on PyTorch, selecting CUDA automatically when available.
+Classic InceptionV3 FID between two **in-memory image batches** (a numpy array or torch tensor), computed with [pytorch-fid](https://github.com/mseitzer/pytorch-fid) (a core dependency, so no `gen-metrics` extra needed). Runs every image through InceptionV3 and returns the Fréchet distance between the two activation distributions. Like every Fréchet-distance metric it estimates a per-side covariance, so it needs **≥ 2 images per side** and raises `ValueError` otherwise. The weights are downloaded and cached by pytorch-fid on first use. `compute_all_metrics` computes this same metric under its `fid` key. Runs on PyTorch, selecting CUDA automatically when available.
 
-:param reference_folder: Path to the reference (real) image folder.
-:type reference_folder: str or Path
-:param generated_folder: Path to the generated image folder.
-:type generated_folder: str or Path
+:param reference_images: Batch of reference (real) images.
+:type reference_images: ndarray or torch.Tensor
+:param generated_images: Batch of generated images.
+:type generated_images: ndarray or torch.Tensor
+:param device: Torch device to run on (e.g. `'cuda'` or `'cpu'`). When `None`, picks `'cuda'` if available, otherwise `'cpu'`. Default: `None`.
+:type device: str or torch.device or None, optional
 :param batch_size: Forward-pass batch size. Default: `50`.
 :type batch_size: int, optional
 :param dims: Dimensionality of the InceptionV3 feature layer (`64`, `192`, `768`, or `2048`). Default: `2048`.
 :type dims: int, optional
-:param device: Torch device to run on (e.g. `'cuda'` or `'cpu'`). When `None`, picks `'cuda'` if available, otherwise `'cpu'`. Default: `None`.
-:type device: str or torch.device or None, optional
-:param num_workers: Number of dataloader workers. Default: `1`.
-:type num_workers: int, optional
-:returns: **fid** (*float*) – The Fréchet (FID) distance. `0.0` when both folders are identical.
+:param reference_cache: Opt-in dict memoising the reference `(mu, sigma)` across calls. Default: `None`.
+:type reference_cache: dict or None, optional
+:returns: **fid** (*float*) – The Fréchet (FID) distance. `0.0` when both batches are identical.
 :rtype: float
 
 **Example**
 
 ```python
 >>> from combra.metrics import compute_fid
->>> fid = compute_fid('data/real', 'data/gen')  # CUDA when available, else CPU
+>>> fid = compute_fid(real_batch, generated_batch)  # CUDA when available, else CPU
 >>> print(f'FID = {fid:.4f}')
 ```
 
