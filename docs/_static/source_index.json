@@ -1416,22 +1416,6 @@
   "end": 111
  },
  {
-  "leaf": "calculate_metrics",
-  "qual": "calculate_metrics",
-  "subpkg": "metrics",
-  "file": "combra/metrics/fid.py",
-  "start": 19,
-  "end": 19
- },
- {
-  "leaf": "calculate_fid_given_paths",
-  "qual": "calculate_fid_given_paths",
-  "subpkg": "metrics",
-  "file": "combra/metrics/fid.py",
-  "start": 18,
-  "end": 18
- },
- {
   "leaf": "images_to_angle_density",
   "qual": "images_to_angle_density",
   "subpkg": "metrics",
