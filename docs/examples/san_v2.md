@@ -28,12 +28,15 @@ Training can also be launched via Hydra (`train_hydra.py`), which shares the sam
 `build_config()` logic as the click CLI.
 
 During training, at each evaluation tick the loop generates a batch from `G_ema`
-and runs `compute_all_metrics(reals, fakes)` (when combra is installed). All
-returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`
-and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
-TensorBoard under `Metrics/combra_*` and printed to the run log. Metrics whose
-optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
-recorded as `nan`; the angle metrics always come back.
+and runs `compute_all_metrics(reals, fakes)` (when combra is installed). `G_ema`
+emits float images in `[-1, 1]`, while the reals are `uint8` `[0, 255]`; the loop
+denormalizes the fakes to `uint8` first so both sides are scored on the same scale
+(the angle-density metrics binarize each side, so a scale mismatch would bias the
+generated side). All returned metrics — angle-Wasserstein `w1`, `w2`,
+`circular_w1`, `circular_w2` and the image-feature metrics `fid`, `cmmd`,
+`fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*` and printed to
+the run log. Metrics whose optional backends are unavailable (e.g. no network to
+fetch DINOv2 weights) are recorded as `nan`; the angle metrics always come back.
 
 ## Evaluation
 
@@ -57,7 +60,10 @@ To score arbitrary real/generated image batches with the combra metrics directly
 ```
 
 Batches may be numpy arrays or torch tensors in `NCHW`/`NHWC`, with pixel values
-in `uint8`, `[0, 1]`, or `[-1, 1]`.
+in `uint8`, `[0, 1]`, or `[-1, 1]`. Pass the reference and generated batches on
+the **same** pixel scale so the angle-density metrics binarize both sides
+identically — convert `[-1, 1]` generator output to `uint8` when the reals are
+`uint8`, as the training loop does.
 
 ## Inference
 
