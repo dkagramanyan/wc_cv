@@ -2,7 +2,7 @@
 
 The `combra.metrics` module bundles three families of metrics:
 
-- **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID (`compute_fid`), CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), and the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`). Every metric takes **in-memory images** (a numpy array or torch tensor), not a folder of files. Each side may be a **single image or a batch** (Wasserstein and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*.
+- **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID (`compute_fid`), CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`), and the bimodal-Gaussian fit relative errors (`compute_gauss_metrics`). Every metric takes **in-memory images** (a numpy array or torch tensor), not a folder of files. Each side may be a **single image or a batch** (Wasserstein, Gaussian and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
@@ -20,16 +20,17 @@ writing them to disk. They live in `combra.metrics.training`.
 (`(H, W)`) and a **batch** (`(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`), but
 they differ in what a single image *means*:
 
-- `compute_wasserstein_metrics` and `compute_cmmd` are valid on a **single
-  image** — Wasserstein reduces each side to an angle density, and CMMD uses
-  kernel means, neither of which needs a sample of images.
+- `compute_wasserstein_metrics`, `compute_gauss_metrics` and `compute_cmmd` are
+  valid on a **single image** — the angle metrics reduce each side to an angle
+  density (then, for the Gaussian metrics, fit it), and CMMD uses kernel means,
+  none of which needs a sample of images.
 - The **Fréchet-distance** metrics — `compute_fd_dinov2` and the InceptionV3 FID
   (`compute_fid`, also computed inside `compute_all_metrics`) — estimate a
   per-side **covariance**, which is undefined for one image, so they require
   **≥ 2 images per side** and raise `ValueError` otherwise (inside
   `compute_all_metrics` this surfaces as a `nan` for that metric).
-- `compute_wasserstein_metrics` additionally accepts a precomputed `(x, y)`
-  angle density in place of images on either side.
+- `compute_wasserstein_metrics` and `compute_gauss_metrics` additionally accept a
+  precomputed `(x, y)` angle density in place of images on either side.
 
 The backbone models (CLIP / DINOv2 / InceptionV3) are loaded once per process and
 memoised with `functools.cache`. Each two-input metric also takes an optional
@@ -192,11 +193,52 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :rtype: tuple(ndarray, ndarray)
 ````
 
+### Gaussian-fit metrics
+
+`compute_gauss_metrics` mirrors `compute_wasserstein_metrics`, but instead of a
+transport distance it fits a **bimodal Gaussian** to each side's angle density
+({py:func}`combra.approx.bimodal_gauss_approx` — two modes, each with a mean `mu`,
+width `sigma` and amplitude `amp`) and reports the **per-mode relative error**
+`(generated − reference) / reference` of every fitted parameter. These are the
+same six numbers (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) the parquet
+comparison path computes from its stored fits, made available directly from
+in-memory images.
+
+````{py:function} combra.metrics.compute_gauss_metrics(reference, generated, step=None, reference_cache=None, **angle_kw) -> dict
+
+Bimodal-Gaussian relative-error metrics between a reference and a generated sample, returned as a flat dict `{'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2'}` — mode 1 then mode 2 for each fitted parameter. Each side is reduced to its angle density once and fitted with {py:func}`combra.approx.bimodal_gauss_approx`; each value is `(generated − reference) / reference` for that parameter.
+
+`reference` and `generated` may each be **a single `(H, W)` image**, **a batch of images**, or **a precomputed `(x, y)` angle density** (a length-2 pair of 1-D arrays) — image input is reduced to a density, a density is used as-is. The `reference_cache` is keyed the same way as `compute_wasserstein_metrics`, so a cache shared between the two reuses the one reference angle density.
+
+:param reference: Reference sample — image, image batch, or `(x, y)` density.
+:type reference: ndarray or torch.Tensor or tuple
+:param generated: Generated sample to score — image, image batch, or `(x, y)` density.
+:type generated: ndarray or torch.Tensor or tuple
+:param step: Histogram bin width in degrees (image input only). Defaults to `5.0`. Default: `None`.
+:type step: float or None, optional
+:param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
+:type reference_cache: dict or None, optional
+:param angle_kw: Extra keyword args forwarded to `images_to_angle_density` (`border_eps`, `tol`, `min_segment_len`).
+:returns: **metrics** (*dict*) – Keys `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2` — the per-mode relative errors of the fitted means, widths and amplitudes.
+:rtype: dict
+
+**Example**
+
+```python
+>>> from combra.metrics import compute_gauss_metrics
+>>> errs = compute_gauss_metrics(real_batch, generated_batch)   # batches
+>>> one  = compute_gauss_metrics(real_image, generated_image)   # single images
+>>> errs['mu1'], errs['sigma2']
+```
+
+The density-level core (used by the parquet comparison path) lives at `combra.metrics.gauss.gauss_density_metrics`; the raw per-mode error math, shared with `compute_metrics`, is `combra.metrics.gauss.gauss_relative_errors`.
+````
+
 ### Unified entry point
 
 ````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
 
-Run every batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-Wasserstein metrics (`w1`, `w2`, `circular_w1`, `circular_w2`) compare the two samples' angle densities; `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back. A single image therefore yields real `w*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
+Run every batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-density metrics — the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) and the bimodal-Gaussian relative errors (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) — compare the two samples' angle densities; `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back. A single image therefore yields real `w*`/`mu*`/`sigma*`/`amp*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -210,7 +252,7 @@ Run every batch metric for a (reference, generated) pair in parallel and return 
 :type angle_kw: dict or None, optional
 :param reference_cache: Opt-in dict reused across calls to compute the reference-side features once. Default: `None`.
 :type reference_cache: dict or None, optional
-:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `fid`, `cmmd`, `fd_dinov2`.
+:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`, `fid`, `cmmd`, `fd_dinov2`.
 :rtype: dict
 
 **Example**
@@ -218,7 +260,7 @@ Run every batch metric for a (reference, generated) pair in parallel and return 
 ```python
 >>> from combra.metrics import compute_all_metrics
 >>> scores = compute_all_metrics(real_batch, generated_batch)
->>> scores['cmmd'], scores['w1']
+>>> scores['cmmd'], scores['w1'], scores['mu1']
 ```
 ````
 
