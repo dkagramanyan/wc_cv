@@ -54,6 +54,13 @@ return a scalar, so generated samples can be evaluated on the fly during trainin
 without writing them to disk. They live in `combra.metrics.training` and accept a
 batch shaped `(H, W)`, `(N, H, W)`, `(N, C, H, W)`, or `(N, H, W, C)`.
 
+The backbone models (CLIP / DINOv2 / InceptionV3) are loaded once per process and
+memoised with `functools.cache`. Each two-input metric also takes an optional
+`reference_cache` dict: pass the **same** dict across calls that share one fixed
+reference batch and the reference-side work (CLIP embedding, DINOv2 / Inception
+`(mu, sigma)`, angle density) runs only once. The cache is keyed by metric and
+parameters, **not** by the reference content — use one cache per reference batch.
+
 ```python
 from combra import metrics
 ```
@@ -65,7 +72,7 @@ batch and compare deep-feature distributions. Both need the `gen-metrics` extra
 (`pip install ".[gen-metrics]"`); the DINOv2 backbone is fetched from `torch.hub`
 on first use.
 
-````{py:function} combra.metrics.compute_cmmd(reference_images, generated_images, model_name='ViT-L-14-336', pretrained='openai', device=None, batch_size=64, sigma=10.0, scale=1000.0) -> float
+````{py:function} combra.metrics.compute_cmmd(reference_images, generated_images, model_name='ViT-L-14-336', pretrained='openai', device=None, batch_size=64, sigma=10.0, scale=1000.0, reference_cache=None) -> float
 
 CLIP-MMD (CMMD) between a reference and a generated image batch. Features come from a ready CLIP model loaded with [open_clip](https://github.com/mlfoundations/open_clip); the distance is the Gaussian-RBF Maximum Mean Discrepancy of [Google's CMMD](https://github.com/google-research/google-research/tree/master/cmmd) (`sigma=10`, `scale=1000`).
 
@@ -85,6 +92,8 @@ CLIP-MMD (CMMD) between a reference and a generated image batch. Features come f
 :type sigma: float, optional
 :param scale: Multiplier applied to the MMD². Default: `1000.0`.
 :type scale: float, optional
+:param reference_cache: Opt-in dict memoising the reference CLIP embedding across calls. Default: `None`.
+:type reference_cache: dict or None, optional
 :returns: **cmmd** (*float*) – The scaled CLIP-MMD distance.
 :rtype: float
 
@@ -97,7 +106,7 @@ CLIP-MMD (CMMD) between a reference and a generated image batch. Features come f
 ```
 ````
 
-````{py:function} combra.metrics.compute_fd_dinov2(reference_images, generated_images, model_name='dinov2_vitb14', device=None, batch_size=64, image_size=224) -> float
+````{py:function} combra.metrics.compute_fd_dinov2(reference_images, generated_images, model_name='dinov2_vitb14', device=None, batch_size=64, image_size=224, reference_cache=None) -> float
 
 Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov2) features of two image batches. The backbone is loaded from `torch.hub` (`facebookresearch/dinov2`); the Fréchet distance itself is computed with pytorch-fid's `calculate_frechet_distance`.
 
@@ -113,6 +122,8 @@ Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov
 :type batch_size: int, optional
 :param image_size: Square size images are resized to before the backbone. Default: `224`.
 :type image_size: int, optional
+:param reference_cache: Opt-in dict memoising the reference `(mu, sigma)` across calls. Default: `None`.
+:type reference_cache: dict or None, optional
 :returns: **fd** (*float*) – Fréchet distance between the two DINOv2 feature sets.
 :rtype: float
 ````
@@ -123,9 +134,9 @@ These reduce *both* a reference and a generated batch to their angle densities
 (the same image → angles → histogram pipeline used to build the parquet datasets)
 and compare them.
 
-````{py:function} combra.metrics.compute_w1(reference_images, generated_images, step=None, **angle_kw) -> float
+````{py:function} combra.metrics.compute_w1(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
 
-1-Wasserstein distance (in degrees) between the reference and generated angle densities. `compute_w2`, `compute_circular_w1`, and `compute_circular_w2` share this exact signature (`reference_images, generated_images, step=None, **angle_kw`) and differ only in the distance returned.
+1-Wasserstein distance (in degrees) between the reference and generated angle densities. `compute_w2`, `compute_circular_w1`, and `compute_circular_w2` share this exact signature (`reference_images, generated_images, step=None, reference_cache=None, **angle_kw`) and differ only in the distance returned.
 
 :param reference_images: Reference image batch.
 :type reference_images: ndarray or torch.Tensor
@@ -133,6 +144,8 @@ and compare them.
 :type generated_images: ndarray or torch.Tensor
 :param step: Histogram bin width in degrees. Defaults to `config.STEP` (`5.0`). Default: `None`.
 :type step: float or None, optional
+:param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
+:type reference_cache: dict or None, optional
 :param angle_kw: Extra keyword args forwarded to `images_to_angle_density` (`border_eps`, `tol`, `min_segment_len`).
 :returns: **dist** (*float*) – The Wasserstein distance in degrees.
 :rtype: float
@@ -146,17 +159,17 @@ and compare them.
 ```
 ````
 
-````{py:function} combra.metrics.compute_w2(reference_images, generated_images, step=None, **angle_kw) -> float
+````{py:function} combra.metrics.compute_w2(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
 
 2-Wasserstein distance (in degrees) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
 ````
 
-````{py:function} combra.metrics.compute_circular_w1(reference_images, generated_images, step=None, **angle_kw) -> float
+````{py:function} combra.metrics.compute_circular_w1(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
 
 Circular 1-Wasserstein distance (angles wrap at 360°) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
 ````
 
-````{py:function} combra.metrics.compute_circular_w2(reference_images, generated_images, step=None, **angle_kw) -> float
+````{py:function} combra.metrics.compute_circular_w2(reference_images, generated_images, step=None, reference_cache=None, **angle_kw) -> float
 
 Circular 2-Wasserstein distance (angles wrap at 360°) between the reference and generated angle densities. Same arguments as {py:func}`combra.metrics.compute_w1`.
 ````
@@ -195,30 +208,9 @@ Linear and circular Wasserstein distances between two angle densities (in degree
 :rtype: dict
 ````
 
-```{warning}
-The reference distributions in `combra.metrics.config` are currently **random
-placeholders**. Replace `REFERENCE_GAUSS_PARAMS` / `REFERENCE_ANGLE_DENSITY` with
-the real per-resolution / per-grain-class values before relying on the
-`reference_density` results.
-```
-
-````{py:function} combra.metrics.reference_density(resolution, grain_class, mode='gauss') -> tuple[ndarray, ndarray]
-
-Return the fixed reference angle density `(x, y)` for a `(resolution, grain_class)`. `mode='gauss'` builds it from the bimodal-Gaussian parameters in `config.REFERENCE_GAUSS_PARAMS`; `mode='empirical'` returns the stored measured distribution. `y` is normalised to unit mass in both cases.
-
-:param resolution: Reference key (e.g. `256`).
-:type resolution: int
-:param grain_class: Reference key (e.g. `'Ultra_small'`).
-:type grain_class: str
-:param mode: `'gauss'` or `'empirical'`. Default: `'gauss'`.
-:type mode: str, optional
-:returns: **density** (*tuple[ndarray, ndarray]*) – `(x, y)` reference angle density.
-:rtype: tuple(ndarray, ndarray)
-````
-
 ### Unified entry point
 
-````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None) -> dict
+````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
 
 Run every batch metric for a (reference, generated) batch pair in parallel and return one flat dict. The angle-Wasserstein metrics (`w1`, `w2`, `circular_w1`, `circular_w2`) compare the two batches' angle densities; `fid` (classic InceptionV3 FID on the in-memory batches), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency or no network) is recorded as `nan` and logged, so the angle metrics still come back.
 
@@ -232,6 +224,8 @@ Run every batch metric for a (reference, generated) batch pair in parallel and r
 :type device: str or torch.device or None, optional
 :param angle_kw: Extra keyword args forwarded to `images_to_angle_density`. Default: `None`.
 :type angle_kw: dict or None, optional
+:param reference_cache: Opt-in dict reused across calls to compute the reference-side features once. Default: `None`.
+:type reference_cache: dict or None, optional
 :returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `fid`, `cmmd`, `fd_dinov2`.
 :rtype: dict
 
