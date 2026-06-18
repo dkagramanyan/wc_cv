@@ -14,13 +14,16 @@ pip install .          # or:  pip install -e .   for an editable install
 
 ### Optional extras
 
-| Extra   | Install                   | Adds                          |
-| ------- | ------------------------- | ----------------------------- |
-| `tests` | `pip install ".[tests]"`  | pytest + pytest-cov           |
-| `docs`  | `pip install ".[docs]"`   | Sphinx docs toolchain         |
-| `dev`   | `pip install -e ".[dev]"` | the `tests` extra + ruff      |
+| Extra         | Install                          | Adds                                          |
+| ------------- | -------------------------------- | --------------------------------------------- |
+| `tests`       | `pip install ".[tests]"`         | pytest + pytest-cov                           |
+| `docs`        | `pip install ".[docs]"`          | Sphinx docs toolchain                         |
+| `gen-metrics` | `pip install ".[gen-metrics]"`   | `open-clip-torch` for `compute_cmmd` / `compute_fd_dinov2` |
+| `dev`         | `pip install -e ".[dev]"`        | the `tests` extra + ruff                      |
 
 FID metrics work out of the box. `combra.metrics.fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity), which ship as core dependencies and download/cache their own InceptionV3 weights on first use — no manual model setup. `compute_fid` runs on CUDA when available and falls back to CPU; see {doc}`combra.metrics <api/metrics>`.
+
+The angle-Wasserstein training metrics use [POT](https://pythonot.github.io/) (`pot`), a core dependency. The CLIP-MMD and DINOv2 metrics (`compute_cmmd`, `compute_fd_dinov2`) additionally need the `gen-metrics` extra; the DINOv2 backbone is fetched from `torch.hub` on first use.
 
 ## Testing
 
@@ -89,6 +92,6 @@ The output file's `run_meta` column records who/when/what — including the git 
 | {doc}`combra.areas <api/areas>` | Polygon-area and effective-radius distribution plots. |
 | {doc}`combra.stats <api/stats>` | Parametric distributions + histogram preprocessor. |
 | {doc}`combra.approx <api/approx>` | Fits Gaussian/binomial/poisson/exponential/linear models. |
-| {doc}`combra.metrics <api/metrics>` | FID, per-class Wasserstein comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
+| {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
 | {doc}`combra.graph <api/graph>` | Crack-image → graph → shortest-energy-path search. |
 | {doc}`combra.utils <api/utils>` | `NumpyEncoder` for JSON dumps. |
