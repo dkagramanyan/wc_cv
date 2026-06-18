@@ -234,6 +234,75 @@ Bimodal-Gaussian relative-error metrics between a reference and a generated samp
 The density-level core (used by the parquet comparison path) lives at `combra.metrics.gauss.gauss_density_metrics`; the raw per-mode error math, shared with `compute_metrics`, is `combra.metrics.gauss.gauss_relative_errors`.
 ````
 
+#### Single-parameter wrappers
+
+When you want just one of the six Gaussian metrics, each has a dedicated function that returns that scalar directly. They take the **same inputs and options** as `compute_gauss_metrics` (single image, batch, or `(x, y)` density; `step`, `reference_cache`, `**angle_kw`) and simply return one value from it — so `compute_mu1(ref, gen)` is exactly `compute_gauss_metrics(ref, gen)['mu1']`. Each returns `(generated − reference) / reference` for the named fitted parameter; **mode 1** is the lower-angle Gaussian, **mode 2** the higher-angle one. When you need **several** of them, call `compute_gauss_metrics` once instead — it fits each side only once, whereas the wrappers refit per call.
+
+````{py:function} combra.metrics.compute_mu1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-1 Gaussian mean** — the `mu1` value of {py:func}`combra.metrics.compute_gauss_metrics`. `reference` and `generated` may each be a single `(H, W)` image, a batch, or a precomputed `(x, y)` density.
+
+:param reference: Reference sample — image, image batch, or `(x, y)` density.
+:type reference: ndarray or torch.Tensor or tuple
+:param generated: Generated sample to score — image, image batch, or `(x, y)` density.
+:type generated: ndarray or torch.Tensor or tuple
+:param step: Histogram bin width in degrees (image input only). Defaults to `5.0`. Default: `None`.
+:type step: float or None, optional
+:param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
+:type reference_cache: dict or None, optional
+:param angle_kw: Extra keyword args forwarded to `images_to_angle_density` (`border_eps`, `tol`, `min_segment_len`).
+:returns: **mu1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted mean.
+:rtype: float
+
+**Example**
+
+```python
+>>> from combra.metrics import compute_mu1
+>>> compute_mu1(real_batch, generated_batch)      # relative error of the mode-1 mean
+>>> compute_mu1(real_image, generated_image)      # single images are fine too
+```
+````
+
+````{py:function} combra.metrics.compute_mu2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-2 Gaussian mean** — the `mu2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
+
+:returns: **mu2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted mean.
+:rtype: float
+````
+
+````{py:function} combra.metrics.compute_sigma1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-1 Gaussian width** — the `sigma1` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
+
+:returns: **sigma1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted width.
+:rtype: float
+````
+
+````{py:function} combra.metrics.compute_sigma2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-2 Gaussian width** — the `sigma2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
+
+:returns: **sigma2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted width.
+:rtype: float
+````
+
+````{py:function} combra.metrics.compute_amp1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-1 Gaussian amplitude** — the `amp1` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
+
+:returns: **amp1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted amplitude.
+:rtype: float
+````
+
+````{py:function} combra.metrics.compute_amp2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
+
+Relative error of the **mode-2 Gaussian amplitude** — the `amp2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
+
+:returns: **amp2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted amplitude.
+:rtype: float
+````
+
 ### Unified entry point
 
 ````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
