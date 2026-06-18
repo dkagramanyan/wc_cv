@@ -142,7 +142,7 @@ and compare them.
 :type reference_images: ndarray or torch.Tensor
 :param generated_images: Generated image batch to score.
 :type generated_images: ndarray or torch.Tensor
-:param step: Histogram bin width in degrees. Defaults to `config.STEP` (`5.0`). Default: `None`.
+:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
 :type step: float or None, optional
 :param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
 :type reference_cache: dict or None, optional
@@ -180,7 +180,7 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 
 :param images: Image batch.
 :type images: ndarray or torch.Tensor
-:param step: Histogram bin width in degrees. Defaults to `config.STEP` (`5.0`). Default: `None`.
+:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
 :type step: float or None, optional
 :param border_eps: Border margin passed to {py:func}`combra.angles.get_angles`. Default: `5`.
 :type border_eps: int, optional
@@ -218,7 +218,7 @@ Run every batch metric for a (reference, generated) batch pair in parallel and r
 :type reference_images: ndarray or torch.Tensor
 :param generated_images: Batch of generated images.
 :type generated_images: ndarray or torch.Tensor
-:param step: Histogram bin width in degrees. Defaults to `config.STEP`. Default: `None`.
+:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
 :type step: float or None, optional
 :param device: Torch device for the image-feature metrics. Default: `None`.
 :type device: str or torch.device or None, optional
