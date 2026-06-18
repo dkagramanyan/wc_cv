@@ -27,18 +27,33 @@ python train.py --outdir=./training-runs/wc --cfg=stylegan3-r --data=./data/wc64
 Training can also be launched via Hydra (`train_hydra.py`), which shares the same
 `build_config()` logic as the click CLI.
 
-During training, at each evaluation tick the loop generates a batch from `G_ema`
-and runs `compute_all_metrics(reals, fakes)` (when combra is installed). `G_ema`
-emits float images in `[-1, 1]`, while the reals are `uint8` `[0, 255]`; the loop
-denormalizes the fakes to `uint8` first so both sides are scored explicitly on the
-same scale. (combra also rescales float inputs internally — both the image-feature
-and the angle-density metrics now map `[-1, 1]`/`[0, 1]` to `uint8` the same way —
-but denormalizing in the loop keeps the comparison unambiguous.) All returned
-metrics — angle-Wasserstein `w1`, `w2`,
-`circular_w1`, `circular_w2` and the image-feature metrics `fid`, `cmmd`,
-`fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*` and printed to
-the run log. Metrics whose optional backends are unavailable (e.g. no network to
-fetch DINOv2 weights) are recorded as `nan`; the angle metrics always come back.
+During training, the combra metrics are scored over the **whole training set** as
+the reference, against an **equal number** of images generated from `G_ema`. The
+reference set is fixed across training, so its features (angle density, FID/DINOv2
+`(mu, sigma)`, CLIP embedding) are computed once and reused via combra's
+`reference_cache`; only the generated side is recomputed each evaluation tick.
+
+This differs from the standard StyleGAN `fid50k_full`, which uses all reals but a
+fixed 50 000 generated samples — the combra metrics instead keep the two sides the
+same size.
+
+`G_ema` emits float images in `[-1, 1]`, while the reals are `uint8` `[0, 255]`;
+the loop denormalizes the fakes to `uint8` first so both sides are scored
+explicitly on the same scale. (combra also rescales float inputs internally — both
+the image-feature and the angle-density metrics map `[-1, 1]`/`[0, 1]` to `uint8`
+the same way — but denormalizing in the loop keeps the comparison unambiguous.)
+All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`
+and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
+TensorBoard under `Metrics/combra_*` and printed to the run log. Metrics whose
+optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
+recorded as `nan`; the angle metrics always come back.
+
+```{note}
+Because the reference is the entire dataset and an equal number of fakes is
+generated each evaluation tick, both the real images and the generated batch are
+held in memory on rank 0. For very large or high-resolution datasets this is
+memory- and compute-intensive (comparable to a full FID pass every snapshot).
+```
 
 ## Evaluation
 
