@@ -2,13 +2,47 @@
 
 ## Installation
 
-Combra is a standard Python package — all dependencies are pure-pip and install automatically, with no system packages required. combra uses the headless OpenCV build (`opencv-python-headless`), so no `libGL`/`libglib` system libraries are needed; it runs out of the box in minimal containers and HPC environments where you can only install Python packages. From a clone of the repository:
+Combra is a standard Python package — all dependencies are pure-pip and install automatically, with no system packages required. combra uses the headless OpenCV build (`opencv-python-headless`), so no `libGL`/`libglib` system libraries are needed; it runs out of the box in minimal containers and HPC environments where you can only install Python packages.
+
+combra is not on PyPI yet, so install it from source:
 
 ```bash
-pip install -e .
+git clone https://github.com/dkagramanyan/combra.git
+cd combra
+pip install .          # or:  pip install -e .   for an editable install
 ```
 
+### Optional extras
+
+| Extra   | Install                   | Adds                          |
+| ------- | ------------------------- | ----------------------------- |
+| `tests` | `pip install ".[tests]"`  | pytest + pytest-cov           |
+| `docs`  | `pip install ".[docs]"`   | Sphinx docs toolchain         |
+| `dev`   | `pip install -e ".[dev]"` | the `tests` extra + ruff      |
+
 FID metrics work out of the box. `combra.metrics.fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid) and [torch-fidelity](https://github.com/toshas/torch-fidelity), which ship as core dependencies and download/cache their own InceptionV3 weights on first use — no manual model setup. `compute_fid` runs on CUDA when available and falls back to CPU; see {doc}`combra.metrics <api/metrics>`.
+
+## Testing
+
+After a development install you can run the full test suite, the linter, and the formatter:
+
+```bash
+pip install -e ".[dev]"
+
+pytest                           # run the test suite
+ruff check combra tests          # lint
+ruff format combra tests         # format
+```
+
+CI (GitHub Actions) runs the ruff lint + format checks and `pytest` on Python 3.10, 3.11, and 3.12.
+
+For a quick post-install sanity check that doesn't need the dev tools, run the bundled self-validation helper — it estimates the fractal dimension of reference shapes with known answers (see {doc}`combra.tests <api/tests>`):
+
+```python
+>>> import numpy as np
+>>> from combra import tests
+>>> tests.test_fractal_dimensions(np.array([2, 3, 4, 6, 8, 12, 16, 24, 32]))
+```
 
 ## Smoke test
 

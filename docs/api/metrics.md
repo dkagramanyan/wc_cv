@@ -317,9 +317,9 @@ Walk every parquet under `folder` (each assumed to be the same generator at a di
 
 Tools that aggregate `metrics_vs_n` records into per-curve statistics (Kendall trend test, endpoint relative error, plateau fit) and turn them into the tables and figures consumed by `3_metrics_convergence.ipynb`.
 
-````{py:function} combra.metrics.convergence_stats(df_metrics, metrics, endpoints_by_kind, expected_points=None) -> pandas.DataFrame
+````{py:function} combra.metrics.convergence_stats(df_metrics, metrics, endpoints_by_kind, expected_points=None, pre_endpoints_by_kind=None) -> pandas.DataFrame
 
-Per `(kind, resolution, class)` curve, compute trend significance, endpoint relative error, and a plateau fit $|m|(N) = a + b \cdot N^{-1/2}$.
+Per `(kind, resolution, class)` curve, compute trend significance, endpoint relative error, a power-law decay exponent, and a plateau fit $|m|(N) = a + b \cdot N^{-1/2}$.
 
 :param df_metrics: Long-form table with columns `kind`, `resolution`, `class`, `n_images`, and one column per metric in `metrics`.
 :type df_metrics: pd.DataFrame
@@ -329,14 +329,19 @@ Per `(kind, resolution, class)` curve, compute trend significance, endpoint rela
 :type endpoints_by_kind: dict[str, tuple[int, int]]
 :param expected_points: `{kind: expected_n_points_per_curve}`. When given, prints a warning if a curve has the wrong count. Default: `None`.
 :type expected_points: dict[str, int] or None, optional
-:returns: **result** (*pd.DataFrame*) – One row per `(kind, resolution, class, metric)`. Columns: `kendall_p`, `rel_err_abs_%`, `m_at_nmax`, `a_hat`, `a_se`, `gain_abs`, `gain_pct`, `vs_a_pct`.
+:param pre_endpoints_by_kind: Optional `{kind: (n_lo, n_hi)}` for an *earlier* N-range (e.g. `360 → 1000` for `san`/`diffit`), reported alongside the main range. The `pre_*` columns are `NaN` for any kind absent from this mapping. Default: `None`.
+:type pre_endpoints_by_kind: dict[str, tuple[int, int]] or None, optional
+:returns: **result** (*pd.DataFrame*) – One row per `(kind, resolution, class, metric)`. Columns: `kendall_p`, `rel_err_abs_%`, `pre_rel_err_abs_%`, `alpha`, `pre_alpha`, `m_at_nhi`, `a_hat`, `a_se`, `b_hat`, `fit_r2`, `gain_abs`, `gain_pct`, `vs_a_pct`.
 :rtype: pandas.DataFrame
 
 The returned columns mean:
 
 - `kendall_p` — one-sided Kendall τ p-value for "|metric| decreases with N".
-- `rel_err_abs_%` — `(|m|@N_lo − |m|@N_hi) / |m|@N_lo × 100`. Positive = improvement between the two N endpoints.
-- `a_hat`, `a_se` — plateau (bias floor) and its standard error from {py:func}`combra.approx.fit_plateau`.
+- `rel_err_abs_%` — `(|m|@N_lo − |m|@N_hi) / |m|@N_lo × 100` over the main endpoints. Positive = improvement between the two N endpoints. `pre_rel_err_abs_%` is the same over `pre_endpoints_by_kind` (`NaN` when no pre pair).
+- `alpha` — power-law decay exponent in `|m| ~ N^(-alpha)`, estimated from the two endpoints as `log(|m|@N_lo / |m|@N_hi) / log(N_hi / N_lo)`. `0.5` is ideal Monte-Carlo decay, `0` means no improvement, `< 0` means |metric| grew with N. `pre_alpha` is the same over the pre endpoints.
+- `m_at_nhi` — `|metric|` at `N_hi`.
+- `a_hat`, `a_se`, `b_hat` — the plateau (bias floor `a`), its standard error, and the `N^{-1/2}` slope `b` from {py:func}`combra.approx.fit_plateau`.
+- `fit_r2` — coefficient of determination of the plateau fit against the observed `|metric|` curve.
 - `gain_pct` — sampling-only gain from `N_hi` to infinity, in percent of `|m|@N_hi`.
 - `vs_a_pct` — excess of `|m|@N_lo` over the bias floor `a_hat`, in percent.
 
@@ -348,19 +353,21 @@ From `co_angles/3_metrics_convergence.ipynb`:
 >>> from combra.metrics import convergence_stats
 >>> METRICS  = ['w_dist', 'mu1', 'mu2', 'sigma1', 'sigma2', 'amp1', 'amp2']
 >>> ENDPTS   = {'real': (100, 300), 'san': (360, 10000), 'diffit': (360, 10000)}
+>>> PRE      = {'san': (360, 1000), 'diffit': (360, 1000)}
 >>> result = convergence_stats(df_metrics, METRICS, ENDPTS,
-...                            expected_points={'real': 5, 'san': 8, 'diffit': 8})
+...                            expected_points={'real': 5, 'san': 8, 'diffit': 8},
+...                            pre_endpoints_by_kind=PRE)
 >>> result.head(3)
 ```
 ````
 
-````{py:function} combra.metrics.print_convergence_report(result, metrics, kinds, endpoints_by_kind, alpha=0.05, step=None, kind_display=None) -> None
+````{py:function} combra.metrics.print_convergence_report(result, metrics, kinds, endpoints_by_kind, alpha=0.05, step=None, kind_display=None, pre_endpoints_by_kind=None) -> None
 
 Print three human-readable tables from a `convergence_stats` result:
 
 - **T1 (kendall_byclass)** — per-class Kendall p-values + `rel_err_abs_%`, with Fisher's combined $\chi^2 = -2 \cdot \sum \log p$ across the 3 classes.
 - **T2 (kendall_fisher_byres)** — per-resolution Fisher across classes; one panel per resolution.
-- **T3 (asymptote)** — plateau-fit summary (`a_gen`, `gain_%`, `vs_a_%`). A trailing `*` on `a_gen` means `a_se >= a` (plateau not yet identified).
+- **T3 (gains+alpha)** — finite-range gain and power-law-exponent columns side by side: `gain_%_a->b = (|m|@a − |m|@b)/|m|@a × 100` (positive = error shrank) and `alpha_a->b = log(|m|@a / |m|@b) / log(b/a)` (`0.5` = ideal Monte-Carlo, `0` = no gain). When `pre_endpoints_by_kind` is given, the pre-range columns are shown next to the main-range ones.
 
 :param result: Output of `convergence_stats`.
 :type result: pd.DataFrame
@@ -376,6 +383,8 @@ Print three human-readable tables from a `convergence_stats` result:
 :type step: float or None, optional
 :param kind_display: Display names (e.g. `{'san': 'SAN', 'diffit': 'DiffiT'}`). Default: `None`.
 :type kind_display: dict[str, str] or None, optional
+:param pre_endpoints_by_kind: Optional `{kind: (n_lo, n_hi)}` earlier-N range; when given, T3 prints its `gain_%`/`alpha` columns alongside the main range. Default: `None`.
+:type pre_endpoints_by_kind: dict[str, tuple[int, int]] or None, optional
 :returns: Nothing. Output goes to stdout.
 :rtype: None
 
@@ -386,6 +395,7 @@ Print three human-readable tables from a `convergence_stats` result:
 >>> print_convergence_report(
 ...     result, METRICS, kinds=['san', 'diffit'],
 ...     endpoints_by_kind={'san': (360, 10000), 'diffit': (360, 10000)},
+...     pre_endpoints_by_kind={'san': (360, 1000), 'diffit': (360, 1000)},
 ...     step=2.0, kind_display={'san': 'SAN', 'diffit': 'DiffiT'},
 ... )
 ```
