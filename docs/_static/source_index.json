@@ -444,8 +444,8 @@
   "qual": "compute_fid",
   "subpkg": "metrics",
   "file": "combra/metrics/fid.py",
-  "start": 22,
-  "end": 43
+  "start": 16,
+  "end": 37
  },
  {
   "leaf": "imdivide",
@@ -1420,64 +1420,64 @@
   "qual": "images_to_angle_density",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 55,
-  "end": 73
+  "start": 54,
+  "end": 72
  },
  {
   "leaf": "compute_w1",
   "qual": "compute_w1",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 82,
-  "end": 84
+  "start": 81,
+  "end": 83
  },
  {
   "leaf": "compute_w2",
   "qual": "compute_w2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 87,
-  "end": 89
+  "start": 86,
+  "end": 88
  },
  {
   "leaf": "compute_circular_w1",
   "qual": "compute_circular_w1",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 92,
-  "end": 96
+  "start": 91,
+  "end": 93
  },
  {
   "leaf": "compute_circular_w2",
   "qual": "compute_circular_w2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 99,
-  "end": 103
+  "start": 96,
+  "end": 98
  },
  {
   "leaf": "compute_cmmd",
   "qual": "compute_cmmd",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 140,
-  "end": 188
+  "start": 135,
+  "end": 183
  },
  {
   "leaf": "compute_fd_dinov2",
   "qual": "compute_fd_dinov2",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 191,
-  "end": 239
+  "start": 186,
+  "end": 234
  },
  {
   "leaf": "compute_all_metrics",
   "qual": "compute_all_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/training.py",
-  "start": 276,
-  "end": 334
+  "start": 271,
+  "end": 318
  },
  {
   "leaf": "wasserstein_density_metrics",
