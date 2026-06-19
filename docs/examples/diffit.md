@@ -38,8 +38,9 @@ diffit-train --outdir=./training-runs \
 ```
 
 During training, at each evaluation tick (every `--snap` ticks) the loop
-generates a batch of images from the EMA model by running the DPM-Solver++
-reverse-diffusion sampler in VAE latent space, decodes them to pixels, and runs
+generates a batch of images from the EMA model by running the configured
+reverse-diffusion sampler (DDIM by default — see the Samplers section below) in
+VAE latent space, decodes them to pixels, and runs
 `compute_all_metrics(reals, fakes)` (when combra is installed). All returned
 metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`, the
 bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`, and
@@ -60,6 +61,33 @@ than a 10k subsample. (Set `--num-fid-samples 0` to disable eval entirely.)
 To keep the larger per-tick generation affordable, the EMA model's sampling
 forward is `torch.compile`d, which speeds up the reverse-diffusion latent
 generation that dominates evaluation time.
+
+### Samplers
+
+The reverse-diffusion sampler used for evaluation **and** inference is selectable.
+All three reuse the same trained model — they only differ in how the reverse
+process is integrated:
+
+- **`ddim`** *(default)* — deterministic DDIM. Reproducible (low-variance) metric
+  curves and good quality at moderate step counts; the recommended default for the
+  training-time eval signal and for final inference.
+- **`dpm++`** — DPM-Solver++(2M). Fastest (near-converged quality in ~25 steps);
+  use it for the cheapest possible training-time eval.
+- **`ddpm`** — stochastic ancestral sampling. Most faithful / most diverse at high
+  step counts (~250), but the slowest.
+
+During training, pick the eval sampler with `--eval-sampler` and its step count
+with `--eval-sampling-steps` (per-sampler defaults: `dpm++`=25, `ddim`=100,
+`ddpm`=250):
+
+```bash
+diffit-train --outdir=./training-runs --cfg=diffit-256 \
+    --data=./datasets/wc_co_256.zip --gpus 2 --batch-gpu 96 \
+    --eval-sampler ddim --eval-sampling-steps 100
+```
+
+The standalone `scripts.sample` and `diffit-gen-images` take the same choice via
+`--sampler` (which replaces the former `--use-ddim` flag).
 
 ### Dry run
 
@@ -84,7 +112,8 @@ on bulk-sampled `.npz` batches:
 torchrun --nproc_per_node=4 -m scripts.sample \
     --model-path ./training-runs/00000-diffit-256-*/network-final.pt \
     --outdir ./samples/256 --image-size 256 \
-    --cfg-scale 4.4 --num-samples 50000 --num-sampling-steps 250 --cfg-cond
+    --cfg-scale 4.4 --num-samples 50000 \
+    --sampler ddim --num-sampling-steps 250 --cfg-cond
 
 diffit-eval \
     --ref-batch ./VIRTUAL_imagenet256_labeled.npz \
@@ -120,7 +149,7 @@ diffit-gen-images \
     --samples-per-class 1000 \
     --classes 0,1,2 \
     --cfg-scale 4.4 \
-    --num-sampling-steps 250 \
+    --sampler ddim --num-sampling-steps 250 \
     --gpus 0,1,2,3 \
     --batch-size 32
 ```
