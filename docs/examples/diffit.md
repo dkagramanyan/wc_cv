@@ -38,15 +38,42 @@ diffit-train --outdir=./training-runs \
 ```
 
 During training, at each evaluation tick (every `--snap` ticks) the loop
-generates a batch from the EMA model and runs `compute_all_metrics(reals, fakes)`
-(when combra is installed). All returned metrics — angle-Wasserstein `w1`, `w2`,
-`circular_w1`, `circular_w2` and the image-feature metrics `fid`, `cmmd`,
-`fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*`, written to
-`stats.jsonl`, and printed to the run log, alongside DiffiT's own IS / FID / sFID
-/ Precision / Recall. Metrics whose optional backends are unavailable (e.g. no
-network to fetch DINOv2 weights) are recorded as `nan`; the angle metrics always
-come back. The reference batch is scored once and cached, so only the
-generated-side work is repeated each tick.
+generates a batch of images from the EMA model by running the DPM-Solver++
+reverse-diffusion sampler in VAE latent space, decodes them to pixels, and runs
+`compute_all_metrics(reals, fakes)` (when combra is installed). All returned
+metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`, the
+bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`, and
+the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to TensorBoard
+under `Metrics/combra_*`, written to `stats.jsonl`, and printed to the run log,
+alongside DiffiT's own IS / FID / sFID / Precision / Recall. Metrics whose
+optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
+recorded as `nan`; the angle metrics always come back. The reference batch is
+scored once and cached, so only the generated-side work is repeated each tick.
+
+**Sample count.** When combra is **not** installed, the eval generates
+`--num-fid-samples` images (default 10000), unchanged. When combra **is**
+installed, each evaluation tick instead scores the **whole training dataset**:
+the reference is every real image used once, and DiffiT generates a matching
+number of images. This makes the combra metrics a full-dataset measurement rather
+than a 10k subsample. (Set `--num-fid-samples 0` to disable eval entirely.)
+
+To keep the larger per-tick generation affordable, the EMA model's sampling
+forward is `torch.compile`d, which speeds up the reverse-diffusion latent
+generation that dominates evaluation time.
+
+### Dry run
+
+To validate the config and data wiring without starting a real run, pass `-n` /
+`--dry-run` — it prints the resolved training options (resolution, batch, sample
+count, etc.) and exits before training:
+
+```bash
+diffit-train --outdir=./training-runs \
+    --cfg=diffit-256 \
+    --data=./datasets/imagenet_256x256.zip \
+    --gpus 1 --batch-gpu 4 \
+    -n
+```
 
 ## Evaluation
 
