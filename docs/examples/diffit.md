@@ -23,15 +23,19 @@ resolutions.
 
 ### From scratch
 
-1. **Install DiffiT-v2** (it lives in its own repo, separate from combra):
+1. **Install combra and DiffiT-v2** into the *same* environment. Both are
+   source-only packages (neither is on PyPI), and combra is **optional** — DiffiT's
+   import of it is guarded, so training runs unchanged without it. To enable the
+   combra metrics, install combra first (so DiffiT can find it), then DiffiT-v2:
 
    ```bash
-   pip install -e .              # run in the DiffiT-v2 checkout
-   pip install -e '.[combra]'    # ...or this, to enable the combra metrics below
+   pip install -e /path/to/combra   # the combra checkout (or wc_cv/combra submodule)
+   pip install -e .                 # run in the DiffiT-v2 checkout
    ```
 
-   This puts the `diffit-train`, `diffit-prepare-data`, `diffit-download-models`,
-   `diffit-sample`, `diffit-gen-images` and `diffit-eval` commands on your `PATH`.
+   Without combra, just run the second line. This puts the `diffit-train`,
+   `diffit-prepare-data`, `diffit-download-models`, `diffit-sample`,
+   `diffit-gen-images` and `diffit-eval` commands on your `PATH`.
 
 2. **(Optional) prefetch model weights** — handy for offline / cluster nodes.
    Training needs the Stable-Diffusion VAE (plus InceptionV3 for FID/IS); the VAE
