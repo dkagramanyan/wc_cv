@@ -194,14 +194,17 @@ To score arbitrary real/generated image batches with the combra metrics directly
 
 ```python
 >>> from combra.metrics import compute_all_metrics
->>> results = compute_all_metrics(reference_images, generated_images)
+>>> results = compute_all_metrics(reference_images, generated_images, image_metrics=True)
 >>> results
 {'w1': ..., 'w2': ..., 'circular_w1': ..., 'circular_w2': ...,
+ 'mu1': ..., 'mu2': ..., 'sigma1': ..., 'sigma2': ..., 'amp1': ..., 'amp2': ...,
  'fid': ..., 'cmmd': ..., 'fd_dinov2': ...}
 ```
 
-Batches may be numpy arrays or torch tensors in `NCHW`/`NHWC`, with pixel values
-in `uint8`, `[0, 1]`, or `[-1, 1]`.
+`image_metrics=True` is what adds the `fid`/`cmmd`/`fd_dinov2` keys; without it,
+only the angle-Wasserstein and bimodal-Gaussian metrics come back. Batches may be
+numpy arrays or torch tensors in `NCHW`/`NHWC`, with pixel values in `uint8`,
+`[0, 1]`, or `[-1, 1]`.
 
 ## Inference
 
