@@ -3,29 +3,92 @@
 [**san-v2**](https://github.com/dkagramanyan/san-v2) is a fork of Sony's
 StyleSAN-XL (Slicing Adversarial Network, StyleGAN3 + Projected GAN) used to
 generate WC-Co microstructure SEM images. Its training evaluation is wired into
-combra: every evaluation tick scores generated samples with
-{py:func}`combra.metrics.compute_all_metrics`.
+combra: on every **snapshot** tick it scores generated samples with
+{py:func}`combra.metrics.compute_all_metrics` and logs the results to TensorBoard.
 
-The combra integration is **optional** — san-v2 does not depend on combra. The
-import is guarded, so training runs unchanged when combra is not installed. To
+The combra integration is **optional** and controlled by its own flag,
+`--combra-metrics` (default `true`) — **independent of `--metrics`**, so you can run
+combra with `--metrics none` (skip FID) or vice-versa. san-v2 does not depend on
+combra: the import is guarded, so training runs unchanged when combra is not
+installed — but if `--combra-metrics=true` and the package is missing, training emits
+a **warning** at startup (and skips the metrics) so it is never silently ignored. To
 enable the metrics, install combra alongside san-v2:
 
 ```bash
 pip install combra            # or: pip install 'san-v2[combra]'
 ```
 
-## Training
+The full **install → test → train → generate** guide lives in the san-v2
+[README](https://github.com/dkagramanyan/san-v2#readme); the essentials are below.
 
-Models are trained progressively (low → high resolution), each stage resuming
-from the previous stage's `best_model.pkl`:
+## Installation
+
+Create a `python=3.12` conda env, install the latest PyTorch (CUDA 13.2 wheels), the
+CUDA compiler (`nvcc`) and ninja **from conda** (both needed to build the custom CUDA
+ops — a pip ninja conflicts with conda's, and the torch wheel ships no `nvcc`), then the
+remaining deps. torch and ninja are intentionally kept out of `requirements.txt` so the
+last step won't disturb them:
 
 ```bash
-python train.py --outdir=./training-runs/wc --cfg=stylegan3-r --data=./data/wc64.zip \
-        --gpus=8 --mirror=1 --snap 10 --batch-gpu 8 --syn_layers 6
+conda create -n san python=3.12 -y && conda activate san
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu132
+conda install -c nvidia cuda-nvcc -y     # match torch's CUDA major (13.x)
+conda install anaconda::ninja -y
+pip install -r requirements.txt          # from the san-v2 repo root
+```
+
+The `sbatch/` scripts load no system CUDA module — they set `CUDA_HOME=$CONDA_PREFIX`
+so the ops compile against this conda toolkit.
+
+## Test the build
+
+The custom CUDA ops are JIT-compiled on first use. Compile and check them (including
+the H200 `sm_90` path) before training, and run the CPU SAN-layer unit tests:
+
+```bash
+python tests/test_cuda_ops.py    # CUDA-op compile + correctness check (needs a GPU)
+python -m pytest tests/ -v       # SAN-layer unit tests (CI; GPU tests auto-skip on CPU)
+```
+
+## Training
+
+Models are trained **progressively** (low → high resolution), each stage resuming
+from the previous stage's `best_model.pkl`. The 16² stem trains from scratch; every
+higher resolution is a super-resolution stage (`--superres --up_factor 2`):
+
+```bash
+# Stage 0 — 16x16 stem
+python train.py --outdir=./runs/wc-cv_h200 --cfg=stylegan3-r --cond True \
+        --data=./datasets/imagenet_9to4_1024x1024_16x16.zip \
+        --gpus=2 --mirror=0 --snap 500 --batch-gpu 320 --kimg 20000 --syn_layers 6
+
+# Stage N — superres, resuming from the previous stage
+python train.py --outdir=./runs/wc-cv_h200 --cfg=stylegan3-r --cond True \
+        --data=./datasets/imagenet_9to4_1024x1024_32x32.zip \
+        --gpus=2 --mirror=0 --snap 100 --batch-gpu 96 --kimg 20000 --syn_layers 6 \
+        --superres --up_factor 2 --head_layers 7 \
+        --path_stem ./runs/wc-cv_h200/00000-.../best_model.pkl
+```
+
+On the cluster the per-stage scripts in `sbatch/` are submitted from the sbatch folder
+onto the `rocky` partition (2× H200 each):
+
+```bash
+cd sbatch
+sbatch train_16x16.sbatch        # … through train_1024x1024.sbatch
 ```
 
 Training can also be launched via Hydra (`train_hydra.py`), which shares the same
-`build_config()` logic as the click CLI.
+`build_config()` logic as the click CLI. Because the click CLI is the single source of
+truth for defaults, any flag below works as a Hydra override too (e.g.
+`save_inference_only=true`).
+
+The `sbatch/train_*.sbatch` scripts pass `--save-inference-only True`, so every snapshot
+tick also writes a small `network-snapshot-<kimg>-inference.pkl` holding **only `G_ema`**
+— no discriminator, no resume state. It is the smallest artifact and is exactly what
+`gen_images.py` and {py:func}`combra.metrics.compute_all_metrics` evaluation consume; use
+the full checkpoint to resume training. There is also `--save-weights-only` (`G`/`D`/`G_ema`,
+larger) for when the discriminator is needed.
 
 During training, the combra metrics are scored over the **whole training set** as
 the reference, against an **equal number** of images generated from `G_ema`. The
@@ -42,17 +105,36 @@ the loop denormalizes the fakes to `uint8` first so both sides are scored
 explicitly on the same scale. (combra also rescales float inputs internally — both
 the image-feature and the angle-density metrics map `[-1, 1]`/`[0, 1]` to `uint8`
 the same way — but denormalizing in the loop keeps the comparison unambiguous.)
-All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`
-and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
-TensorBoard under `Metrics/combra_*` and printed to the run log. Metrics whose
-optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
-recorded as `nan`; the angle metrics always come back.
+Each tick computes **both** the angle-density metrics (Wasserstein `w1`, `w2`,
+`circular_w1`, `circular_w2` and the bimodal-Gaussian `mu/sigma/amp` errors) **and**
+the image-feature metrics `fid`, `cmmd`, `fd_dinov2`. All are logged to TensorBoard
+under `Metrics/combra_*` and printed to the run log.
+
+On a **multi-GPU** run the image-feature extraction is **sharded across ranks**:
+each rank generates and extracts its CLIP / DINOv2 / InceptionV3 features from its
+own shard of the fakes, the feature rows are gathered to rank 0, and the Fréchet /
+MMD distances are taken there against the cached reference features. This uses
+combra's split feature-extraction API ({py:func}`combra.metrics.fid_features` +
+{py:func}`combra.metrics.fid_from_features`, and the `cmmd_*` / `fd_dinov2_*`
+analogues) and is numerically identical to the single-GPU
+`compute_all_metrics(image_metrics=True)` path; the angle-density metrics run on
+rank 0 over the full gathered batch. On a single GPU the three image metrics
+instead run concurrently in a thread pool. Any whose optional backend is
+unavailable (e.g. no network to fetch the DINOv2/CLIP weights on an offline compute
+node) is recorded as `nan` rather than aborting — the angle metrics always come back. To
+avoid those `nan`s, pre-download the weights once on a login node with
+`bash download_models.sh` (or `python tests/test_san_modules.py`); the weights cache
+under `$HOME`, shared with the compute nodes.
 
 ```{note}
 Because the reference is the entire dataset and an equal number of fakes is
-generated each evaluation tick, both the real images and the generated batch are
-held in memory on rank 0. For very large or high-resolution datasets this is
-memory- and compute-intensive (comparable to a full FID pass every snapshot).
+generated each evaluation tick, the reals and the full generated batch are held in
+memory on rank 0 (for the reference cache and the angle-density metrics). The
+image-feature backbones (InceptionV3 + CLIP + DINOv2) run on every rank over its
+own shard, so that GPU cost is shared across GPUs, but each snapshot still costs
+more than a full FID pass. For very large or high-resolution datasets this is
+memory- and compute-intensive; pass `--combra-metrics False` on runs where you
+don't want it.
 ```
 
 ## Evaluation
@@ -95,7 +177,44 @@ python gen_images.py \
   --trunc=0.7 \
   --samples-per-class 1000 \
   --classes 0,1,2 \
-  --gpus 4 \
+  --gpus 2 \
   --batch-gpu 60 \
   --network=<path_to_checkpoint>
 ```
+
+### Class index → grain class
+
+The `--classes` integer selects a grain morphology. For the SAN model trained on the
+WC-Co dataset the indices map as:
+
+| index | grain class | morphology |
+|---|---|---|
+| `0` | `Ultra_Co25` | medium grain (средние зёрна) |
+| `1` | `Ultra_Co11` | small grain (мелкие зёрна) |
+| `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
+
+```{warning}
+**The index order differs between the two generators.** DiffiT numbers the same grains
+as `0 → Ultra_Co11`, `1 → Ultra_Co25` (indices 0 and 1 swapped relative to SAN;
+`2 → Ultra_Co6_2` matches — see {doc}`diffit`). So the same index does **not** generate
+the same morphology across SAN and DiffiT. When comparing a generator against the real
+classes — e.g. in the `co_angles` notebooks — remap per model with combra's
+`CLASS_MAP`, which {py:func}`combra.angles.resolve_overlay_rows` and
+{py:func}`combra.angles.build_overlay_grid` consume as `gen_name_for_mode`.
+```
+
+**Why the order differs.** The dataset stores only an integer label per image — never
+the `Ultra_Co*` name — and the two pipelines derive that integer by *different rules*:
+
+- **SAN** (`dataset_tool.py`) copies the label **verbatim from the preprocessed
+  source's `dataset.json`**, which was written `Ultra_Co25 → 0`, `Ultra_Co11 → 1`,
+  `Ultra_Co6_2 → 2` — an order that is **not** alphabetical.
+- **DiffiT** (`dataset_tool_for_imagenet.py`) ignores that file and re-derives labels
+  from the **alphabetical order of the class-folder names** (`sorted` then
+  `enumerate`): `Ultra_Co11 → 0`, `Ultra_Co25 → 1`, `Ultra_Co6_2 → 2`.
+
+Because the source `dataset.json` lists `Co25` before `Co11` while the folder sort puts
+`Co11` first, the two conventions disagree on labels 0 and 1 — the `Co11`↔`Co25` swap.
+`Ultra_Co6_2` is last under both rules, so it stays `2`. Since neither pipeline records
+the grain name downstream (generated images and their h5s carry only `class_0/1/2`), the
+correspondence has to be recovered after the fact and pinned in combra's `CLASS_MAP`.

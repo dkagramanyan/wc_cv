@@ -18,12 +18,11 @@ pip install .          # or:  pip install -e .   for an editable install
 | ------------- | -------------------------------- | --------------------------------------------- |
 | `tests`       | `pip install ".[tests]"`         | pytest + pytest-cov                           |
 | `docs`        | `pip install ".[docs]"`          | Sphinx docs toolchain                         |
-| `gen-metrics` | `pip install ".[gen-metrics]"`   | `open-clip-torch` for `compute_cmmd` / `compute_fd_dinov2` |
 | `dev`         | `pip install -e ".[dev]"`        | the `tests` extra + ruff                      |
 
-FID metrics work out of the box. `compute_fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid), which ships as a core dependency and downloads/caches its own InceptionV3 weights on first use — no manual model setup. It scores in-memory image batches and runs on CUDA when available, falling back to CPU; see {doc}`combra.metrics <api/metrics>`.
+All generative metrics work out of the box — `open-clip-torch` (for `compute_cmmd`), `pytorch-fid` and `torchvision` are core dependencies, so a plain `pip install combra` pulls everything. `compute_fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid), which downloads/caches its own InceptionV3 weights on first use; the DINOv2 backbone for `compute_fd_dinov2` is fetched from `torch.hub` on first use — no manual model setup. The metrics score in-memory image batches and run on CUDA when available, falling back to CPU; see {doc}`combra.metrics <api/metrics>`.
 
-The angle-Wasserstein training metrics use [POT](https://pythonot.github.io/) (`pot`), a core dependency. The CLIP-MMD and DINOv2 metrics (`compute_cmmd`, `compute_fd_dinov2`) additionally need the `gen-metrics` extra; the DINOv2 backbone is fetched from `torch.hub` on first use.
+The angle-Wasserstein training metrics use [POT](https://pythonot.github.io/) (`pot`), also a core dependency.
 
 ## Testing
 

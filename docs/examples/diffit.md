@@ -119,6 +119,16 @@ optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
 recorded as `nan`; the angle metrics always come back. The reference batch is
 scored once and cached, so only the generated-side work is repeated each tick.
 
+On a multi-GPU run the image-feature metrics (`fid`, `cmmd`, `fd_dinov2`) extract
+their CLIP / DINOv2 / InceptionV3 features **in parallel across every rank**: each
+rank generates and extracts features from its own shard of the fakes, the feature
+rows are gathered to rank 0, and the Fréchet / MMD distances are taken there
+against the cached reference features. This uses combra's split feature-extraction
+API ({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`,
+and the `cmmd_*` / `fd_dinov2_*` analogues) and is numerically identical to the
+single-GPU `compute_all_metrics` path. The angle-density metrics still run on
+rank 0 over the full gathered batch.
+
 **Sample count.** When combra is **not** installed, the eval generates
 `--num-fid-samples` images (default 10000), unchanged. When combra **is**
 installed, each evaluation tick instead scores the **whole training dataset**:
@@ -221,3 +231,40 @@ diffit-gen-images \
     --gpus 0,1,2,3 \
     --batch-size 32
 ```
+
+### Class index → grain class
+
+The `--classes` / `--class-idx` integer selects a grain morphology. For the DiffiT
+model trained on the WC-Co dataset the indices map as:
+
+| index | grain class | morphology |
+|---|---|---|
+| `0` | `Ultra_Co11` | small grain (мелкие зёрна) |
+| `1` | `Ultra_Co25` | medium grain (средние зёрна) |
+| `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
+
+```{warning}
+**The index order differs between the two generators.** SAN numbers the same grains
+as `0 → Ultra_Co25`, `1 → Ultra_Co11` (indices 0 and 1 swapped; `2 → Ultra_Co6_2`
+matches — see {doc}`san_v2`). So the same index does **not** generate the same
+morphology across SAN and DiffiT. When comparing a generator against the real
+classes — e.g. in the `co_angles` notebooks — remap per model with combra's
+`CLASS_MAP`, which {py:func}`combra.angles.resolve_overlay_rows` and
+{py:func}`combra.angles.build_overlay_grid` consume as `gen_name_for_mode`.
+```
+
+**Why the order differs.** The dataset stores only an integer label per image — never
+the `Ultra_Co*` name — and the two pipelines derive that integer by *different rules*:
+
+- **DiffiT** (`dataset_tool_for_imagenet.py`) assigns each class an integer from the
+  **alphabetical order of the class-folder names** (`sorted(train_dirs)` then
+  `enumerate`): `Ultra_Co11 → 0`, `Ultra_Co25 → 1`, `Ultra_Co6_2 → 2`.
+- **SAN** (`dataset_tool.py`) copies the label **verbatim from the preprocessed
+  source's `dataset.json`**, which was written `Ultra_Co25 → 0`, `Ultra_Co11 → 1`,
+  `Ultra_Co6_2 → 2` — an order that is **not** alphabetical.
+
+Because the source `dataset.json` lists `Co25` before `Co11` while the folder sort puts
+`Co11` first, the two conventions disagree on labels 0 and 1 — the `Co11`↔`Co25` swap.
+`Ultra_Co6_2` is last under both rules, so it stays `2`. Since neither pipeline records
+the grain name downstream (generated images and their h5s carry only `class_0/1/2`), the
+correspondence has to be recovered after the fact and pinned in combra's `CLASS_MAP`.

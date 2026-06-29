@@ -256,8 +256,8 @@ Batch helper that builds an angle-convergence sweep: for each `N` in `ns` it ins
 a {py:class}`~combra.data.PobeditDataset` capped at `N` images per class and calls
 {py:meth}`~combra.data.PobeditDataset.generate_angles`, writing one `angles_n{N}.parquet`
 per sample size into `out_dir`. A parquet is only (re)generated when it is missing **or**
-exists but lacks rows at `step` (`generate_angles` overwrites, it does not append), so
-reruns are cheap. One status line is printed per call.
+exists but lacks rows at one of the requested steps (`generate_angles` overwrites, it does
+not append), so reruns are cheap. One status line is printed per call.
 
 :param h5_path: Source HDF5 (or class-folder) passed to each `PobeditDataset`.
 :type h5_path: str or Path
@@ -265,8 +265,8 @@ reruns are cheap. One status line is printed per call.
 :type out_dir: str or Path
 :param ns: Sample sizes to sweep — one parquet per value.
 :type ns: Iterable[int]
-:param step: Histogram step used both for generation and for the "already present" check.
-:type step: float
+:param step: Histogram step(s) stored in each parquet and used for the "already present" check. A single value or a list of steps (all must be present for a parquet to count as up to date).
+:type step: float or list[float]
 :param types_dict: Class-name to display-label map, forwarded to `generate_angles`.
 :type types_dict: dict[str, str]
 :param tag: Prefix shown in brackets in the printed status lines (e.g. the generator family). Default: `''`.

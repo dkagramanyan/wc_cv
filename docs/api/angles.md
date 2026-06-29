@@ -75,6 +75,34 @@ overlaying text on a custom plot.
 ```
 ````
 
+## Output layout
+
+````{py:function} combra.angles.angles_out_dir(out_root, src_path, msl) -> pathlib.Path
+
+Canonical per-source folder for generated angle parquets:
+`{out_root}/{stem}_msl{int(msl)}`, where `stem` is the source file/folder stem and
+`msl` the `min_segment_len` used at generation. This is the exact folder
+{py:func}`combra.data.generate_angles_sweep` writes into, so the generation and
+plotting sides share one naming convention instead of re-deriving the `_msl` suffix.
+
+:param out_root: Root directory holding the per-source angle folders.
+:type out_root: str or pathlib.Path
+:param src_path: Source image folder or h5 path; only its stem is used.
+:type src_path: str or pathlib.Path
+:param msl: ``min_segment_len`` used at generation; ``int(msl)`` forms the ``_msl`` suffix.
+:type msl: float
+:returns: **out_dir** – ``Path(out_root) / f'{Path(src_path).stem}_msl{int(msl)}'``.
+:rtype: pathlib.Path
+
+**Example**
+
+```python
+>>> from combra import angles
+>>> angles.angles_out_dir('./data/angles', './data/h5/gen_san_256x256_N100_000.h5', 5.0)
+PosixPath('data/angles/gen_san_256x256_N100_000_msl5')
+```
+````
+
 ## Plotting
 
 ````{py:function} combra.angles.angles_plot_base(rows=None, save_name=None, N=20, M=20, save=False, indices=None, font_size=20, scatter_size=20, xlim=None, ylim=None, parquet_path=None, step=None, show=True) -> None
@@ -175,6 +203,147 @@ Three-source 3×3 grid (real, SAN-GAN, DiffiT × small/medium/large grains):
 ...     col_titles=['small grain', 'medium grain', 'large grain'],
 ...     step=2.0,
 ... )
+```
+````
+
+````{py:function} combra.angles.build_overlay_grid(rows, classes, gen_name_for_mode, styles, orig_label='orig') -> tuple[list, dict]
+
+Assemble the nested ``grid`` for {py:func}`combra.angles.angles_plot_grid` **and** the per-mode comparison pairs for {py:func}`combra.metrics.compare_pairs` from already-resolved per-row sources — so an "original vs N generators across resolution × class" notebook only declares its paths/availability and trace styles instead of hand-building the grid.
+
+:param rows: One `(row_label, orig_parquet, {mode: gen_parquet})` per grid row (e.g. per resolution). The `{mode: gen_parquet}` dict lists only the generators actually available for that row.
+:type rows: list[tuple[str, str, dict[str, str]]]
+:param classes: Ordered class keys **without** the `class_` prefix; each cell's orig trace uses `class_name = f'class_{key}'`.
+:type classes: list[str]
+:param gen_name_for_mode: `{mode: {class_key: gen_class_name}}` — the generated `meta.name` per (mode, class), since generators index classes differently.
+:type gen_name_for_mode: dict[str, dict[str, str]]
+:param styles: `{label: {'color': ..., 'marker': ...}}` for `orig_label` and each mode; merged into every trace dict.
+:type styles: dict[str, dict]
+:param orig_label: Label/style key for the reference (original) trace. Default: `'orig'`.
+:type orig_label: str, optional
+:returns: **(grid, pairs_by_mode)** – `grid` is the nested trace structure for `angles_plot_grid`; `pairs_by_mode` is `{mode: [(row_label, orig_parquet, gen_parquet, class_map), ...]}` for `compare_pairs` (with `class_map = {f'class_{key}': gen_class_name}`).
+:rtype: tuple[list, dict]
+
+**Example**
+
+From `co_angles/1_generation_and_plots.ipynb` — resolve availability, then let combra build both the plot grid and the metric pairs:
+
+```python
+>>> from combra import angles
+>>> from combra.metrics import compare_pairs
+>>> STYLES = {'orig': dict(color='blue', marker='circle'),
+...           'san':  dict(color='orange', marker='square'),
+...           'diffit': dict(color='green', marker='diamond')}
+>>> gen_name = {'san':    {'Ultra_Co25': 'class_0', 'Ultra_Co11': 'class_1', 'Ultra_Co6_2': 'class_2'},
+...             'diffit': {'Ultra_Co11': 'class_0', 'Ultra_Co25': 'class_1', 'Ultra_Co6_2': 'class_2'}}
+>>> rows = [('256', './a/orig/angles_n360.parquet',
+...          {'san': './a/san/angles_n10000.parquet', 'diffit': './a/diffit/angles_n10000.parquet'})]
+>>> grid, pairs = angles.build_overlay_grid(
+...     rows, ['Ultra_Co11', 'Ultra_Co25', 'Ultra_Co6_2'], gen_name, STYLES)
+>>> compare_pairs(pairs['diffit'], step=2, coef=1, label_header='res')
+>>> fig = angles.angles_plot_grid(grid, ['256×256'],
+...                               ['small', 'medium', 'large'], step=2)
+```
+````
+
+````{py:function} combra.angles.resolve_overlay_rows(out_root, sources, n, msl, real_family='real') -> list
+
+Group a generation *sources manifest* into the `rows` argument of
+{py:func}`combra.angles.build_overlay_grid`, so a comparison notebook declares its
+sources once — the same `(src_path, n_list, family, resolution)` list it feeds
+{py:func}`combra.data.generate_angles_sweep` — and the plot side cannot drift from
+generation. Per resolution (in first-seen order) the single `real_family` source
+becomes the reference (`orig`) parquet at its own first N; every other source is
+added at `angles_n{n}.parquet` when `n` is in its `n_list` **and** the file exists
+on disk. Folder names are resolved via {py:func}`combra.angles.angles_out_dir`.
+
+:param out_root: Root holding the per-source angle folders.
+:type out_root: str or pathlib.Path
+:param sources: Manifest of ``(src_path, n_list, family, resolution)`` tuples; ``n_list`` is each source's available N budgets.
+:type sources: list[tuple]
+:param n: Generated-images-per-class budget to plot for the non-real sources.
+:type n: int
+:param msl: ``min_segment_len`` used at generation; selects the folder suffix.
+:type msl: float
+:param real_family: Family label of the reference source. Default: ``'real'``.
+:type real_family: str, optional
+:returns: **rows** – ``[(row_label, orig_parquet, {family: gen_parquet}), ...]`` for each resolution that has a real source, ready for {py:func}`~combra.angles.build_overlay_grid`.
+:rtype: list[tuple[str, str, dict[str, str]]]
+
+**Example**
+
+```python
+>>> from combra import angles
+>>> SOURCES = [
+...     ('o_bc_left_..._256x256_rgb_N360', [360],           'real',   256),
+...     ('./data/h5/gen_san_256x256_N100_000.h5', [1000, 10000], 'san', 256),
+...     ('./data/h5/00017-diffit-256-..._N10000.h5', [1000, 10000], 'diffit', 256),
+... ]
+>>> rows = angles.resolve_overlay_rows('./data/angles', SOURCES, n=10000, msl=5.0)
+```
+````
+
+````{py:function} combra.angles.plot_overlay_grid_from_sources(out_root, sources, n, msl, classes, gen_name_for_mode, styles, col_titles=None, row_label_fmt='{r}×{r}', step=2, ylim=None, title=None, save=None, show=True, compare=False, compare_coef=1, real_family='real', orig_label='orig') -> tuple
+
+End-to-end orig-vs-generators overlay grid for one N, straight from a sources
+manifest. Composes {py:func}`~combra.angles.resolve_overlay_rows` →
+{py:func}`~combra.angles.build_overlay_grid` → (optional
+{py:func}`combra.metrics.compare_pairs` printing when ``compare=True``) →
+{py:func}`~combra.angles.angles_plot_grid`, so a notebook keeps only its own config
+(class maps, styles, labels, title/filename) and calls this once per ``n``.
+
+:param out_root: Root holding the per-source angle folders.
+:type out_root: str or pathlib.Path
+:param sources: Manifest of ``(src_path, n_list, family, resolution)`` tuples (see {py:func}`~combra.angles.resolve_overlay_rows`).
+:type sources: list[tuple]
+:param n: Generated-images-per-class budget to plot for the non-real sources.
+:type n: int
+:param msl: ``min_segment_len`` used at generation; selects the folder suffix.
+:type msl: float
+:param classes: Ordered class keys **without** the ``class_`` prefix.
+:type classes: list[str]
+:param gen_name_for_mode: ``{mode: {class_key: gen_class_name}}`` — the generated ``meta.name`` per (mode, class).
+:type gen_name_for_mode: dict[str, dict[str, str]]
+:param styles: ``{label: {'color': ..., 'marker': ...}}`` for ``orig_label`` and each mode.
+:type styles: dict[str, dict]
+:param col_titles: Per-column labels. Defaults to ``classes``.
+:type col_titles: list[str] or None, optional
+:param row_label_fmt: Format string for each resolution row title (``{r}`` = resolution). Default: ``'{r}×{r}'``.
+:type row_label_fmt: str, optional
+:param step: Histogram step to filter on. Default: ``2``.
+:type step: float, optional
+:param ylim: Shared y-axis range across cells. Default: ``None``.
+:type ylim: tuple[float, float] or None, optional
+:param title: Figure title. Default: ``None``.
+:type title: str or None, optional
+:param save: If given, save the figure to this path. Default: ``None``.
+:type save: str or None, optional
+:param show: ``True`` to call ``fig.show()``. Default: ``True``.
+:type show: bool, optional
+:param compare: When ``True``, print the per-mode Wasserstein table before plotting. Default: ``False``.
+:type compare: bool, optional
+:param compare_coef: Multiplier passed to {py:func}`combra.metrics.compare_pairs` (``1`` prints raw degrees). Default: ``1``.
+:type compare_coef: float, optional
+:param real_family: Family label of the reference source. Default: ``'real'``.
+:type real_family: str, optional
+:param orig_label: Label/style key for the reference trace. Default: ``'orig'``.
+:type orig_label: str, optional
+:returns: **(fig, pairs_by_mode)** – the assembled grid figure and the per-mode comparison pairs from {py:func}`~combra.angles.build_overlay_grid`.
+:rtype: tuple[plotly.graph_objects.Figure, dict]
+
+**Example**
+
+From `co_angles/1_generation_and_plots.ipynb` — one call per N draws the grid and prints the metric table:
+
+```python
+>>> from combra import angles
+>>> for max_n in [1000, 10000]:
+...     angles.plot_overlay_grid_from_sources(
+...         './data/angles', SOURCES, n=max_n, msl=5.0,
+...         classes=['Ultra_Co11', 'Ultra_Co25', 'Ultra_Co6_2'],
+...         col_titles=['small', 'medium', 'large'],
+...         gen_name_for_mode=gen_name, styles=STYLES,
+...         step=2, compare=True, title=f'angles N={max_n}',
+...     )
 ```
 ````
 
