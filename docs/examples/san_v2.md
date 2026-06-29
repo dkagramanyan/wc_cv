@@ -108,11 +108,12 @@ the loop denormalizes the fakes to `uint8` first so both sides are scored
 explicitly on the same scale. (combra also rescales float inputs internally — both
 the image-feature and the angle-density metrics map `[-1, 1]`/`[0, 1]` to `uint8`
 the same way — but denormalizing in the loop keeps the comparison unambiguous.)
-<<<<<<< HEAD
 Each tick computes **both** the angle-density metrics (Wasserstein `w1`, `w2`,
 `circular_w1`, `circular_w2` and the bimodal-Gaussian `mu/sigma/amp` errors) **and**
 the image-feature metrics `fid`, `cmmd`, `fd_dinov2`. All are logged to TensorBoard
-under `Metrics/combra_*` and printed to the run log.
+under `Metrics/combra_*` and printed to the run log; the three image-feature metrics
+carry their 10k sample size in the key (`combra_fid10k`, `combra_cmmd10k`,
+`combra_fd_dinov2_10k`).
 
 On a **multi-GPU** run the image-feature extraction is **sharded across ranks**:
 each rank generates and extracts its CLIP / DINOv2 / InceptionV3 features from its
@@ -129,16 +130,6 @@ node) is recorded as `nan` rather than aborting — the angle metrics always com
 avoid those `nan`s, pre-download the weights once on a login node with
 `bash download_models.sh` (or `python tests/test_san_modules.py`); the weights cache
 under `$HOME`, shared with the compute nodes.
-=======
-All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`,
-the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`,
-and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
-TensorBoard under `Metrics/combra_*` and printed to the run log; the three
-image-feature metrics carry their 10k sample size in the TensorBoard key
-(`combra_fid10k`, `combra_cmmd10k`, `combra_fd_dinov2_10k`). Metrics whose
-optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
-recorded as `nan`; the angle metrics always come back.
->>>>>>> 81f2feb8f1a08baec7280c3494901235673445ac
 
 When `--combra-metrics` is enabled (the default), `fid50k_full` is dropped from
 `--metrics` so the expensive 50k-image FID pass is not computed twice, and
@@ -146,7 +137,6 @@ When `--combra-metrics` is enabled (the default), `fid50k_full` is dropped from
 (`best_model.pkl`).
 
 ```{note}
-<<<<<<< HEAD
 Because the reference is the entire dataset and an equal number of fakes is
 generated each evaluation tick, the reals and the full generated batch are held in
 memory on rank 0 (for the reference cache and the angle-density metrics). The
@@ -155,12 +145,6 @@ own shard, so that GPU cost is shared across GPUs, but each snapshot still costs
 more than a full FID pass. For very large or high-resolution datasets this is
 memory- and compute-intensive; pass `--combra-metrics False` on runs where you
 don't want it.
-=======
-Because the reference is the entire dataset and 10 000 fakes are generated each
-evaluation tick, both the real images and the generated batch are held in memory
-on rank 0. For very large or high-resolution datasets this is
-memory- and compute-intensive (comparable to a full FID pass every snapshot).
->>>>>>> 81f2feb8f1a08baec7280c3494901235673445ac
 ```
 
 ## Evaluation
