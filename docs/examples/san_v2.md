@@ -90,21 +90,25 @@ tick also writes a small `network-snapshot-<kimg>-inference.pkl` holding **only 
 the full checkpoint to resume training. There is also `--save-weights-only` (`G`/`D`/`G_ema`,
 larger) for when the discriminator is needed.
 
-During training, the combra metrics are scored over the **whole training set** as
-the reference, against an **equal number** of images generated from `G_ema`. The
-reference set is fixed across training, so its features (angle density, FID/DINOv2
-`(mu, sigma)`, CLIP embedding) are computed once and reused via combra's
-`reference_cache`; only the generated side is recomputed each evaluation tick.
+During training, the combra metrics use the **whole training set** as the fixed
+reference, scored against a fixed **`COMBRA_NUM_GEN = 10 000`** images generated
+from `G_ema` (their labels sampled from the training-set class distribution, seeded
+identically on every rank). combra's image-feature metrics estimate per-side
+statistics, so the two counts need not match. The reference set is fixed across
+training, so its features (angle density, FID/DINOv2 `(mu, sigma)`, CLIP embedding)
+are computed once and reused via combra's `reference_cache`; only the generated
+side is recomputed each evaluation tick.
 
-This differs from the standard StyleGAN `fid50k_full`, which uses all reals but a
-fixed 50 000 generated samples — the combra metrics instead keep the two sides the
-same size.
+This mirrors the standard StyleGAN `fid50k_full` (all reals vs a fixed sample of
+fakes) but with a 10 000-image generated side, and it adds the angle-distribution
+and CMMD/FD-DINOv2 metrics on top of FID.
 
 `G_ema` emits float images in `[-1, 1]`, while the reals are `uint8` `[0, 255]`;
 the loop denormalizes the fakes to `uint8` first so both sides are scored
 explicitly on the same scale. (combra also rescales float inputs internally — both
 the image-feature and the angle-density metrics map `[-1, 1]`/`[0, 1]` to `uint8`
 the same way — but denormalizing in the loop keeps the comparison unambiguous.)
+<<<<<<< HEAD
 Each tick computes **both** the angle-density metrics (Wasserstein `w1`, `w2`,
 `circular_w1`, `circular_w2` and the bimodal-Gaussian `mu/sigma/amp` errors) **and**
 the image-feature metrics `fid`, `cmmd`, `fd_dinov2`. All are logged to TensorBoard
@@ -125,8 +129,24 @@ node) is recorded as `nan` rather than aborting — the angle metrics always com
 avoid those `nan`s, pre-download the weights once on a login node with
 `bash download_models.sh` (or `python tests/test_san_modules.py`); the weights cache
 under `$HOME`, shared with the compute nodes.
+=======
+All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`,
+the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`,
+and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
+TensorBoard under `Metrics/combra_*` and printed to the run log; the three
+image-feature metrics carry their 10k sample size in the TensorBoard key
+(`combra_fid10k`, `combra_cmmd10k`, `combra_fd_dinov2_10k`). Metrics whose
+optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
+recorded as `nan`; the angle metrics always come back.
+>>>>>>> 81f2feb8f1a08baec7280c3494901235673445ac
+
+When `--combra-metrics` is enabled (the default), `fid50k_full` is dropped from
+`--metrics` so the expensive 50k-image FID pass is not computed twice, and
+`combra_fid10k` becomes the FID that drives best-model checkpoint selection
+(`best_model.pkl`).
 
 ```{note}
+<<<<<<< HEAD
 Because the reference is the entire dataset and an equal number of fakes is
 generated each evaluation tick, the reals and the full generated batch are held in
 memory on rank 0 (for the reference cache and the angle-density metrics). The
@@ -135,6 +155,12 @@ own shard, so that GPU cost is shared across GPUs, but each snapshot still costs
 more than a full FID pass. For very large or high-resolution datasets this is
 memory- and compute-intensive; pass `--combra-metrics False` on runs where you
 don't want it.
+=======
+Because the reference is the entire dataset and 10 000 fakes are generated each
+evaluation tick, both the real images and the generated batch are held in memory
+on rank 0. For very large or high-resolution datasets this is
+memory- and compute-intensive (comparable to a full FID pass every snapshot).
+>>>>>>> 81f2feb8f1a08baec7280c3494901235673445ac
 ```
 
 ## Evaluation
@@ -152,15 +178,19 @@ To score arbitrary real/generated image batches with the combra metrics directly
 
 ```python
 >>> from combra.metrics import compute_all_metrics
->>> results = compute_all_metrics(reference_images, generated_images)
+>>> results = compute_all_metrics(reference_images, generated_images, image_metrics=True)
 >>> results
 {'w1': ..., 'w2': ..., 'circular_w1': ..., 'circular_w2': ...,
+ 'mu1': ..., 'mu2': ..., 'sigma1': ..., 'sigma2': ..., 'amp1': ..., 'amp2': ...,
  'fid': ..., 'cmmd': ..., 'fd_dinov2': ...}
 ```
 
-Batches may be numpy arrays or torch tensors in `NCHW`/`NHWC`, with pixel values
-in `uint8`, `[0, 1]`, or `[-1, 1]`; combra rescales each side to `uint8` by
-inferring the range (any negative ⇒ `[-1, 1]`, else max ≤ 1 ⇒ `[0, 1]`). Because
+`image_metrics=True` is what adds the `fid`/`cmmd`/`fd_dinov2` keys (and is what the
+training loop passes); without it, only the angle-Wasserstein and bimodal-Gaussian
+metrics come back. Batches may be numpy arrays or torch tensors in `NCHW`/`NHWC`,
+with pixel values in `uint8`, `[0, 1]`, or `[-1, 1]`; combra rescales each side to
+`uint8` by inferring the range (any negative ⇒ `[-1, 1]`, else max ≤ 1 ⇒ `[0, 1]`).
+Because
 that inference is per-batch, prefer passing `uint8` (or an explicit, consistent
 scale) when you can — as the training loop does — so an unusual batch (e.g. a
 generated batch that happens to be all-positive) cannot be misread.
