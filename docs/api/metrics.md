@@ -313,6 +313,22 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :rtype: tuple(ndarray, ndarray)
 ````
 
+````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0) -> ndarray
+
+The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → get_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
+
+:param images: Image batch.
+:type images: ndarray or torch.Tensor
+:param border_eps: Border margin passed to {py:func}`combra.angles.get_angles`. Default: `5`.
+:type border_eps: int, optional
+:param tol: Polygon-approximation tolerance passed to `get_angles`. Default: `3`.
+:type tol: int, optional
+:param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
+:type min_segment_len: float, optional
+:returns: **pooled** (*ndarray*) – 1-D array of all pooled vertex angles (degrees).
+:rtype: ndarray
+````
+
 ### Gaussian-fit metrics
 
 `compute_gauss_metrics` mirrors `compute_wasserstein_metrics`, but instead of a
@@ -451,6 +467,32 @@ Run every batch metric for a (reference, generated) pair in parallel and return 
 >>> scores = compute_all_metrics(real_batch, generated_batch)
 >>> scores['cmmd'], scores['w1'], scores['mu1']
 ```
+````
+
+### Sharded angle metrics
+
+Just as the image-feature metrics split into [extractor + distance halves](#sharded-feature-extraction), the angle suite splits into {py:func}`combra.metrics.images_to_pooled_angles` (the expensive, per-image extraction) and `angle_density_metrics_from_pooled` (the cheap histogram + Wasserstein + Gaussian-fit assembly). This lets the angle extraction be **sharded across devices or processes**: pool the angles for disjoint slices in parallel, concatenate the 1-D arrays, then compute the metrics once. Pooling is plain concatenation and the histogram is a `bincount`, so the sharded result is **exact**, not an approximation — identical to `compute_all_metrics(..., image_metrics=False)` over the full set. DiffiT's multi-GPU training loop uses this (alongside the sharded features) so the angle work — for both the generated and the reference set — is spread over every rank instead of running on rank 0 (see the {doc}`DiffiT example </examples/diffit>`).
+
+```python
+>>> import numpy as np
+>>> from combra.metrics import images_to_pooled_angles, angle_density_metrics_from_pooled
+>>> ref_ang = images_to_pooled_angles(real_batch)                          # once, cacheable
+>>> gen_ang = np.concatenate([images_to_pooled_angles(s) for s in gen_shards])  # sharded
+>>> m = angle_density_metrics_from_pooled(ref_ang, gen_ang)  # == compute_all_metrics(..., image_metrics=False)
+```
+
+````{py:function} combra.metrics.angle_density_metrics_from_pooled(reference_angles, generated_angles, step=None) -> dict
+
+Angle-density metrics from pre-pooled angle arrays — the distributed-friendly counterpart of `compute_all_metrics(image_metrics=False)`. Callers that sharded {py:func}`combra.metrics.images_to_pooled_angles` across workers/ranks gather the pooled arrays and pass them here. Histograms each side at `step` degrees with {py:func}`combra.stats.stats_preprocess` and returns the same angle-suite keys as {py:func}`combra.metrics.compute_all_metrics` — the Wasserstein `w1`/`w2`/`circular_w1`/`circular_w2` and the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`.
+
+:param reference_angles: 1-D pooled reference angles, as returned by {py:func}`combra.metrics.images_to_pooled_angles`.
+:type reference_angles: ndarray
+:param generated_angles: 1-D pooled generated angles.
+:type generated_angles: ndarray
+:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
+:type step: float or None, optional
+:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`.
+:rtype: dict
 ````
 
 ## Distribution comparison

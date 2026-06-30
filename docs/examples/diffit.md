@@ -119,15 +119,24 @@ optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
 recorded as `nan`; the angle metrics always come back. The reference batch is
 scored once and cached, so only the generated-side work is repeated each tick.
 
-On a multi-GPU run the image-feature metrics (`fid`, `cmmd`, `fd_dinov2`) extract
-their CLIP / DINOv2 / InceptionV3 features **in parallel across every rank**: each
-rank generates and extracts features from its own shard of the fakes, the feature
-rows are gathered to rank 0, and the Fréchet / MMD distances are taken there
-against the cached reference features. This uses combra's split feature-extraction
-API ({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`,
-and the `cmmd_*` / `fd_dinov2_*` analogues) and is numerically identical to the
-single-GPU `compute_all_metrics` path. The angle-density metrics still run on
-rank 0 over the full gathered batch.
+On a multi-GPU run **all** the per-image extraction work is spread across every
+rank — both the image-feature metrics (`fid`, `cmmd`, `fd_dinov2`) and the
+angle-density / Gaussian-fit metrics. Each rank generates its own shard of the
+fakes and, from that shard, extracts the CLIP / DINOv2 / InceptionV3 features and
+pools the vertex angles; the feature rows and the pooled-angle arrays are gathered
+to rank 0, where the Fréchet / MMD distances and the angle Wasserstein / Gaussian
+metrics are computed once against the reference. The reference side is sharded the
+same way and extracted **once before training** (each rank processes its
+deterministic slice of the reals), then cached on rank 0 — so no reference work or
+collective recurs per tick. This uses combra's split APIs — the feature halves
+({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`
+and the `cmmd_*` / `fd_dinov2_*` analogues) and the angle halves
+({py:func}`combra.metrics.images_to_pooled_angles` +
+`angle_density_metrics_from_pooled`) — and is numerically identical to the
+single-GPU `compute_all_metrics` path. Sharding the angle extraction this way also
+fixes a multi-GPU hang: when it ran rank-0-only over the full gathered batch, at
+512²/1024² it could take longer than NCCL's watchdog while the other ranks idled,
+aborting the job.
 
 **Sample count.** When combra is **not** installed, the eval generates
 `--num-fid-samples` images (default 10000), unchanged. When combra **is**
