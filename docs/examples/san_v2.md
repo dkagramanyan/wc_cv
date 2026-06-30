@@ -95,9 +95,10 @@ reference, scored against a fixed **`COMBRA_NUM_GEN = 10 000`** images generated
 from `G_ema` (their labels sampled from the training-set class distribution, seeded
 identically on every rank). combra's image-feature metrics estimate per-side
 statistics, so the two counts need not match. The reference set is fixed across
-training, so its features (angle density, FID/DINOv2 `(mu, sigma)`, CLIP embedding)
-are computed once and reused via combra's `reference_cache`; only the generated
-side is recomputed each evaluation tick.
+training, so its features (pooled angles, FID/DINOv2 `(mu, sigma)`, CLIP embedding)
+are extracted **once before the training loop** — sharded across ranks (each rank
+processes its deterministic slice of the reals) and gathered to rank 0 — then
+cached; only the generated side is recomputed each evaluation tick.
 
 This mirrors the standard StyleGAN `fid50k_full` (all reals vs a fixed sample of
 fakes) but with a 10 000-image generated side, and it adds the angle-distribution
@@ -115,16 +116,22 @@ under `Metrics/combra_*` and printed to the run log; the three image-feature met
 carry their 10k sample size in the key (`combra_fid10k`, `combra_cmmd10k`,
 `combra_fd_dinov2_10k`).
 
-On a **multi-GPU** run the image-feature extraction is **sharded across ranks**:
-each rank generates and extracts its CLIP / DINOv2 / InceptionV3 features from its
-own shard of the fakes, the feature rows are gathered to rank 0, and the Fréchet /
-MMD distances are taken there against the cached reference features. This uses
-combra's split feature-extraction API ({py:func}`combra.metrics.fid_features` +
-{py:func}`combra.metrics.fid_from_features`, and the `cmmd_*` / `fd_dinov2_*`
-analogues) and is numerically identical to the single-GPU
-`compute_all_metrics(image_metrics=True)` path; the angle-density metrics run on
-rank 0 over the full gathered batch. On a single GPU the three image metrics
-instead run concurrently in a thread pool. Any whose optional backend is
+On a **multi-GPU** run **all** the per-image extraction is **sharded across ranks** —
+both the image-feature metrics and the angle-density / Gaussian-fit metrics. Each
+rank generates its own shard of the fakes and, from that shard, extracts the CLIP /
+DINOv2 / InceptionV3 features and pools the vertex angles; the feature rows and the
+pooled-angle arrays are gathered to rank 0, where the Fréchet / MMD distances and
+the angle Wasserstein / Gaussian metrics are taken against the precomputed
+reference. This uses combra's split APIs — the feature halves
+({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`,
+and the `cmmd_*` / `fd_dinov2_*` analogues) and the angle halves
+({py:func}`combra.metrics.images_to_pooled_angles` +
+`angle_density_metrics_from_pooled`) — and is numerically identical to the
+single-GPU `compute_all_metrics(image_metrics=True)` path. Sharding the angle
+extraction also fixes a multi-GPU hang: when it ran rank-0-only over the full
+gathered batch, at 512/1024 px it could exceed NCCL's collective-timeout watchdog
+while the other ranks idled, aborting the job. On a single GPU the three image
+metrics instead run concurrently in a thread pool. Any whose optional backend is
 unavailable (e.g. no network to fetch the DINOv2/CLIP weights on an offline compute
 node) is recorded as `nan` rather than aborting — the angle metrics always come back. To
 avoid those `nan`s, pre-download the weights once on a login node with
@@ -138,11 +145,11 @@ When `--combra-metrics` is enabled (the default), `fid50k_full` is dropped from
 
 ```{note}
 Because the reference is the entire dataset and an equal number of fakes is
-generated each evaluation tick, the reals and the full generated batch are held in
-memory on rank 0 (for the reference cache and the angle-density metrics). The
-image-feature backbones (InceptionV3 + CLIP + DINOv2) run on every rank over its
-own shard, so that GPU cost is shared across GPUs, but each snapshot still costs
-more than a full FID pass. For very large or high-resolution datasets this is
+generated each evaluation tick, both the reference and the generated extraction
+(angle pooling + the InceptionV3 / CLIP / DINOv2 backbones) run on every rank over
+its own shard, so that cost is shared across GPUs; only the small gathered feature
+rows and pooled-angle arrays land on rank 0 for the final distances. Each snapshot
+still costs more than a full FID pass. For very large or high-resolution datasets this is
 memory- and compute-intensive; pass `--combra-metrics False` on runs where you
 don't want it.
 ```
