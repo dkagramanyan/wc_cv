@@ -41,6 +41,7 @@ examples/angles
 examples/fid
 examples/san_v2
 examples/diffit
+examples/edm2
 examples/sampler_comparison
 ```
 
