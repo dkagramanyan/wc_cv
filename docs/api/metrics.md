@@ -296,7 +296,7 @@ All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1'
 The density-level core (used by the parquet comparison path) lives at `combra.metrics.wasserstein.wasserstein_density_metrics` if you need to call it on `(x, y)` densities directly.
 ````
 
-````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, ndarray]
+````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> tuple[ndarray, ndarray]
 
 Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_image → get_angles` on each image, pools all vertex angles, then histograms them with {py:func}`combra.stats.stats_preprocess` at `step` degrees.
 
@@ -310,11 +310,13 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :type tol: int, optional
 :param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
 :returns: **density** (*tuple[ndarray, ndarray]*) – `(x, y)` angle-bin centres and densities.
 :rtype: tuple(ndarray, ndarray)
 ````
 
-````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0) -> ndarray
+````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> ndarray
 
 The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → get_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
 
@@ -326,6 +328,8 @@ The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: 
 :type tol: int, optional
 :param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
 :returns: **pooled** (*ndarray*) – 1-D array of all pooled vertex angles (degrees).
 :rtype: ndarray
 ````
@@ -442,9 +446,9 @@ Relative error of the **mode-2 Gaussian amplitude** — the `amp2` value of {py:
 
 ### Unified entry point
 
-````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
+````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None, image_metrics=False, workers=None) -> dict
 
-Run every batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-density metrics — the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) and the bimodal-Gaussian relative errors (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) — compare the two samples' angle densities; `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back. A single image therefore yields real `w*`/`mu*`/`sigma*`/`amp*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
+Run every requested batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-density metrics — the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) and the bimodal-Gaussian relative errors (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) — compare the two samples' angle densities and are **always** computed. The image-feature metrics — `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` — compare their deep features and are added **only when `image_metrics=True`**; the default is `False`, so the cheap angle-only suite needs no GPU or optional deps. When `image_metrics=True`, an image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back — a single image therefore yields real `w*`/`mu*`/`sigma*`/`amp*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -458,14 +462,18 @@ Run every batch metric for a (reference, generated) pair in parallel and return 
 :type angle_kw: dict or None, optional
 :param reference_cache: Opt-in dict reused across calls to compute the reference-side features once. Default: `None`.
 :type reference_cache: dict or None, optional
-:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`, `fid`, `cmmd`, `fd_dinov2`.
+:param image_metrics: When `True`, also compute the image-feature metrics `fid`, `cmmd`, `fd_dinov2` (they run concurrently in a thread pool). When `False` (the default) only the angle-density and Gaussian-fit metrics are returned, so no GPU or optional deps are needed. Default: `False`.
+:type image_metrics: bool, optional
+:param workers: When `> 1`, parallelise the angle-density extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
+:returns: **results** (*dict*) – Flat `{metric_name: value}` dict. Always contains `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`; with `image_metrics=True` it additionally contains `fid`, `cmmd`, `fd_dinov2`.
 :rtype: dict
 
 **Example**
 
 ```python
 >>> from combra.metrics import compute_all_metrics
->>> scores = compute_all_metrics(real_batch, generated_batch)
+>>> scores = compute_all_metrics(real_batch, generated_batch, image_metrics=True)
 >>> scores['cmmd'], scores['w1'], scores['mu1']
 ```
 ````

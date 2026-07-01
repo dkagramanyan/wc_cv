@@ -109,15 +109,19 @@ During training, at each evaluation tick (every `--snap` ticks) the loop
 generates a batch of images from the EMA model by running the configured
 reverse-diffusion sampler (DDIM by default — see the Samplers section below) in
 VAE latent space, decodes them to pixels, and runs
-`compute_all_metrics(reals, fakes)` (when combra is installed). All returned
-metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`, the
-bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`, and
-the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to TensorBoard
-under `Metrics/combra_*`, written to `stats.jsonl`, and printed to the run log,
-alongside DiffiT's own IS / FID / sFID / Precision / Recall. Metrics whose
-optional backends are unavailable (e.g. no network to fetch DINOv2 weights) are
-recorded as `nan`; the angle metrics always come back. The reference batch is
-scored once and cached, so only the generated-side work is repeated each tick.
+`compute_all_metrics(reals, fakes, image_metrics=True)` (when combra is
+installed). All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`,
+`circular_w2`, the bimodal-Gaussian relative errors
+`mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`, and the image-feature metrics `fid`,
+`cmmd`, `fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*`, written
+to `stats.jsonl`, and printed to the run log. Enabling the combra metrics (the
+default `--combra-metrics=true`) **replaces** DiffiT's own Inception suite: when
+they are on, IS / FID / sFID / Precision / Recall are **not** computed (so FID is
+not measured twice); pass `--combra-metrics=false` to compute that Inception
+suite instead. Metrics whose optional backends are unavailable (e.g. no network
+to fetch DINOv2 weights) are recorded as `nan`; the angle metrics always come
+back. The reference batch is scored once and cached, so only the generated-side
+work is repeated each tick.
 
 On a multi-GPU run **all** the per-image extraction work is spread across every
 rank — both the image-feature metrics (`fid`, `cmmd`, `fd_dinov2`) and the
