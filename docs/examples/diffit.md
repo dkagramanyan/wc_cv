@@ -160,12 +160,16 @@ process is integrated:
   training-time eval signal and for final inference.
 - **`dpm++`** — DPM-Solver++(2M). Fastest (near-converged quality in ~25 steps);
   use it for the cheapest possible training-time eval.
+- **`unipc`** — UniPC (Unified Predictor-Corrector, via diffusers'
+  `UniPCMultistepScheduler`). Like `dpm++` it subsamples the full 1000-step
+  schedule and converges in very few steps (~20); a solid fast-sampler
+  alternative to DPM-Solver++.
 - **`ddpm`** — stochastic ancestral sampling. Most faithful / most diverse at high
   step counts (~250), but the slowest.
 
 During training, pick the eval sampler with `--eval-sampler` and its step count
-with `--eval-sampling-steps` (per-sampler defaults: `dpm++`=25, `ddim`=100,
-`ddpm`=250):
+with `--eval-sampling-steps` (per-sampler defaults: `dpm++`=25, `unipc`=20,
+`ddim`=100, `ddpm`=250):
 
 ```bash
 diffit-train --outdir=./training-runs --cfg=diffit-256 \
