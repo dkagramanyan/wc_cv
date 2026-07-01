@@ -4,6 +4,7 @@ The `combra.metrics` module bundles three families of metrics:
 
 - **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID (`compute_fid`), CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`), and the bimodal-Gaussian fit relative errors (`compute_gauss_metrics`). Every metric takes **in-memory images** (a numpy array or torch tensor), not a folder of files. Each side may be a **single image or a batch** (Wasserstein, Gaussian and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
+- **Sampler comparison** — sweep a diffusion sampler over a range of step counts, score each batch with the training-loop metrics, and plot metric-vs-steps (`compare_samplers`, `plot_sampler_comparison`) to see how many steps a sampler needs for good quality.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
 ```python
@@ -713,6 +714,85 @@ Drive it over several `(resolution, generator)` sources and save one tidy parque
 ...                'class_2': 'class_Ultra_Co6_2'},
 ...     ns=[100, 250, 1000, 10000], step=2.0)
 >>> pd.DataFrame.from_records(recs).to_parquet('all_metrics_vs_n.parquet', index=False)
+```
+````
+
+## Sampler comparison
+
+Answer *how many reverse-diffusion steps `k` does a sampler need for good quality?*
+For each sampler and each step count, generate a batch, score it against a fixed
+real reference batch with `compute_all_metrics`, and plot metric (Y) vs. `k` (X),
+one curve per sampler. `compare_samplers` is sampler- and codebase-agnostic — the
+caller supplies the generators — so the same function drives any diffusion model
+(see `docs/examples/sampler_comparison.md` for the DiffiT-v2 wiring). They live in
+`combra.metrics.samplers` and `combra.metrics.plot`.
+
+````{py:function} combra.metrics.compare_samplers(reference_images, samplers, k_values, *, step=None, device=None, image_metrics=True, metrics=None, angle_kw=None, verbose=True) -> pandas.DataFrame
+
+Sweep each sampler over `k_values`, scoring the generated batch against a fixed reference with `compute_all_metrics`. A single `reference_cache` is reused across every call, so the reference-side work (FID/CMMD/DINOv2 features, angle density) runs only once.
+
+:param reference_images: Fixed batch of real reference images (numpy array or torch tensor).
+:type reference_images: ndarray or torch.Tensor
+:param samplers: Mapping `name -> fn(k)` where `fn(k)` returns a batch of generated images produced with `k` sampling steps.
+:type samplers: dict[str, callable]
+:param k_values: Step counts to sweep (e.g. `[5, 10, 20, 50, 100, 250]`).
+:type k_values: list[int]
+:param step: Angle-histogram bin width in degrees forwarded to `compute_all_metrics`. Default: `None` (5.0°).
+:type step: float or None, optional
+:param device: Torch device for the image-feature metrics. Default: `None`.
+:type device: str or None, optional
+:param image_metrics: If `True`, also compute FID / CMMD / FD-DINOv2. Angle metrics are always computed. Default: `True`.
+:type image_metrics: bool, optional
+:param metrics: Restrict the returned metric columns to this subset. Default: every key from `compute_all_metrics`.
+:type metrics: list[str] or None, optional
+:param angle_kw: Extra keyword arguments forwarded to the angle-extraction pipeline. Default: `None`.
+:type angle_kw: dict or None, optional
+:param verbose: Print a line per `(sampler, k)`. Default: `True`.
+:type verbose: bool, optional
+:returns: **df** (*pd.DataFrame*) – One row per `(sampler, k)` with columns `sampler`, `k`, and one column per metric.
+:rtype: pandas.DataFrame
+
+**Example**
+
+```python
+>>> from combra.metrics import compare_samplers, plot_sampler_comparison
+>>> samplers = {'ddim': ddim_fn, 'unipc': unipc_fn}   # fn(k) -> generated batch
+>>> df = compare_samplers(real_batch, samplers, k_values=[5, 10, 20, 50, 100, 250])
+>>> plot_sampler_comparison(df, save_path='sampler_comparison.png')
+```
+````
+
+````{py:function} combra.metrics.plot_sampler_comparison(df, metrics=None, x_col='k', sampler_col='sampler', metric_labels=None, log_x=True, n_cols=4, title=None, save_path=None, png_meta=None, fonts=None, height_per_row=420, width_per_col=520) -> plotly.graph_objects.Figure
+
+Small-multiples of every metric vs. sampling steps: one subplot per metric, X = `k`, Y = metric value, one curve per sampler. The companion plot to `compare_samplers`.
+
+:param df: Tidy DataFrame from `compare_samplers` (columns `sampler`, `k`, and one per metric).
+:type df: pd.DataFrame
+:param metrics: Metric columns to tile. Default: every column except `sampler_col` / `x_col`.
+:type metrics: list[str] or None, optional
+:param x_col: Column holding the step count. Default: `'k'`.
+:type x_col: str, optional
+:param sampler_col: Column holding the sampler name. Default: `'sampler'`.
+:type sampler_col: str, optional
+:param metric_labels: `{metric: subplot_title}`. Default: the metric key.
+:type metric_labels: dict[str, str] or None, optional
+:param log_x: Log-scale the `k` axis. Default: `True`.
+:type log_x: bool, optional
+:param n_cols: Subplots per row. Default: `4`.
+:type n_cols: int, optional
+:param title: Figure title. Default: `'Sampler comparison'`.
+:type title: str or None, optional
+:param save_path: If given, also render the figure to this PNG path. Default: `None`.
+:type save_path: str or None, optional
+:returns: **fig** (*plotly.graph_objects.Figure*) – The metric-vs-k figure.
+:rtype: plotly.graph_objects.Figure
+
+**Example**
+
+```python
+>>> from combra.metrics import plot_sampler_comparison
+>>> fig = plot_sampler_comparison(df, metrics=['fid', 'cmmd', 'fd_dinov2', 'w1'])
+>>> fig.show()
 ```
 ````
 
