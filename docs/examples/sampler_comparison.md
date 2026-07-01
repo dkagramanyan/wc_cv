@@ -53,6 +53,23 @@ dataset it was trained on:
 sbatch sbatch/h200_compare_samplers_256x256.sbatch
 ```
 
+## Running it on EDM2-v2
+
+{doc}`EDM2-v2 <edm2>` provides the same wiring via `edm2-compare-samplers`, over
+its EDM σ-space samplers (`edm`, `euler`, `ddim`, `dpm++`). It loads a checkpoint,
+pulls `--num-samples` real reference images from `--data`, builds a `fn(k)` per
+sampler, and calls `compare_samplers`:
+
+```bash
+python compare_samplers.py \
+    --net ./training-runs/00000-*/network-snapshot-final.pkl \
+    --data ./datasets/wc_co_256x256.zip \
+    --samplers edm,euler,ddim,dpm++ \
+    --k-values 5,10,20,50,100,250 \
+    --num-samples 512 --outdir ./sampler-comparison/256
+# or: sbatch sbatch/compare_samplers_256x256.sbatch
+```
+
 ## Calling combra directly
 
 If you already have generator callbacks (from any model), skip the DiffiT script
