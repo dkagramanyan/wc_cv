@@ -42,6 +42,7 @@ examples/fid
 examples/san_v2
 examples/styleswin
 examples/diffit
+examples/styleswin
 examples/edm2
 examples/sampler_comparison
 ```
