@@ -41,6 +41,7 @@ examples/angles
 examples/fid
 examples/san_v2
 examples/diffit
+examples/styleswin
 ```
 
 ## Module map
