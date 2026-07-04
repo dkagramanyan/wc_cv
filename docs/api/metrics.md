@@ -4,6 +4,7 @@ The `combra.metrics` module bundles three families of metrics:
 
 - **Training-loop / batch metrics** — score generated images on the fly (no parquet round-trip): classic InceptionV3 FID (`compute_fid`), CLIP-MMD (`compute_cmmd`), Fréchet distance on DINOv2 features (`compute_fd_dinov2`), the four angle-Wasserstein distances between two samples' angle densities (`compute_wasserstein_metrics`), and the bimodal-Gaussian fit relative errors (`compute_gauss_metrics`). Every metric takes **in-memory images** (a numpy array or torch tensor), not a folder of files. Each side may be a **single image or a batch** (Wasserstein, Gaussian and CMMD are valid on one image; the Fréchet-distance metrics FID/FD-DINOv2 need ≥ 2). `compute_all_metrics` runs the whole set — FID included — in one call. Every two-input metric takes the *reference* first, then the *generated*.
 - **Distribution comparison helpers** — for comparing per-class angle distributions stored as parquet files.
+- **Sampler comparison** — sweep a diffusion sampler over a range of step counts, score each batch with the training-loop metrics, and plot metric-vs-steps (`compare_samplers`, `plot_sampler_comparison`) to see how many steps a sampler needs for good quality.
 - **Convergence analysis** — N-sweep aggregation, Kendall trend tests, plateau fits, and the convergence-grid / gain-distribution plots used by `3_metrics_convergence.ipynb`.
 
 ```python
@@ -295,7 +296,7 @@ All four angle-Wasserstein distances in a single pass, returned as a dict `{'w1'
 The density-level core (used by the parquet comparison path) lives at `combra.metrics.wasserstein.wasserstein_density_metrics` if you need to call it on `(x, y)` densities directly.
 ````
 
-````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, ndarray]
+````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> tuple[ndarray, ndarray]
 
 Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_image → get_angles` on each image, pools all vertex angles, then histograms them with {py:func}`combra.stats.stats_preprocess` at `step` degrees.
 
@@ -309,11 +310,13 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :type tol: int, optional
 :param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
 :returns: **density** (*tuple[ndarray, ndarray]*) – `(x, y)` angle-bin centres and densities.
 :rtype: tuple(ndarray, ndarray)
 ````
 
-````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0) -> ndarray
+````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> ndarray
 
 The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → get_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
 
@@ -325,6 +328,8 @@ The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: 
 :type tol: int, optional
 :param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
 :returns: **pooled** (*ndarray*) – 1-D array of all pooled vertex angles (degrees).
 :rtype: ndarray
 ````
@@ -441,9 +446,9 @@ Relative error of the **mode-2 Gaussian amplitude** — the `amp2` value of {py:
 
 ### Unified entry point
 
-````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None) -> dict
+````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None, image_metrics=False, workers=None) -> dict
 
-Run every batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-density metrics — the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) and the bimodal-Gaussian relative errors (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) — compare the two samples' angle densities; `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` compare their deep features. An image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back. A single image therefore yields real `w*`/`mu*`/`sigma*`/`amp*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
+Run every requested batch metric for a (reference, generated) pair in parallel and return one flat dict. The angle-density metrics — the Wasserstein distances (`w1`, `w2`, `circular_w1`, `circular_w2`) and the bimodal-Gaussian relative errors (`mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`) — compare the two samples' angle densities and are **always** computed. The image-feature metrics — `fid` (classic InceptionV3 FID on the in-memory images), `cmmd`, and `fd_dinov2` — compare their deep features and are added **only when `image_metrics=True`**; the default is `False`, so the cheap angle-only suite needs no GPU or optional deps. When `image_metrics=True`, an image-feature metric that cannot run (missing optional dependency, no network, **or fewer than 2 images per side** for the Fréchet-distance `fid`/`fd_dinov2`) is recorded as `nan` and logged, so the angle metrics still come back — a single image therefore yields real `w*`/`mu*`/`sigma*`/`amp*`/`cmmd` values and `nan` for `fid`/`fd_dinov2`.
 
 :param reference_images: Batch of reference (real) images.
 :type reference_images: ndarray or torch.Tensor
@@ -457,14 +462,18 @@ Run every batch metric for a (reference, generated) pair in parallel and return 
 :type angle_kw: dict or None, optional
 :param reference_cache: Opt-in dict reused across calls to compute the reference-side features once. Default: `None`.
 :type reference_cache: dict or None, optional
-:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`, `fid`, `cmmd`, `fd_dinov2`.
+:param image_metrics: When `True`, also compute the image-feature metrics `fid`, `cmmd`, `fd_dinov2` (they run concurrently in a thread pool). When `False` (the default) only the angle-density and Gaussian-fit metrics are returned, so no GPU or optional deps are needed. Default: `False`.
+:type image_metrics: bool, optional
+:param workers: When `> 1`, parallelise the angle-density extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:type workers: int or None, optional
+:returns: **results** (*dict*) – Flat `{metric_name: value}` dict. Always contains `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`; with `image_metrics=True` it additionally contains `fid`, `cmmd`, `fd_dinov2`.
 :rtype: dict
 
 **Example**
 
 ```python
 >>> from combra.metrics import compute_all_metrics
->>> scores = compute_all_metrics(real_batch, generated_batch)
+>>> scores = compute_all_metrics(real_batch, generated_batch, image_metrics=True)
 >>> scores['cmmd'], scores['w1'], scores['mu1']
 ```
 ````
@@ -713,6 +722,85 @@ Drive it over several `(resolution, generator)` sources and save one tidy parque
 ...                'class_2': 'class_Ultra_Co6_2'},
 ...     ns=[100, 250, 1000, 10000], step=2.0)
 >>> pd.DataFrame.from_records(recs).to_parquet('all_metrics_vs_n.parquet', index=False)
+```
+````
+
+## Sampler comparison
+
+Answer *how many reverse-diffusion steps `k` does a sampler need for good quality?*
+For each sampler and each step count, generate a batch, score it against a fixed
+real reference batch with `compute_all_metrics`, and plot metric (Y) vs. `k` (X),
+one curve per sampler. `compare_samplers` is sampler- and codebase-agnostic — the
+caller supplies the generators — so the same function drives any diffusion model
+(see `docs/examples/sampler_comparison.md` for the DiffiT-v2 wiring). They live in
+`combra.metrics.samplers` and `combra.metrics.plot`.
+
+````{py:function} combra.metrics.compare_samplers(reference_images, samplers, k_values, *, step=None, device=None, image_metrics=True, metrics=None, angle_kw=None, verbose=True) -> pandas.DataFrame
+
+Sweep each sampler over `k_values`, scoring the generated batch against a fixed reference with `compute_all_metrics`. A single `reference_cache` is reused across every call, so the reference-side work (FID/CMMD/DINOv2 features, angle density) runs only once.
+
+:param reference_images: Fixed batch of real reference images (numpy array or torch tensor).
+:type reference_images: ndarray or torch.Tensor
+:param samplers: Mapping `name -> fn(k)` where `fn(k)` returns a batch of generated images produced with `k` sampling steps.
+:type samplers: dict[str, callable]
+:param k_values: Step counts to sweep (e.g. `[5, 10, 20, 50, 100, 250]`).
+:type k_values: list[int]
+:param step: Angle-histogram bin width in degrees forwarded to `compute_all_metrics`. Default: `None` (5.0°).
+:type step: float or None, optional
+:param device: Torch device for the image-feature metrics. Default: `None`.
+:type device: str or None, optional
+:param image_metrics: If `True`, also compute FID / CMMD / FD-DINOv2. Angle metrics are always computed. Default: `True`.
+:type image_metrics: bool, optional
+:param metrics: Restrict the returned metric columns to this subset. Default: every key from `compute_all_metrics`.
+:type metrics: list[str] or None, optional
+:param angle_kw: Extra keyword arguments forwarded to the angle-extraction pipeline. Default: `None`.
+:type angle_kw: dict or None, optional
+:param verbose: Print a line per `(sampler, k)`. Default: `True`.
+:type verbose: bool, optional
+:returns: **df** (*pd.DataFrame*) – One row per `(sampler, k)` with columns `sampler`, `k`, and one column per metric.
+:rtype: pandas.DataFrame
+
+**Example**
+
+```python
+>>> from combra.metrics import compare_samplers, plot_sampler_comparison
+>>> samplers = {'ddim': ddim_fn, 'unipc': unipc_fn}   # fn(k) -> generated batch
+>>> df = compare_samplers(real_batch, samplers, k_values=[5, 10, 20, 50, 100, 250])
+>>> plot_sampler_comparison(df, save_path='sampler_comparison.png')
+```
+````
+
+````{py:function} combra.metrics.plot_sampler_comparison(df, metrics=None, x_col='k', sampler_col='sampler', metric_labels=None, log_x=True, n_cols=4, title=None, save_path=None, png_meta=None, fonts=None, height_per_row=420, width_per_col=520) -> plotly.graph_objects.Figure
+
+Small-multiples of every metric vs. sampling steps: one subplot per metric, X = `k`, Y = metric value, one curve per sampler. The companion plot to `compare_samplers`.
+
+:param df: Tidy DataFrame from `compare_samplers` (columns `sampler`, `k`, and one per metric).
+:type df: pd.DataFrame
+:param metrics: Metric columns to tile. Default: every column except `sampler_col` / `x_col`.
+:type metrics: list[str] or None, optional
+:param x_col: Column holding the step count. Default: `'k'`.
+:type x_col: str, optional
+:param sampler_col: Column holding the sampler name. Default: `'sampler'`.
+:type sampler_col: str, optional
+:param metric_labels: `{metric: subplot_title}`. Default: the metric key.
+:type metric_labels: dict[str, str] or None, optional
+:param log_x: Log-scale the `k` axis. Default: `True`.
+:type log_x: bool, optional
+:param n_cols: Subplots per row. Default: `4`.
+:type n_cols: int, optional
+:param title: Figure title. Default: `'Sampler comparison'`.
+:type title: str or None, optional
+:param save_path: If given, also render the figure to this PNG path. Default: `None`.
+:type save_path: str or None, optional
+:returns: **fig** (*plotly.graph_objects.Figure*) – The metric-vs-k figure.
+:rtype: plotly.graph_objects.Figure
+
+**Example**
+
+```python
+>>> from combra.metrics import plot_sampler_comparison
+>>> fig = plot_sampler_comparison(df, metrics=['fid', 'cmmd', 'fd_dinov2', 'w1'])
+>>> fig.show()
 ```
 ````
 
