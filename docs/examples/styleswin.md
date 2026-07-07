@@ -41,8 +41,9 @@ succeeds when you are authenticated to GitHub — sign in once with the GitHub C
 (`gh auth login` → github.com → HTTPS) and `pip` inherits its credential helper.
 
 The combra metrics pull InceptionV3 / CLIP / DINOv2 backbones from the network on first use;
-prefetch and cache them for offline / cluster nodes with `python download_models.py` (StyleSwin
-is a GAN trained from scratch, so it has no other weights to fetch).
+`pip install -e .` installs a `styleswin-download-models` command that prefetches and caches them
+for offline / cluster nodes (StyleSwin is a GAN trained from scratch, so it has no other weights
+to fetch).
 
 The `sbatch/` scripts `module load CUDA/13.1`, derive `CUDA_HOME` from the loaded `nvcc`, and set
 `TORCH_CUDA_ARCH_LIST=9.0` so the ops compile for the H200 (`sm_90`).
