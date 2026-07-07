@@ -21,7 +21,7 @@ The import is guarded, so training runs unchanged when combra is not installed �
 skips the metrics) so it is never silently ignored:
 
 ```bash
-pip install -e ../combra            # or install combra into the env some other way
+pip install -e '.[combra]'          # from the StyleSwin repo root; see Installation below
 ```
 
 ## Installation
@@ -35,8 +35,14 @@ conda create -n styleswin python=3.12 -y && conda activate styleswin
 pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu132
 conda install -c nvidia cuda-nvcc -y     # match torch's CUDA major (13.x)
 conda install anaconda::ninja -y
-pip install -r requirements.txt          # from the StyleSwin repo root
+pip install -e .                         # from the StyleSwin repo root (reads pyproject.toml)
+pip install -e '.[combra]'               # optional: adds the combra metrics package
 ```
+
+combra lives in a **private** repo, so the `.[combra]` extra clones it over `git+https` and only
+succeeds when you are authenticated to GitHub — sign in once with the GitHub CLI
+(`gh auth login` → github.com → HTTPS) and `pip` inherits its credential helper. On hosts with
+the nexus PyPI proxy, a plain `pip install combra` resolves it without GitHub.
 
 The `sbatch/` scripts load no system CUDA module — they set `CUDA_HOME=$CONDA_PREFIX` and
 `TORCH_CUDA_ARCH_LIST=9.0` so the ops compile against this conda toolkit for the H200 (`sm_90`).
