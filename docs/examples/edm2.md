@@ -9,11 +9,8 @@ GPU ranks).
 
 The combra integration is **optional** — EDM2 does not depend on combra. The
 import is guarded, so training runs unchanged when combra is not installed. To
-enable the metrics, install combra alongside EDM2:
-
-```bash
-pip install combra            # or: pip install 'edm2[combra]'
-```
+enable the metrics, install EDM2 with the `[combra]` extra — see
+[Installation](#from-scratch) below.
 
 ## Training
 
@@ -25,19 +22,19 @@ in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 
 
 ### From scratch
 
-1. **Install combra and EDM2-v2** into the *same* environment. Both are
-   source-only packages (neither is on PyPI), and combra is **optional** — EDM2's
-   import of it is guarded, so training runs unchanged without it. To enable the
-   combra metrics, install combra first (so EDM2 can find it), then EDM2-v2:
+1. **Install EDM2-v2.** combra is **optional** — EDM2's import of it is guarded,
+   so training runs unchanged without it. Enable the metrics with the `[combra]`
+   extra, which pulls combra from its **private** GitHub repo over `git+https`
+   (log in once with `gh auth login` → github.com → HTTPS and `pip` inherits the
+   credential helper):
 
    ```bash
-   pip install -e /path/to/combra   # the combra checkout (or wc_cv/combra submodule)
-   pip install -e .                 # run in the edm2-v2 checkout
+   pip install -e '.[combra]'       # run in the edm2-v2 checkout; omit [combra] to skip metrics
    ```
 
-   Without combra, just run the second line. This puts the `edm2-train`,
-   `edm2-prepare-data`, `edm2-download-models`, `edm2-sample`, `edm2-gen-images`,
-   `edm2-eval` and `edm2-compare-samplers` commands on your `PATH`.
+   This puts the `edm2-train`, `edm2-prepare-data`, `edm2-download-models`,
+   `edm2-sample`, `edm2-gen-images`, `edm2-eval` and `edm2-compare-samplers`
+   commands on your `PATH`.
 
 2. **(Optional) prefetch model weights** — handy for offline / cluster nodes.
    Training needs the Stable-Diffusion VAE (plus InceptionV3 / CLIP / DINOv2 for the
