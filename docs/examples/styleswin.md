@@ -18,34 +18,30 @@ conditioning and the san-v2-style tooling wrap around it.
 The combra integration is **optional** and controlled by `--combra-metrics` (default `true`).
 The import is guarded, so training runs unchanged when combra is not installed — but if
 `--combra-metrics=true` and the package is missing, training emits a **warning** at startup (and
-skips the metrics) so it is never silently ignored:
-
-```bash
-pip install -e '.[combra]'          # from the StyleSwin repo root; see Installation below
-```
+skips the metrics) so it is never silently ignored. Install it via the `[combra]` extra — see
+[Installation](#installation).
 
 ## Installation
 
-Create a `python=3.12` conda env named `styleswin`, install the latest PyTorch (CUDA 13.x
-wheels), the CUDA compiler (`nvcc`) and ninja **from conda** (both needed to build StyleSwin's
-custom CUDA ops — `fused_act` / `upfirdn2d`), then the remaining deps:
+StyleSwin's custom CUDA ops (`fused_act` / `upfirdn2d`) are JIT-compiled by torch on first
+import, so the env needs `nvcc` and `ninja`. `nvcc` comes from the system CUDA module
+(`module load CUDA/13.1`, loaded by the `sbatch/` scripts); `ninja` — torch's build backend — is
+installed from conda (a pip `ninja` conflicts with conda's). torch comes from the CUDA wheel index:
 
 ```bash
 conda create -n styleswin python=3.12 -y && conda activate styleswin
 pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu132
-conda install -c nvidia cuda-nvcc -y     # match torch's CUDA major (13.x)
-conda install anaconda::ninja -y
-pip install -e .                         # from the StyleSwin repo root (reads pyproject.toml)
-pip install -e '.[combra]'               # optional: adds the combra metrics package
+conda install anaconda::ninja -y         # torch's JIT build backend
+pip install -e .                         # base deps, from the repo root (reads pyproject.toml)
+pip install -e '.[combra]'               # optional: combra in-training metrics
 ```
 
 combra lives in a **private** repo, so the `.[combra]` extra clones it over `git+https` and only
 succeeds when you are authenticated to GitHub — sign in once with the GitHub CLI
-(`gh auth login` → github.com → HTTPS) and `pip` inherits its credential helper. On hosts with
-the nexus PyPI proxy, a plain `pip install combra` resolves it without GitHub.
+(`gh auth login` → github.com → HTTPS) and `pip` inherits its credential helper.
 
-The `sbatch/` scripts load no system CUDA module — they set `CUDA_HOME=$CONDA_PREFIX` and
-`TORCH_CUDA_ARCH_LIST=9.0` so the ops compile against this conda toolkit for the H200 (`sm_90`).
+The `sbatch/` scripts `module load CUDA/13.1`, derive `CUDA_HOME` from the loaded `nvcc`, and set
+`TORCH_CUDA_ARCH_LIST=9.0` so the ops compile for the H200 (`sm_90`).
 
 ## Dataset
 
