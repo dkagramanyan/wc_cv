@@ -76,6 +76,21 @@ in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 
    To **resume**, run the exact same command again — training picks up the latest
    `training-state-*.pt` in `--outdir`.
 
+5. **(Alternative) launch via Hydra.** `train_hydra.py` wraps the same launch path
+   as {doc}`DiffiT-v2 <diffit>` and {doc}`san-v2 <san_v2>`. The `train_edm2.py`
+   click CLI remains the single source of truth for every option and default, so
+   both entry points produce identical run configs:
+
+   ```bash
+   python train_hydra.py outdir=./training-runs preset=edm2-img256-s \
+       data=./datasets/wc_co_256x256.zip gpus=2 batch_gpu=96 \
+       eval_sampler=dpm++ eval_sampling_steps=25
+   ```
+
+   Options are overridden by their Python name (dashes become underscores; `--cfg`
+   / `--preset` is `preset`). Everything is declared in `configs/config.yaml`, where
+   `null` means "use the CLI default".
+
 ### Quick example (single-GPU smoke test)
 
 A short run to confirm the whole pipeline works end-to-end before committing to a
@@ -91,8 +106,28 @@ python train_edm2.py --outdir ./training-runs --preset edm2-img256-s \
 
 Watch it in TensorBoard with `tensorboard --logdir ./training-runs`. Add `-n` /
 `--dry-run` to print the resolved options and exit without training (see the Dry
-run section below). Drop `--num-fid-samples 0` to re-enable the combra eval (EDM
-Heun sampler by default).
+run section below). Drop `--num-fid-samples 0` to re-enable the combra eval
+(DPM-Solver++(2M) at 25 steps by default).
+
+### Logging
+
+EDM2 uses the same multi-format logger as {doc}`DiffiT-v2 <diffit>`. Every run
+directory gets:
+
+| file | contents |
+| --- | --- |
+| `log.txt` | the full console transcript (rank 0), one timestamp per line |
+| `progress.csv` / `progress.json` | one row per status tick of every scalar |
+| `stats.jsonl` | training stats, combra metrics and mirrored log text |
+| `events.out.tfevents.*` | TensorBoard scalars, image grids and text |
+| `reals.png`, `fakes_init.png`, `fakes<kimg>.png` | image grids per snapshot tick |
+
+Every logged event carries the local **system time**. Text lines are prefixed
+`[YYYY-MM-DD HH:MM:SS]`, and each `progress.csv` / `progress.json` row additionally
+carries a `datetime` column (human-readable) and a `wall_time` column (Unix epoch
+seconds), so scalar rows can be aligned with the text log and with each other.
+Non-zero ranks write their own `log-rankNNN.txt`; TensorBoard is written by rank 0
+only. Watch a run with `tensorboard --logdir ./training-runs`.
 
 ### Progressive training
 
@@ -102,9 +137,10 @@ Each higher-resolution stage starts from the previous stage's snapshot by pointi
 (`edm2-img512-s`, `edm2-img1024-s`) and dataset zip.
 
 During training, at each snapshot tick the loop generates a batch of images from
-the EMA model by running the configured reverse-diffusion sampler (EDM Heun by
-default — see the Samplers section below) in VAE latent space, decodes them to
-pixels, and runs `compute_all_metrics(reals, fakes)` (when combra is installed).
+the EMA model by running the configured reverse-diffusion sampler (DPM-Solver++(2M)
+at 25 steps by default — see the Samplers section below) in VAE latent space,
+decodes them to pixels, and runs `compute_all_metrics(reals, fakes)` (when combra
+is installed).
 All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`,
 the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`,
 and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
@@ -141,26 +177,35 @@ The reverse-diffusion sampler used for evaluation **and** inference is selectabl
 All reuse the same trained model — they differ only in how the reverse-time ODE is
 integrated, all in the native EDM σ-space on the `net(x, σ, labels)` denoiser:
 
-- **`edm`** *(default)* — EDM 2nd-order Heun sampler (supports stochasticity via
-  `S_churn`). The reference EDM2 sampler; strong quality at moderate step counts.
-- **`dpm++`** — DPM-Solver++(2M) in log-σ space. Fastest (near-converged quality in
-  ~25 steps); use it for the cheapest possible training-time eval.
+- **`dpm++`** *(default, 25 steps)* — DPM-Solver++(2M) in log-σ space. Like `edm` it
+  is 2nd-order accurate, but reaches that order with **one** denoiser evaluation per
+  step instead of two, so it is the cheapest way to near-converged quality. This is
+  the default everywhere: training-time eval, `edm2-gen-images` and `sample_images.py`.
+- **`edm`** — EDM 2nd-order Heun sampler; the reference EDM2 sampler and the only one
+  supporting stochasticity (via `S_churn`). Costs 2 denoiser evaluations per step.
 - **`ddim`** — deterministic DDIM (η=0), which for the EDM probability-flow ODE is
   the first-order deterministic step (≡ `euler`).
 - **`euler`** — 1st-order deterministic Euler.
 
-During training, pick the eval sampler with `--sampler` and its step count with
-`--sampling-steps`:
+Only `edm` and `dpm++` are 2nd-order; `euler`/`ddim` converge at 1st order and need
+far more steps for the same error. Because `dpm++` spends one network evaluation per
+step where `edm` spends two, the default `dpm++` at 25 steps costs **25** denoiser
+evaluations against **63** for the old `edm`-at-32-steps default — roughly 2.5× less
+sampling compute per eval tick.
+
+To use a different sampler or step count during training, pass `--eval-sampler`
+and `--eval-sampling-steps`:
 
 ```bash
 torchrun --standalone --nproc_per_node=2 train_edm2.py \
     --outdir=./training-runs --preset=edm2-img256-s \
     --data=./datasets/wc_co_256x256.zip --batch-gpu 96 \
-    --sampler dpm++ --sampling-steps 25
+    --eval-sampler edm --eval-sampling-steps 32
 ```
 
 `edm2-gen-images` and `sample_images.py` take the same choice via `--sampler` /
-`--steps`.
+`--steps`. Use `edm2-compare-samplers` (below) to confirm the step count on your own
+data rather than trusting the default.
 
 ### Dry run
 

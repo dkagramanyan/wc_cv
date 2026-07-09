@@ -764,7 +764,7 @@ Sweep each sampler over `k_values`, scoring the generated batch against a fixed 
 
 ```python
 >>> from combra.metrics import compare_samplers, plot_sampler_comparison
->>> samplers = {'ddim': ddim_fn, 'unipc': unipc_fn}   # fn(k) -> generated batch
+>>> samplers = {'ddim': ddim_fn, 'dpm++': dpmpp_fn}   # fn(k) -> generated batch
 >>> df = compare_samplers(real_batch, samplers, k_values=[5, 10, 20, 50, 100, 250])
 >>> plot_sampler_comparison(df, save_path='sampler_comparison.png')
 ```
