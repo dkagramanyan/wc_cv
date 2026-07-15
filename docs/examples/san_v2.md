@@ -85,10 +85,20 @@ truth for defaults, any flag below works as a Hydra override too (e.g.
 
 The `sbatch/train_*.sbatch` scripts pass `--save-inference-only True`, so every snapshot
 tick also writes a small `network-snapshot-<kimg>-inference.pkl` holding **only `G_ema`**
-— no discriminator, no resume state. It is the smallest artifact and is exactly what
-`gen_images.py` and {py:func}`combra.metrics.compute_all_metrics` evaluation consume; use
-the full checkpoint to resume training. There is also `--save-weights-only` (`G`/`D`/`G_ema`,
-larger) for when the discriminator is needed.
+— no discriminator, no resume state. These per-tick files are the accumulating history and
+are exactly what `gen_images.py` and {py:func}`combra.metrics.compute_all_metrics`
+evaluation consume. To resume training, use the single full checkpoint
+`network-snapshot-latest.pt` — one big file **overwritten in place** every snapshot tick
+(it never accumulates), holding `G`/`D`/`G_ema` plus resume `progress`. There is also
+`--save-weights-only` (`G`/`D`/`G_ema`, larger) for when the discriminator is needed.
+
+```{note}
+Checkpoints that embed the projected discriminator's `timm` feature networks
+(`best_model.pkl` stems, `network-snapshot-latest.pt`) are `timm`-version-sensitive.
+`san-v2` now uses **timm 1.x**; stems saved under the old `timm==0.4.12` pin will not
+unpickle and must be regenerated. The inference-only `G_ema` snapshots carry no `timm`
+modules and are unaffected.
+```
 
 During training, the combra metrics use the **whole training set** as the fixed
 reference, scored against a fixed **`COMBRA_NUM_GEN = 10 000`** images generated
