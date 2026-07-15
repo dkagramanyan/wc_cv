@@ -112,14 +112,19 @@ cd sbatch
 sbatch train_256x256.sbatch        # … train_512x512.sbatch, train_1024x1024.sbatch
 ```
 
-The scripts pass `--save-inference-only True`, so every snapshot tick writes a small
-`network-snapshot-<kimg>-inference.pt` holding **only `G_ema`** — the smallest artifact and
-exactly what `gen_images.py` and the combra evaluation consume. With this flag set the full
-`network-snapshot-<kimg>.pt` (`G` + `D` + `G_ema` + both optimizers) is **not** written; leave
-`--save-inference-only False` (the default) to get that full snapshot each tick instead — it is
-what you need to resume a run with `--resume`. Regardless of the flag, `best_model.pt` (selected
-by `combra_fid10k`) is always a full checkpoint. All carry `g_ema`/`n_classes`/`size`, so any of
-them can drive `gen_images.py`.
+Every snapshot tick writes a small `network-snapshot-<kimg>-inference.pt` holding **only `G_ema`**
+(+ `n_classes`/`size`) — the smallest artifact and exactly what `gen_images.py` and the combra
+evaluation consume. To keep disk bounded on long runs, only the **most recent
+`--snapshot-keep-last`** of these are kept (default `3`; the sbatch scripts pass it explicitly) —
+older inference snapshots are deleted as new ones are written. Set `--snapshot-keep-last 0` to
+keep them all.
+
+The scripts also pass `--save-inference-only True`, so **no full per-tick checkpoint** is written.
+Leave `--save-inference-only False` (the default) and each tick additionally writes the full
+`network-snapshot-latest.pt` (`G` + `D` + `G_ema` + both optimizers) — a **single file overwritten
+every tick** (so it never accumulates) that you resume from with `--resume`. Either way,
+`best_model.pt` (selected by `combra_fid10k`) is always a full checkpoint, so a run can always be
+resumed from it. All carry `g_ema`/`n_classes`/`size`, so any of them can drive `gen_images.py`.
 
 ## Metrics
 
