@@ -112,13 +112,14 @@ cd sbatch
 sbatch train_256x256.sbatch        # … train_512x512.sbatch, train_1024x1024.sbatch
 ```
 
-The scripts pass `--save-inference-only True`, so every snapshot tick also writes a small
+The scripts pass `--save-inference-only True`, so every snapshot tick writes a small
 `network-snapshot-<kimg>-inference.pt` holding **only `G_ema`** — the smallest artifact and
-exactly what `gen_images.py` and the combra evaluation consume. This is written *in addition to*
-the full `network-snapshot-<kimg>.pt` (`G` + `D` + `G_ema` + both optimizers), which is kept so a
-run can be resumed with `--resume`; `best_model.pt` (selected by `combra_fid10k`) is a full
-checkpoint too. All three carry `g_ema`/`n_classes`/`size`, so any of them can drive
-`gen_images.py`.
+exactly what `gen_images.py` and the combra evaluation consume. With this flag set the full
+`network-snapshot-<kimg>.pt` (`G` + `D` + `G_ema` + both optimizers) is **not** written; leave
+`--save-inference-only False` (the default) to get that full snapshot each tick instead — it is
+what you need to resume a run with `--resume`. Regardless of the flag, `best_model.pt` (selected
+by `combra_fid10k`) is always a full checkpoint. All carry `g_ema`/`n_classes`/`size`, so any of
+them can drive `gen_images.py`.
 
 ## Metrics
 
