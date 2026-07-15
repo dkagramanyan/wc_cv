@@ -70,7 +70,8 @@ from a generic labelled folder with `dataset_tool.py convert-dataset`.
 ## Training
 
 `train.py` is the primary entry point — a san-v2-style `click` CLI (`--outdir/--data/--gpus/
---cfg/--cond/--kimg/--snap/--combra-metrics/--save-inference-only/--resume` plus StyleSwin's own
+--cfg/--cond/--kimg/--snap/--combra-metrics/--save-inference-only/--snapshot-keep-last/--resume`
+plus StyleSwin's own
 model flags). Checkpoints and logs are written under `--outdir`; the WC-Co runs use
 `./runs/wc-cv_h200`.
 
@@ -82,7 +83,7 @@ chain). Pick the resolution with a `--cfg` preset:
 python train.py --outdir=./runs/wc-cv_h200 \
         --cfg styleswin-256 \
         --data=./datasets/imagenet_9to4_1024x1024_256x256.zip \
-        --gpus=2 --cond True --combra-metrics True --save-inference-only True \
+        --gpus=2 --cond True --combra-metrics True --save-inference-only 0 --snapshot-keep-last 3 \
         --kimg 25000 --snap 50
 ```
 
@@ -119,12 +120,13 @@ evaluation consume. To keep disk bounded on long runs, only the **most recent
 older inference snapshots are deleted as new ones are written. Set `--snapshot-keep-last 0` to
 keep them all.
 
-The scripts also pass `--save-inference-only True`, so **no full per-tick checkpoint** is written.
-Leave `--save-inference-only False` (the default) and each tick additionally writes the full
+The scripts pass `--save-inference-only 0`, so each tick **also** writes the full
 `network-snapshot-latest.pt` (`G` + `D` + `G_ema` + both optimizers) — a **single file overwritten
-every tick** (so it never accumulates) that you resume from with `--resume`. Either way,
-`best_model.pt` (selected by `combra_fid10k`) is always a full checkpoint, so a run can always be
-resumed from it. All carry `g_ema`/`n_classes`/`size`, so any of them can drive `gen_images.py`.
+every tick** (so it never accumulates) that you resume from with `--resume`. Set
+`--save-inference-only True` to skip that full checkpoint and keep only the inference snapshots.
+Either way, `best_model.pt` (selected by `combra_fid10k`) is always a full checkpoint, so a run can
+always be resumed from it. All carry `g_ema`/`n_classes`/`size`, so any of them can drive
+`gen_images.py`.
 
 ## Metrics
 
