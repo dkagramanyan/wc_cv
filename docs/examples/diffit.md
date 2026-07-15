@@ -105,6 +105,27 @@ diffit-train --outdir=./training-runs \
     --lr 5e-5 --lr-warmup 500 --kimg 100000
 ```
 
+### Checkpoints
+
+At every snapshot tick (every `--snap` ticks) the run directory accumulates a
+small inference snapshot for history and keeps single, non-growing full
+checkpoints for resume:
+
+| File | Contents | Cadence |
+| --- | --- | --- |
+| `network-snapshot-<kimg>-inference.pt` | G_ema weights only (smallest artifact for `diffit-sample` / `diffit-gen-images`) | every tick; only the newest `--snapshot-keep-last` (default 3) are kept |
+| `network-snapshot-latest.pt` | full `{model, ema, opt, scaler?, cur_nimg}` for `--resume` | overwritten in place each tick (skipped under `--save-inference-only`) |
+| `best_model.pt` | full checkpoint of the lowest-FID tick (`combra_fid10k`, else `FID`) | rewritten only when FID improves; never pruned |
+| `network-final.pt` / `network-final-inference.pt` | full / G_ema-only final model | once at end |
+
+This keeps disk bounded — the full optimizer state lives in exactly one rolling
+file rather than one per tick. Resume from whichever full checkpoint you want:
+`network-snapshot-latest.pt` for the most recent step, or `best_model.pt` for the
+best-scoring one. `--save-inference-only` skips the rolling `network-snapshot-latest.pt`
+(so a run writes no repeated optimizer state), but `best_model.pt` and the final
+`network-final.pt` are still full checkpoints, so resume — and progressive
+finetuning from a previous stage — always work.
+
 During training, at each evaluation tick (every `--snap` ticks) the loop
 generates a batch of images from the EMA model by running the configured
 reverse-diffusion sampler (DDIM by default — see the Samplers section below) in
