@@ -73,8 +73,22 @@ in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 
        --batch-gpu 96
    ```
 
-   To **resume**, run the exact same command again — training picks up the latest
-   `training-state-*.pt` in `--outdir`.
+   Each run gets its own directory under `--outdir`, named
+   `<id:05d>-<preset>-gpus<N>-batch<B>` (e.g.
+   `training-runs/00000-edm2-img256-s-gpus2-batch2048/`), the same convention as
+   {doc}`DiffiT-v2 <diffit>`.
+
+   To **resume**, run the exact same command again — the matching run directory is
+   reused and training picks up its `network-snapshot-latest.pt` (falling back to
+   `best_model.pt`). Changing the preset, GPU count or batch size produces a
+   different directory name, and so a fresh run.
+
+   Each snapshot tick writes, best-of-both style: small self-contained inference
+   `network-snapshot-<kimg>.pkl` (EMA + encoder) kept as history and pruned to the
+   newest `--snapshot-keep-last` (default 3); a single full `network-snapshot-latest.pt`
+   overwritten in place for resume (skipped under `--save-inference-only`); and
+   `best_model.pt`, the full checkpoint of the lowest-combra-FID tick, written in both
+   modes so a resume anchor always exists.
 
 5. **(Alternative) launch via Hydra.** `train_hydra.py` wraps the same launch path
    as {doc}`DiffiT-v2 <diffit>` and {doc}`san-v2 <san_v2>`. The `train_edm2.py`
@@ -131,10 +145,12 @@ only. Watch a run with `tensorboard --logdir ./training-runs`.
 
 ### Progressive training
 
-Each higher-resolution stage starts from the previous stage's snapshot by pointing
-`--outdir` at a fresh directory seeded with that checkpoint (EDM2 auto-resumes from
-`training-state-*.pt`), or simply retrain per resolution with the matching preset
-(`edm2-img512-s`, `edm2-img1024-s`) and dataset zip.
+Each higher-resolution stage starts from the previous stage's snapshot by seeding the
+new stage's run directory (`<outdir>/<id:05d>-<preset>-gpus<N>-batch<B>`) with that
+stage's `network-snapshot-latest.pt` (or `best_model.pt`), which EDM2 then
+auto-resumes from; or simply retrain per
+resolution with the matching preset (`edm2-img512-s`, `edm2-img1024-s`) and dataset
+zip.
 
 During training, at each snapshot tick the loop generates a batch of images from
 the EMA model by running the configured reverse-diffusion sampler (DPM-Solver++(2M)
