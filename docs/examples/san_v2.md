@@ -83,14 +83,15 @@ Training can also be launched via Hydra (`train_hydra.py`), which shares the sam
 truth for defaults, any flag below works as a Hydra override too (e.g.
 `save_inference_only=true`).
 
-The `sbatch/train_*.sbatch` scripts pass `--save-inference-only True`, so every snapshot
-tick also writes a small `network-snapshot-<kimg>-inference.pkl` holding **only `G_ema`**
-— no discriminator, no resume state. These per-tick files are the accumulating history and
-are exactly what `gen_images.py` and {py:func}`combra.metrics.compute_all_metrics`
-evaluation consume. To resume training, use the single full checkpoint
-`network-snapshot-latest.pt` — one big file **overwritten in place** every snapshot tick
-(it never accumulates), holding `G`/`D`/`G_ema` plus resume `progress`. There is also
-`--save-weights-only` (`G`/`D`/`G_ema`, larger) for when the discriminator is needed.
+The production `sbatch/train_*.sbatch` scripts pass `--save-inference-only 0`, so a prod
+run keeps only the single full checkpoint `network-snapshot-latest.pt` — one big file
+**overwritten in place** every snapshot tick (it never accumulates), holding `G`/`D`/`G_ema`
+plus resume `progress` for `--resume` — together with the best-FID `best_model.pkl`. It
+does **not** accumulate per-tick artifacts. Pass `--save-inference-only 1` to also write a
+small `network-snapshot-<kimg>-inference.pkl` each tick holding **only `G_ema`** (no
+discriminator, no resume state) — the smallest artifact, exactly what `gen_images.py` and
+{py:func}`combra.metrics.compute_all_metrics` evaluation consume — or `--save-weights-only 1`
+for per-tick `G`/`D`/`G_ema` when the discriminator is needed.
 
 ```{note}
 Checkpoints that embed the projected discriminator's `timm` feature networks
