@@ -26,10 +26,21 @@ console-script family:
 | `<model>-eval` | standalone metrics | all |
 | `<model>-prepare-data` | dataset zip builder | all |
 | `<model>-download-models` | backbone / weight prefetch | all |
-| `<model>-sample` | bulk `.npz` for FID | diffusion only |
 | `<model>-compare-samplers` | sampler-vs-steps sweep | diffusion only |
 
-- `requirements.txt` **and** `pyproject.toml` both present and kept in sync.
+The upstream bulk-`.npz` samplers (`scripts/sample.py` in DiffiT-v2,
+`sample_images.py` in EDM2-v2) are **outside the convention**: their only
+consumer is the upstream-paper FID protocol (ADM-style `.npz` reference
+batches), which the WC-Co workflow does not use. Bulk generation is
+`<model>-gen-images --save-mode hdf5`; scoring is the combra eval and
+`<model>-eval`. The scripts may remain in the repos as legacy tools but are
+not part of the contract.
+
+- **`pyproject.toml` is the single dependency source — no `requirements.txt`.**
+  Repos that have one remove it: maintaining two hand-written lists is exactly
+  what produced today's dependency drift (stale caps, dead deps, missing
+  entries). `pip install -e .` is the one install path. torch / ninja stay out
+  of `pyproject.toml` as now (installed from the CUDA wheel index / conda).
 - combra from **one** source everywhere: optional extra `[combra]` →
   `git+https` private repo (replaces san-v2's editable `-e ../wc_cv/combra`
   and DiffiT's bare `combra` extra).
@@ -147,6 +158,7 @@ Both repos ship `<model>-compare-samplers` producing
 | `--network` alias for `--model-path` | no |
 | `--combra-ref-count` knob; `--num-fid-samples` governs the combra fake count | no |
 | combra extra → `git+https` source | no |
+| remove `requirements.txt` (pyproject.toml is the single dependency source) | no |
 | `class_names` metadata in checkpoints | no |
 
 ### EDM2-v2 — generation is the gap
@@ -156,6 +168,7 @@ Both repos ship `<model>-compare-samplers` producing
 | `--cfg` alias for `--preset` | no |
 | `--network` alias for `--net` | no |
 | **`edm2-gen-images`: add `--classes` + `--samples-per-class` class-batch mode and `--save-mode hdf5` (RankH5Writer layout)** | no (additive; `--seeds` mode kept) |
+| remove `requirements.txt` (pyproject.toml is the single dependency source) | no |
 | `class_names` metadata in inference pickles / checkpoints | no |
 
 ### StyleSwin-v2 — parity kit
@@ -163,7 +176,6 @@ Both repos ship `<model>-compare-samplers` producing
 | change | breaking? |
 |---|---|
 | add `train_hydra.py` + `configs/config.yaml` (port of the sibling ~50-line shim) | no |
-| add `requirements.txt` (mirroring `pyproject.toml`) | no |
 | console scripts `styleswin-train / -gen-images / -eval / -prepare-data` | no |
 | **`gen_images.py`: add `--save-mode hdf5` (RankH5Writer layout)** | no (additive) |
 | add `styleswin-eval` standalone evaluator + startup `combra_smoke_test` | no |
@@ -178,6 +190,7 @@ Both repos ship `<model>-compare-samplers` producing
 | new saves as `.pt` state dicts + metadata; `legacy.py` keeps loading old pickles | no for reading; changes artifact type |
 | `--num-fid-samples` / `--combra-ref-count` knobs | no |
 | combra install via `[combra]` extra (`git+https`) | no |
+| remove `requirements.txt` — its editable `-e ../wc_cv/combra` moves to the `[combra]` extra; pyproject.toml (cleaned of the dead GUI deps) becomes the single dependency source | no |
 
 **Deprecation path for the flag flip:** one transition release where the old
 behavior stays available behind `--legacy-snapshots`, and passing
