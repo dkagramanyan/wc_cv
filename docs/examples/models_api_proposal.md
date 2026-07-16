@@ -72,20 +72,27 @@ console-script family:
 
 - **Self-spawning multi-GPU**: `--gpus N` spawns one worker per GPU via
   `torch.multiprocessing`; `torchrun` is never required for training.
+- **`--seed` means the same thing everywhere**: it seeds weight
+  initialisation, data shuffling and the eval-latent draws in all four repos,
+  so two runs with the same command and seed produce the same snapshots (up
+  to hardware nondeterminism from cuDNN / `torch.compile`). Generation-side
+  determinism is the §4 seed rule.
 - Run directory: `<outdir>/<id:05d>-<cfg>-gpus<G>-batch<B>[-desc]`; its
   contents are fixed by the §7 log contract.
 
 ## 3. Checkpoint contract
 
-Exactly two artifact kinds — no resume, no best-model tracking:
+Exactly one artifact kind — no resume, no best-model tracking, no separate
+final checkpoint:
 
 | artifact | rule |
 |---|---|
-| `<model>-snapshot-<kimg:06d>-inference.pt` | EMA-only weights; written every snapshot tick; history pruned to `--snapshot-keep-last` (default 3, `0` = keep all) |
-| `<model>-final.pt` | model + EMA weights (no optimizer state), written once at the end of training |
+| `<model>-snapshot-<kimg:06d>-inference.pt` | EMA-only weights; written every snapshot tick **and always at the last tick**, so the newest snapshot *is* the final model; history pruned to `--snapshot-keep-last` (default 3, `0` = keep all) |
 
 - **No resume.** There is no `--resume` flag, no rolling `latest` checkpoint
   and no auto-restart: training runs start-to-finish.
+- **Only EMA weights ever touch disk** — raw (non-EMA) model weights,
+  discriminators and optimizer state are never saved.
 - **No `best_model.*`.** Pick the best checkpoint post-hoc from `stats.jsonl`
   against the snapshot history (set `--snapshot-keep-last 0` on runs where
   you want the full history to choose from).
@@ -211,6 +218,12 @@ One console log, one scalar stream, one TensorBoard event file:
 | `events.out.tfevents.*` | TensorBoard scalars, image grids and text — written by rank 0 only |
 | `reals.png`, `fakes<kimg>.png` | sample grids: reals once at start, fakes every snapshot tick |
 
+The event file is written **directly in the run directory** — never in a
+`tb/` or `logs/` subfolder — so the TensorBoard run name is exactly the run
+directory name (`<id:05d>-<cfg>-gpus<G>-batch<B>[-desc]`). Point TensorBoard
+at the parent: `tensorboard --logdir <outdir>` and every run appears under
+its training-folder name.
+
 TensorBoard tag schema — identical namespaces in all four, with the global
 step = `cur_nimg` everywhere, so curves are directly comparable across batch
 sizes, GPU counts and repos:
@@ -248,17 +261,47 @@ repos, so step counts and quality do not transfer. Calibrate per repo with
 its own `<model>-compare-samplers` ({doc}`sampler_comparison`).
 ```
 
+## 9. Launch scripts
+
+Cluster launches are plain shell scripts — **no `.sbatch` files in the
+repos**. Each repo ships the same set under `sh/`:
+
+```
+sh/train_256.sh     sh/train_512.sh     sh/train_1024.sh
+sh/generate_256.sh  sh/generate_512.sh  sh/generate_1024.sh
+```
+
+Each script contains exactly two things:
+
+1. **The environment** — everything a compute node needs, in one place:
+   conda activation (env name = repo name), `CUDA_HOME` /
+   `TORCH_CUDA_ARCH_LIST`, and the **offline-cluster contract**:
+   `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` set in every script, with
+   backbones prefetched once on a login node via `<model>-download-models`.
+2. **One console-command call** — `<model>-train …` or
+   `<model>-gen-images …` with the §2 / §4 flags.
+
+Rules:
+
+- **No hardcoded user homes, `--nodelist`, or account IDs** inside the
+  scripts. The repo root is self-located (walk up to `pyproject.toml`);
+  SLURM specifics are supplied at submission time:
+  `sbatch --account=<proj> --partition=rocky --gpus=2 sh/train_256.sh`.
+- The same script runs unmodified on a workstation:
+  `bash sh/train_256.sh`.
+
 ---
 
 # Part 2 — Proposed changes in the four repos
 
-## 9. Changes common to all four
+## 10. Changes common to all four
 
 - **Checkpoint scheme (§3)**: drop `--resume` / auto-restart, `best_model.*`,
-  the rolling `latest` checkpoint and `--save-inference-only`; rename
-  snapshot files to `<model>-snapshot-*`; save `.pt` state dicts only and
-  remove the legacy `.pkl` loaders — tag the last pickle-capable commit
-  `legacy-pkl` so old artifacts stay readable by checking out old code.
+  the rolling `latest` checkpoint, `--save-inference-only` and the final full
+  checkpoints (DiffiT-v2's `network-final*.pt`); rename snapshot files to
+  `<model>-snapshot-*`; save `.pt` state dicts only and remove the legacy
+  `.pkl` loaders — tag the last pickle-capable commit `legacy-pkl` so old
+  artifacts stay readable by checking out old code.
 - **Log contract (§7)**: EDM2-v2 drops `progress.csv` / `progress.json`
   (duplicates of `stats.jsonl`) and its per-rank `log-rankNNN.txt`; DiffiT-v2
   drops its extra OpenAI-baselines logger formats.
@@ -277,12 +320,17 @@ its own `<model>-compare-samplers` ({doc}`sampler_comparison`).
   `sample_images.py` (EDM2-v2) fall outside the contract — their only
   consumer is the upstream-paper FID protocol, which the WC-Co workflow does
   not use. They may remain in the repos but carry no contract guarantees.
+- **Launch scripts (§9)**: every `sbatch/` collection — plus DiffiT-v2's root
+  `train_*prod.sbatch` / `generate_*.sbatch` / `run_train.sh` — is replaced
+  by the `sh/` set. The hardcoded user homes (`/home/dgkagramanyan`),
+  nodelists (`cn-049`…`cn-051`) and account IDs (`proj_1631` / `proj_1661`)
+  move to submission-time SLURM options.
 
 **Breaking everywhere:** interrupted runs can no longer be continued (see the
 §3 warning), old `.pkl` artifacts need the `legacy-pkl` tag, and old commands
 using the removed flags fail.
 
-## 10. Per-model deltas
+## 11. Per-model deltas
 
 ### DiffiT-v2 — nearly compliant
 
@@ -292,6 +340,7 @@ using the removed flags fail.
 | `--network` alias for `--model-path` | no |
 | `--combra-ref-count` knob; `--num-fid-samples` governs the combra fake count | no |
 | combra extra → `git+https` source | no |
+| dead-code cleanup: remove the unused `--metrics` train flag and the duplicate `diffit/resample.py` module | no |
 
 ### EDM2-v2 — generation is the gap
 
@@ -301,6 +350,7 @@ using the removed flags fail.
 | `--network` alias for `--net` | no |
 | **`edm2-gen-images`: add `--classes` + `--samples-per-class` class-batch mode and `--save-mode hdf5` (RankH5Writer layout)** | no (additive; `--seeds` mode kept) |
 | inference snapshots keep the EMA-std suffix: `edm2-snapshot-<kimg>[-<ema_std>]-inference.pt` | no (naming detail) |
+| delete the committed `docs/*-help.txt` dumps (already stale once) — help text lives only in the CLI | no |
 
 ### StyleSwin-v2 — parity kit
 
@@ -310,6 +360,7 @@ using the removed flags fail.
 | **`gen_images.py`: add `--save-mode hdf5` (RankH5Writer layout)** | no (additive) |
 | add `styleswin-eval` standalone evaluator + startup `combra_smoke_test` | no |
 | `--num-fid-samples` / `--combra-ref-count` knobs (replacing fixed 10 000) | no (defaults unchanged) |
+| dead-flag cleanup: remove the reserved `--metrics` stub | no |
 
 ### san-v2 — dataset rebuild + format change
 
@@ -333,7 +384,7 @@ is welded to its training-time indices:
   convention and the class-map warnings on the model pages become historical
   notes about legacy artifacts.
 
-## 11. Conformance checks
+## 12. Conformance checks
 
 A small conformance suite in wc_cv keeps the convention from drifting again
 (today's `--use-ddim` / `network-snapshot-final.pkl` / inverted-flag rot all
@@ -350,10 +401,12 @@ grew silently). No model execution needed:
 4. **Label contract** — assert `class_names` present and index-aligned in
    `dataset.json`, in checkpoint metadata and in a generated h5; assert the
    alphabetical ordering rule on a fresh dataset build (§5).
+5. **Launch scripts** — grep `sh/` for hardcoded home paths, `--nodelist`
+   and account IDs (must be none, §9).
 
 Wired into each repo's CI next to the existing smoke tests.
 
-## 12. Adoption order
+## 13. Adoption order
 
 1. **Generation contract (§4)** — the only change with direct scientific
    payoff: EDM2-v2 and StyleSwin-v2 outputs become consumable by the wc_cv
@@ -364,6 +417,7 @@ Wired into each repo's CI next to the existing smoke tests.
 3. **Checkpoint scheme (§3)** — all four repos: EMA-snapshot-only saving as
    `.pt` state dicts; resume / best-model machinery and pickle loaders
    removed (ends the flag divergence and the `timm` unpickling fragility).
-4. **StyleSwin-v2 parity kit (§10)**.
-5. **Aliases, eval knobs and the log contract (§2, §6, §7, §8)**.
-6. **Conformance CI (§11)** — last, so it locks in the finished state.
+4. **StyleSwin-v2 parity kit (§11)**.
+5. **Aliases, eval knobs, the log contract and launch scripts
+   (§2, §6, §7, §8, §9)**.
+6. **Conformance CI (§12)** — last, so it locks in the finished state.
