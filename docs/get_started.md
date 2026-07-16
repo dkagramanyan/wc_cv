@@ -91,6 +91,6 @@ The output file's `run_meta` column records who/when/what — including the git 
 | {doc}`combra.areas <api/areas>` | Polygon-area and effective-radius distribution plots. |
 | {doc}`combra.stats <api/stats>` | Parametric distributions + histogram preprocessor. |
 | {doc}`combra.approx <api/approx>` | Fits Gaussian/binomial/poisson/exponential/linear models. |
-| {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
+| {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, sampler-vs-steps comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
 | {doc}`combra.graph <api/graph>` | Crack-image → graph → shortest-energy-path search. |
 | {doc}`combra.utils <api/utils>` | `NumpyEncoder` for JSON dumps. |

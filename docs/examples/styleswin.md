@@ -4,8 +4,9 @@
 [StyleSwin](https://github.com/microsoft/StyleSwin) (a Swin-transformer StyleGAN) specialised
 for generating WC-Co microstructure SEM images. Upstream StyleSwin is **unconditional**; this
 fork adds **class-conditional** generation over the three grain classes and wires the training
-evaluation into combra: on every **snapshot** tick it scores generated samples with
-{py:func}`combra.metrics.compute_all_metrics` and logs the results to TensorBoard — the same
+evaluation into combra: on every **snapshot** tick it scores generated samples with combra's
+sharded split-API metrics (numerically equivalent to
+{py:func}`combra.metrics.compute_all_metrics`) and logs the results to TensorBoard — the same
 integration as {doc}`san_v2` and {doc}`diffit`.
 
 Conditioning reuses the san-v2 techniques: the generator embeds the one-hot label into the

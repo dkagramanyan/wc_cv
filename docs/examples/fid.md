@@ -5,6 +5,13 @@ See {py:func}`combra.metrics.compute_fid`.
 
 combra does not implement FID itself — `compute_fid` delegates to the reference library [pytorch-fid](https://github.com/mseitzer/pytorch-fid). It ships as a core dependency and downloads/caches its own InceptionV3 weights on first use, so there is no manual model setup. `compute_fid` takes **in-memory image batches** (a numpy array or torch tensor), not a folder, and runs on CUDA when it is available, falling back to CPU otherwise.
 
+```{note}
+This page predates the model-specific docs and shows the bare `compute_fid`
+call. For the current end-to-end workflows — training-time combra metrics and
+standalone evaluation per generator — see {doc}`models_api` and the model pages
+{doc}`san_v2`, {doc}`styleswin`, {doc}`diffit`, {doc}`edm2`.
+```
+
 Load each resolution's images into a batch array, then loop over the pairs:
 
 ```python

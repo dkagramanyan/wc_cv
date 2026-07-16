@@ -3,7 +3,8 @@
 [**DiffiT-v2**](https://github.com/dkagramanyan/DiffiT-v2) is a performance
 refresh of NVlabs' DiffiT (Diffusion Vision Transformers) used to generate WC-Co
 microstructure SEM images. Its training evaluation is wired into combra: every
-evaluation tick scores generated samples with
+evaluation tick scores generated samples with combra's sharded split-API
+metrics — numerically equivalent to
 {py:func}`combra.metrics.compute_all_metrics`.
 
 The combra integration is **optional** — DiffiT does not depend on combra. The
@@ -129,9 +130,9 @@ finetuning from a previous stage — always work.
 During training, at each evaluation tick (every `--snap` ticks) the loop
 generates a batch of images from the EMA model by running the configured
 reverse-diffusion sampler (DDIM by default — see the Samplers section below) in
-VAE latent space, decodes them to pixels, and runs
-`compute_all_metrics(reals, fakes, image_metrics=True)` (when combra is
-installed). All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`,
+VAE latent space, decodes them to pixels, and scores them with the combra suite
+(when combra is installed) — the sharded equivalent of
+`compute_all_metrics(reals, fakes, image_metrics=True)` (see below). All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`,
 `circular_w2`, the bimodal-Gaussian relative errors
 `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`, and the image-feature metrics `fid`,
 `cmmd`, `fd_dinov2` — are logged to TensorBoard under `Metrics/combra_*`, written
@@ -210,7 +211,7 @@ count, etc.) and exits before training:
 ```bash
 diffit-train --outdir=./training-runs \
     --cfg=diffit-256 \
-    --data=./datasets/imagenet_256x256.zip \
+    --data=./datasets/wc_co_256x256.zip \
     --gpus 1 --batch-gpu 4 \
     -n
 ```
@@ -227,8 +228,9 @@ torchrun --nproc_per_node=4 -m scripts.sample \
     --cfg-scale 4.4 --num-samples 50000 \
     --sampler ddim --num-sampling-steps 250 --cfg-cond
 
+# reference: a folder of real WC-Co images (--ref-path) or a prebuilt .npz batch (--ref-batch)
 diffit-eval \
-    --ref-batch ./VIRTUAL_imagenet256_labeled.npz \
+    --ref-path ./raw_wc_co_images \
     --sample-batch ./samples/256/samples_50000x256x256x3.npz
 ```
 
@@ -281,10 +283,11 @@ model trained on the WC-Co dataset the indices map as:
 | `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
 
 ```{warning}
-**The index order differs between the two generators.** SAN numbers the same grains
+**The index order differs from SAN.** SAN numbers the same grains
 as `0 → Ultra_Co25`, `1 → Ultra_Co11` (indices 0 and 1 swapped; `2 → Ultra_Co6_2`
-matches — see {doc}`san_v2`). So the same index does **not** generate the same
-morphology across SAN and DiffiT. When comparing a generator against the real
+matches — see {doc}`san_v2`), while EDM2 and StyleSwin share DiffiT's alphabetical
+convention ({doc}`edm2`, {doc}`styleswin`). So the same index does **not** generate
+the same morphology across SAN and the other three models. When comparing a generator against the real
 classes — e.g. in the `co_angles` notebooks — remap per model with combra's
 `CLASS_MAP`, which {py:func}`combra.angles.resolve_overlay_rows` and
 {py:func}`combra.angles.build_overlay_grid` consume as `gen_name_for_mode`.

@@ -39,6 +39,7 @@ api/tests
 
 examples/angles
 examples/fid
+examples/models_api
 examples/san_v2
 examples/styleswin
 examples/diffit

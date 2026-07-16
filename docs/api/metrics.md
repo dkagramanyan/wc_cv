@@ -151,9 +151,10 @@ devices or processes**: extract features for disjoint slices of the generated se
 in parallel, concatenate the rows, then take the distance once. Extraction is
 per-image, so `concat(features(shard_a), features(shard_b))` equals
 `features(concat(shard_a, shard_b))` — the pooled result is exact, not an
-approximation. This is how DiffiT's multi-GPU training loop spreads the `fid` /
+approximation. This is how the model training loops (DiffiT-v2, EDM2-v2, san-v2,
+StyleSwin-v2) spread the `fid` /
 `cmmd` / `fd_dinov2` work over every rank (see the {doc}`DiffiT example
-</examples/diffit>`): each rank extracts features from its own generated shard,
+</examples/diffit>` and the {doc}`models API scheme </examples/models_api>`): each rank extracts features from its own generated shard,
 the feature rows are gathered to rank 0, and the distance is taken there against
 the (cached) reference features.
 
@@ -480,7 +481,7 @@ Run every requested batch metric for a (reference, generated) pair in parallel a
 
 ### Sharded angle metrics
 
-Just as the image-feature metrics split into [extractor + distance halves](#sharded-feature-extraction), the angle suite splits into {py:func}`combra.metrics.images_to_pooled_angles` (the expensive, per-image extraction) and `angle_density_metrics_from_pooled` (the cheap histogram + Wasserstein + Gaussian-fit assembly). This lets the angle extraction be **sharded across devices or processes**: pool the angles for disjoint slices in parallel, concatenate the 1-D arrays, then compute the metrics once. Pooling is plain concatenation and the histogram is a `bincount`, so the sharded result is **exact**, not an approximation — identical to `compute_all_metrics(..., image_metrics=False)` over the full set. DiffiT's multi-GPU training loop uses this (alongside the sharded features) so the angle work — for both the generated and the reference set — is spread over every rank instead of running on rank 0 (see the {doc}`DiffiT example </examples/diffit>`).
+Just as the image-feature metrics split into [extractor + distance halves](#sharded-feature-extraction), the angle suite splits into {py:func}`combra.metrics.images_to_pooled_angles` (the expensive, per-image extraction) and `angle_density_metrics_from_pooled` (the cheap histogram + Wasserstein + Gaussian-fit assembly). This lets the angle extraction be **sharded across devices or processes**: pool the angles for disjoint slices in parallel, concatenate the 1-D arrays, then compute the metrics once. Pooling is plain concatenation and the histogram is a `bincount`, so the sharded result is **exact**, not an approximation — identical to `compute_all_metrics(..., image_metrics=False)` over the full set. The model training loops (DiffiT-v2, EDM2-v2, san-v2, StyleSwin-v2) use this (alongside the sharded features) so the angle work — for both the generated and the reference set — is spread over every rank instead of running on rank 0 (see the {doc}`DiffiT example </examples/diffit>`).
 
 ```python
 >>> import numpy as np
@@ -732,7 +733,7 @@ For each sampler and each step count, generate a batch, score it against a fixed
 real reference batch with `compute_all_metrics`, and plot metric (Y) vs. `k` (X),
 one curve per sampler. `compare_samplers` is sampler- and codebase-agnostic — the
 caller supplies the generators — so the same function drives any diffusion model
-(see `docs/examples/sampler_comparison.md` for the DiffiT-v2 wiring). They live in
+(see `docs/examples/sampler_comparison.md` for the EDM2-v2 wiring). They live in
 `combra.metrics.samplers` and `combra.metrics.plot`.
 
 ````{py:function} combra.metrics.compare_samplers(reference_images, samplers, k_values, *, step=None, device=None, image_metrics=True, metrics=None, angle_kw=None, verbose=True) -> pandas.DataFrame

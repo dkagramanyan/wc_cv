@@ -3,8 +3,9 @@
 [**san-v2**](https://github.com/dkagramanyan/san-v2) is a fork of Sony's
 StyleSAN-XL (Slicing Adversarial Network, StyleGAN3 + Projected GAN) used to
 generate WC-Co microstructure SEM images. Its training evaluation is wired into
-combra: on every **snapshot** tick it scores generated samples with
-{py:func}`combra.metrics.compute_all_metrics` and logs the results to TensorBoard.
+combra: on every **snapshot** tick it scores generated samples with combra's
+sharded split-API metrics (numerically equivalent to
+{py:func}`combra.metrics.compute_all_metrics`) and logs the results to TensorBoard.
 
 The combra integration is **optional** and controlled by its own flag,
 `--combra-metrics` (default `true`) — **independent of `--metrics`**, so you can run
@@ -90,8 +91,18 @@ plus resume `progress` for `--resume` — together with the best-FID `best_model
 does **not** accumulate per-tick artifacts. Pass `--save-inference-only 1` to also write a
 small `network-snapshot-<kimg>-inference.pkl` each tick holding **only `G_ema`** (no
 discriminator, no resume state) — the smallest artifact, exactly what `gen_images.py` and
-{py:func}`combra.metrics.compute_all_metrics` evaluation consume — or `--save-weights-only 1`
+the combra evaluation consume — or `--save-weights-only 1`
 for per-tick `G`/`D`/`G_ema` when the discriminator is needed.
+
+```{warning}
+`--save-inference-only` means the **opposite** here than in the other three
+models: in san-v2 the rolling full `network-snapshot-latest.pt` is written
+regardless and `1` *adds* the per-tick inference `.pkl`s, whereas in
+{doc}`DiffiT-v2 <diffit>`, {doc}`EDM2-v2 <edm2>` and {doc}`StyleSwin-v2 <styleswin>`
+inference snapshots are always written and the flag *skips* the rolling full
+checkpoint. See the {doc}`API scheme <models_api>` before copying the flag
+between repos.
+```
 
 ```{note}
 Checkpoints that embed the projected discriminator's `timm` feature networks
@@ -226,10 +237,12 @@ WC-Co dataset the indices map as:
 | `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
 
 ```{warning}
-**The index order differs between the two generators.** DiffiT numbers the same grains
+**The index order differs from the other generators.** DiffiT — and likewise EDM2
+and StyleSwin, which share its alphabetical convention (see {doc}`diffit`,
+{doc}`edm2`, {doc}`styleswin`) — numbers the same grains
 as `0 → Ultra_Co11`, `1 → Ultra_Co25` (indices 0 and 1 swapped relative to SAN;
-`2 → Ultra_Co6_2` matches — see {doc}`diffit`). So the same index does **not** generate
-the same morphology across SAN and DiffiT. When comparing a generator against the real
+`2 → Ultra_Co6_2` matches). So the same index does **not** generate
+the same morphology across SAN and the other three models. When comparing a generator against the real
 classes — e.g. in the `co_angles` notebooks — remap per model with combra's
 `CLASS_MAP`, which {py:func}`combra.angles.resolve_overlay_rows` and
 {py:func}`combra.angles.build_overlay_grid` consume as `gen_name_for_mode`.

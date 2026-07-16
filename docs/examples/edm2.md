@@ -4,8 +4,8 @@
 EDM2 ("Analyzing and Improving the Training Dynamics of Diffusion Models") used to
 generate WC-Co microstructure SEM images. Like {doc}`DiffiT-v2 <diffit>`, its
 training evaluation is wired into combra: every snapshot tick scores generated
-samples with {py:func}`combra.metrics.compute_all_metrics` (computed across all
-GPU ranks).
+samples with combra's sharded split-API metrics, computed across all GPU ranks
+(numerically equivalent to {py:func}`combra.metrics.compute_all_metrics`).
 
 The combra integration is **optional** — EDM2 does not depend on combra. The
 import is guarded, so training runs unchanged when combra is not installed. To
@@ -14,7 +14,9 @@ enable the metrics, install EDM2 with the `[combra]` extra — see
 
 ## Training
 
-`edm2-train` (equivalently `torchrun … train_edm2.py`) trains the model.
+`edm2-train` (equivalently `python train_edm2.py`) trains the model; it spawns
+its own per-GPU worker processes via `--gpus`, so **no `torchrun` is needed for
+training** (only some generation scripts use `torchrun`).
 **"From scratch" simply means launching against an empty `--outdir`** (random
 initialisation); re-running the same command resumes automatically. EDM2 operates
 in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 /
@@ -66,11 +68,11 @@ in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 
 
    ```bash
    # 256² from scratch, 2 GPUs
-   torchrun --standalone --nproc_per_node=2 train_edm2.py \
+   edm2-train \
        --outdir=./training-runs \
        --preset=edm2-img256-s \
        --data=./datasets/wc_co_256x256.zip \
-       --batch-gpu 96
+       --gpus 2 --batch-gpu 96
    ```
 
    Each run gets its own directory under `--outdir`, named
@@ -84,7 +86,8 @@ in the Stable-Diffusion VAE latent space, so the same pipeline serves 256 / 512 
    different directory name, and so a fresh run.
 
    Each snapshot tick writes, best-of-both style: small self-contained inference
-   `network-snapshot-<kimg>.pkl` (EMA + encoder) kept as history and pruned to the
+   `network-snapshot-<kimg>-<ema_std>.pkl` (EMA + encoder; one per EMA std, e.g.
+   `network-snapshot-0002000-0.100.pkl`) kept as history and pruned to the
    newest `--snapshot-keep-last` (default 3); a single full `network-snapshot-latest.pt`
    overwritten in place for resume (skipped under `--save-inference-only`); and
    `best_model.pt`, the full checkpoint of the lowest-combra-FID tick, written in both
@@ -155,8 +158,9 @@ zip.
 During training, at each snapshot tick the loop generates a batch of images from
 the EMA model by running the configured reverse-diffusion sampler (DPM-Solver++(2M)
 at 25 steps by default — see the Samplers section below) in VAE latent space,
-decodes them to pixels, and runs `compute_all_metrics(reals, fakes)` (when combra
-is installed).
+decodes them to pixels, and scores them with the combra suite (when combra is
+installed) — the sharded equivalent of `compute_all_metrics(reals, fakes)` (see
+below).
 All returned metrics — angle-Wasserstein `w1`, `w2`, `circular_w1`, `circular_w2`,
 the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`,
 and the image-feature metrics `fid`, `cmmd`, `fd_dinov2` — are logged to
@@ -213,9 +217,9 @@ To use a different sampler or step count during training, pass `--eval-sampler`
 and `--eval-sampling-steps`:
 
 ```bash
-torchrun --standalone --nproc_per_node=2 train_edm2.py \
+edm2-train \
     --outdir=./training-runs --preset=edm2-img256-s \
-    --data=./datasets/wc_co_256x256.zip --batch-gpu 96 \
+    --data=./datasets/wc_co_256x256.zip --gpus 2 --batch-gpu 96 \
     --eval-sampler edm --eval-sampling-steps 32
 ```
 
@@ -240,11 +244,14 @@ python train_edm2.py --outdir=./training-runs \
 ## Evaluation
 
 A full FID-style evaluation of a trained checkpoint bulk-samples a `.npz` batch and
-scores it with the offline evaluator (`edm2-eval` = `calculate_metrics.py`):
+scores it with the offline evaluator (`edm2-eval` = `calculate_metrics.py`). For
+`--net`, pass the newest inference snapshot in the run directory — the trainer
+writes `network-snapshot-<kimg>-<ema_std>.pkl` and prunes the history to the
+newest `--snapshot-keep-last`:
 
 ```bash
 torchrun --standalone --nproc_per_node=4 sample_images.py \
-    --net ./training-runs/00000-*/network-snapshot-final.pkl \
+    --net ./training-runs/00000-*/network-snapshot-<kimg>-0.100.pkl \
     --outdir ./samples/256 --num-samples 50000 \
     --sampler dpm++ --steps 25
 
@@ -279,7 +286,7 @@ plateaus at the optimal step count per sampler (see {doc}`sampler_comparison`):
 
 ```bash
 python compare_samplers.py \
-    --net ./training-runs/00000-*/network-snapshot-final.pkl \
+    --net ./training-runs/00000-*/network-snapshot-<kimg>-0.100.pkl \
     --data ./datasets/wc_co_256x256.zip \
     --samplers edm,euler,ddim,dpm++ --k-values 5,10,20,50,100,250 \
     --num-samples 512 --outdir ./sampler-comparison/256
@@ -294,7 +301,7 @@ GPUs:
 
 ```bash
 edm2-gen-images \
-    --net ./training-runs/00000-*/network-snapshot-final.pkl \
+    --net ./training-runs/00000-*/network-snapshot-<kimg>-0.100.pkl \
     --outdir ./generated/256 \
     --seeds 0-999 \
     --class 0 \

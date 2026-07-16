@@ -38,7 +38,7 @@ sampler, and calls `compare_samplers`. It writes a tidy
 
 ```bash
 python compare_samplers.py \
-    --net ./training-runs/00000-*/network-snapshot-final.pkl \
+    --net ./training-runs/00000-*/network-snapshot-<kimg>-0.100.pkl \
     --data ./datasets/wc_co_256x256.zip \
     --samplers edm,euler,ddim,dpm++ \
     --k-values 5,10,20,50,100,250 \
