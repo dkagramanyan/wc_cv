@@ -5,6 +5,12 @@ Four source-only repos generate WC-Co microstructure SEM images. They are
 convention** — not a single package. This page is the cross-model map: what is
 identical everywhere (the contract), and where the repos still diverge.
 
+```{seealso}
+This page documents the **current** state. A specification that unifies the
+remaining divergences — including per-repo migration deltas — is proposed in
+{doc}`models_api_proposal`.
+```
+
 | repo | family | upstream | docs |
 |---|---|---|---|
 | [san-v2](https://github.com/dkagramanyan/san-v2) | GAN — StyleGAN3 + Projected GAN + SAN | Sony StyleSAN-XL | {doc}`san_v2` |
