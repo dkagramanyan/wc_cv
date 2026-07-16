@@ -53,10 +53,11 @@ not part of the contract.
 <model>-train --outdir <dir> --cfg <preset> --data <zip> --gpus N --batch-gpu B
 ```
 
-- **click CLI is the single source of truth** for options and defaults.
-- **Hydra shim in all four**: `train_hydra.py` (~50 lines) introspects the
-  click options and calls the same launch path; `configs/config.yaml` is a
-  single flat file (`???` = required, `null` = "use click default").
+- **The click CLI is the only interface** — no Hydra. `train_hydra.py`,
+  `configs/`, and the `hydra-core` dependency are removed from the repos that
+  have them: no launch script ever calls the Hydra path, the configs are
+  single flat files with no groups, and no composition or multirun feature is
+  used — it is a second launch path to keep in sync for zero benefit.
 - **`--cfg` is the preset flag name everywhere** (EDM2 keeps `--preset` as an
   alias).
 - Shared optional flags — identical names *and semantics* in all four:
@@ -91,7 +92,7 @@ not part of the contract.
   `{n_classes, resolution, class_names, cur_nimg}`. `class_names` is the new
   requirement — it removes the SAN-vs-rest index-swap hazard at the source,
   because downstream code can read grain-class *names* instead of guessing
-  index conventions (see {doc}`models_api` "Class index → grain class").
+  index conventions (the full label contract is §5).
 
 ## 4. Generation contract
 
@@ -107,6 +108,8 @@ not part of the contract.
 
 - One checkpoint flag: **`--network`** (deprecated aliases kept:
   `--model-path` in DiffiT-v2, `--net` in EDM2-v2).
+- `--classes` accepts indices **or class names**
+  (`--classes Ultra_Co11,Ultra_Co6_2`) — see the label contract in §5.
 - **Determinism rule** in all four: `seed = base + class·samples_per_class + idx`
   — any subset of the output is reproducible in isolation.
 - **Identical outputs across repos**:
@@ -117,7 +120,49 @@ not part of the contract.
 - EDM2's seed-oriented mode (`--seeds 0-999 --class <idx>`) survives as a
   power-user mode; the class-batch mode above becomes the default interface.
 
-## 5. Evaluation contract
+## 5. Class-label contract
+
+Today the artifacts carry only integers (`class_0/1/2`), and the meaning of
+the integer depends on which dataset tool wrote the zip — san-v2's
+`dataset.json` was once written non-alphabetically, and that decision now
+lives in every SAN checkpoint and generated h5, recoverable only through
+combra's hand-pinned `CLASS_MAP` (see {doc}`models_api` "Class index → grain
+class"). Two rules end this:
+
+**Rule 1 — canonical ordering.** The integer label is the index of the class
+folder in `sorted()` (alphabetical) order. Every `dataset_tool*.py` derives
+labels this way; san-v2's tool stops copying labels verbatim from the source
+`dataset.json`.
+
+**Rule 2 — names travel with every artifact.** The integer becomes an
+implementation detail; the grain-class *name* is the identity:
+
+| stage | requirement |
+|---|---|
+| dataset zip | `dataset.json` carries `"class_names": ["Ultra_Co11", "Ultra_Co25", "Ultra_Co6_2"]`, index-aligned, written automatically from the folder names |
+| checkpoint | `class_names` copied into every checkpoint (part of the §3 metadata) |
+| generated h5 | `class_names` stamped as a root attribute + per-`class_<c>` group attribute |
+| generated dir | a `classes.json` manifest next to the `class_<c>/` folders |
+| CLI | `--classes` accepts **names as well as indices**: `--classes Ultra_Co11,Ultra_Co6_2` |
+| downstream | combra matches by **name**; `CLASS_MAP` remains only as the fallback for legacy artifacts that lack `class_names` |
+
+### san-v2 dataset rebuild
+
+The existing san-v2 `imagenet_9to4_*` zips are **rebuilt** with alphabetical
+labels + `class_names`, ending the SAN exception at the data level. Safety
+rails, because a trained model's class embedding is welded to its
+training-time indices:
+
+- Rebuilt zips are for **new runs only**. **Never resume or finetune a
+  pre-rebuild checkpoint against a rebuilt zip** — the label semantics of
+  classes 0 and 1 silently swap.
+- Pre-rebuild checkpoints and everything generated from them stay under the
+  legacy `CLASS_MAP` until retrained.
+- Once san-v2 is retrained on the rebuilt zips, all four models share one
+  convention and the class-map warnings on the model pages become historical
+  notes about legacy artifacts.
+
+## 6. Evaluation contract
 
 - **In-training combra eval** (all four): every snapshot tick, fakes generated
   **sharded across all ranks**; reference = whole training set with features
@@ -132,7 +177,7 @@ not part of the contract.
 - `<model>-eval` standalone evaluator in all four (StyleSwin-v2 currently has
   none; its shim can wrap the combra split APIs over an image folder / h5).
 
-## 6. Samplers (diffusion repos)
+## 7. Samplers (diffusion repos)
 
 Sampler **algorithms stay per-family** — DiffiT-v2's `dpm++/unipc/ddim/ddpm`
 (DDPM 1000-step schedule) and EDM2-v2's `dpm++/edm/euler/ddim` (σ-space) are
@@ -148,7 +193,7 @@ Both repos ship `<model>-compare-samplers` producing
 `sampler_comparison.parquet` + `sampler_comparison.png`
 (see {doc}`sampler_comparison`).
 
-## 7. Per-model migration deltas
+## 8. Per-model migration deltas
 
 ### DiffiT-v2 — nearly compliant
 
@@ -159,7 +204,8 @@ Both repos ship `<model>-compare-samplers` producing
 | `--combra-ref-count` knob; `--num-fid-samples` governs the combra fake count | no |
 | combra extra → `git+https` source | no |
 | remove `requirements.txt` (pyproject.toml is the single dependency source) | no |
-| `class_names` metadata in checkpoints | no |
+| remove `train_hydra.py` + `configs/` + `hydra-core` dep | no (unused) |
+| label contract (§5): dataset tool writes `class_names`; gen-images stamps names into h5 / `classes.json`; `--classes` accepts names; `class_names` in checkpoints | no |
 
 ### EDM2-v2 — generation is the gap
 
@@ -169,19 +215,20 @@ Both repos ship `<model>-compare-samplers` producing
 | `--network` alias for `--net` | no |
 | **`edm2-gen-images`: add `--classes` + `--samples-per-class` class-batch mode and `--save-mode hdf5` (RankH5Writer layout)** | no (additive; `--seeds` mode kept) |
 | remove `requirements.txt` (pyproject.toml is the single dependency source) | no |
-| `class_names` metadata in inference pickles / checkpoints | no |
+| remove `train_hydra.py` + `configs/` + `hydra-core` dep | no (unused) |
+| label contract (§5): dataset tool writes `class_names`; gen-images stamps names into h5 / `classes.json`; `--classes` accepts names; `class_names` in inference pickles / checkpoints | no |
 
 ### StyleSwin-v2 — parity kit
 
 | change | breaking? |
 |---|---|
-| add `train_hydra.py` + `configs/config.yaml` (port of the sibling ~50-line shim) | no |
 | console scripts `styleswin-train / -gen-images / -eval / -prepare-data` | no |
 | **`gen_images.py`: add `--save-mode hdf5` (RankH5Writer layout)** | no (additive) |
 | add `styleswin-eval` standalone evaluator + startup `combra_smoke_test` | no |
 | `--num-fid-samples` / `--combra-ref-count` knobs (replacing fixed 10 000) | no (defaults unchanged) |
+| label contract (§5): dataset tool writes `class_names`; gen-images stamps names into h5 / `classes.json`; `--classes` accepts names; `class_names` in checkpoints | no |
 
-### san-v2 — the one breaking migration
+### san-v2 — the only repo with breaking changes
 
 | change | breaking? |
 |---|---|
@@ -191,13 +238,16 @@ Both repos ship `<model>-compare-samplers` producing
 | `--num-fid-samples` / `--combra-ref-count` knobs | no |
 | combra install via `[combra]` extra (`git+https`) | no |
 | remove `requirements.txt` — its editable `-e ../wc_cv/combra` moves to the `[combra]` extra; pyproject.toml (cleaned of the dead GUI deps) becomes the single dependency source | no |
+| remove `train_hydra.py` + `configs/` + `hydra-core` dep | no (unused) |
+| label contract (§5): `dataset_tool.py` derives labels alphabetically + writes `class_names`; gen-images stamps names; `--classes` accepts names | no |
+| **rebuild the `imagenet_9to4_*` dataset zips with alphabetical labels + `class_names`** | **yes** — pre-rebuild checkpoints must never be resumed / finetuned on rebuilt zips; they and their artifacts stay under the legacy `CLASS_MAP` until retrained (§5) |
 
 **Deprecation path for the flag flip:** one transition release where the old
 behavior stays available behind `--legacy-snapshots`, and passing
 `--save-inference-only` prints a prominent warning describing the new meaning;
 the production `sbatch/train_*.sbatch` scripts are updated in the same commit.
 
-## 8. Conformance checks
+## 9. Conformance checks
 
 A small conformance suite in wc_cv keeps the convention from drifting again
 (today's `--use-ddim` / `network-snapshot-final.pkl` / inverted-flag rot all
@@ -211,16 +261,22 @@ grew silently). No model execution needed:
 3. **Artifact contract** — validate a sample `.h5` against the RankH5Writer
    schema (`class_<c>/images|seeds`) and a checkpoint against the §3 metadata
    keys.
+4. **Label contract** — assert `class_names` present and index-aligned in
+   `dataset.json`, in checkpoint metadata and in a generated h5; assert the
+   alphabetical ordering rule on a fresh dataset build (§5).
 
 Wired into each repo's CI next to the existing smoke tests.
 
-## 9. Adoption order
+## 10. Adoption order
 
 1. **Generation contract (§4)** — the only change with direct scientific
    payoff: EDM2-v2 and StyleSwin-v2 outputs become consumable by the wc_cv
    angle pipeline.
-2. **san-v2 flag flip + state dicts (§3, §7)** — removes the most dangerous
+2. **Class-label contract (§5)** — dataset tools write `class_names`, the
+   san-v2 zips are rebuilt; paired with (1) so every new artifact is
+   self-describing from day one.
+3. **san-v2 flag flip + state dicts (§3, §8)** — removes the most dangerous
    cross-repo divergence and the `timm` unpickling fragility.
-3. **StyleSwin-v2 parity kit (§7)**.
-4. **Aliases and eval knobs (§2, §5, §6)**.
-5. **Conformance CI (§8)** — last, so it locks in the finished state.
+4. **StyleSwin-v2 parity kit (§8)**.
+5. **Aliases and eval knobs (§2, §6, §7)**.
+6. **Conformance CI (§9)** — last, so it locks in the finished state.
