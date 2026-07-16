@@ -58,15 +58,15 @@ not part of the contract.
   have them: no launch script ever calls the Hydra path, the configs are
   single flat files with no groups, and no composition or multirun feature is
   used — it is a second launch path to keep in sync for zero benefit.
-- **`--cfg` is the preset flag name everywhere** (EDM2 keeps `--preset` as an
-  alias).
+- **`--cfg` is the preset flag name everywhere** (EDM2 renames `--preset` →
+  `--cfg`; no alias is kept).
 - Shared optional flags — identical names *and semantics* in all four:
 
   | group | flags |
   |---|---|
-  | run control | `--kimg --tick --snap --seed --resume --desc -n/--dry-run --workers` |
+  | run control | `--kimg --tick --snap --seed --desc -n/--dry-run --workers` |
   | data | `--cond --mirror` |
-  | checkpointing | `--snapshot-keep-last --save-inference-only` |
+  | checkpointing | `--snapshot-keep-last` |
   | combra eval | `--combra-metrics --num-fid-samples --combra-ref-count` |
   | diffusion eval | `--eval-sampler --eval-sampling-steps` |
 
@@ -78,21 +78,47 @@ not part of the contract.
 
 ## 3. Checkpoint contract
 
+Exactly two artifact kinds — no resume, no best-model tracking:
+
 | artifact | rule |
 |---|---|
-| `network-snapshot-<kimg:06d>-inference.<ext>` | **always written**; EMA-only; history pruned to `--snapshot-keep-last` (default 3, `0` = keep all) |
-| `network-snapshot-latest.<ext>` | full resume state **including optimizers**; atomically overwritten each snapshot tick; **skipped under `--save-inference-only`** |
-| `best_model.<ext>` | full checkpoint; refreshed on `combra_fid10k` improvement; written in both modes; paired with `best_nimg.txt` |
-| resume | explicit `--resume PATH`, plus auto-resume when re-running the same command (`latest` → `best_model` fallback) |
+| `<model>-snapshot-<kimg:06d>-inference.pt` | EMA-only weights; written every snapshot tick; history pruned to `--snapshot-keep-last` (default 3, `0` = keep all) |
+| `<model>-final.pt` | model + EMA weights (no optimizer state), written once at the end of training |
 
-- **Format: `.pt` state dicts** (portable, `timm`-version-insensitive), not
-  pickled live modules. Legacy `.pkl` loaders are kept for old artifacts;
-  new saves are state dicts.
+- **No resume.** There is no `--resume` flag, no rolling `latest` checkpoint
+  and no auto-restart: training runs start-to-finish. This also deletes
+  `--save-inference-only` — and with it san-v2's inverted-flag hazard —
+  because there is no full rolling checkpoint left to skip.
+- **No `best_model.*`.** Per-tick best-FID bookkeeping goes away; pick the
+  best checkpoint post-hoc from `stats.jsonl` against the snapshot history
+  (set `--snapshot-keep-last 0` on runs where you want the full history to
+  choose from).
+- **Progressive stages still work**: san-v2's `--path_stem` and DiffiT's
+  higher-resolution finetuning are **weights-only warm starts** from a
+  previous stage's snapshot — initialization, not resume.
+- **Format: `.pt` state dicts only** — a state dict stores only weight
+  tensors keyed by parameter name, so loading rebuilds the model from current
+  code instead of unpickling stored classes. Pickled-module saving is removed
+  everywhere.
+- **No `timm` in artifacts.** Both artifact kinds hold **generator-side
+  weights only** — no discriminator and therefore no `timm` feature-network
+  modules or weights ever enter a checkpoint. Loading a checkpoint never
+  requires `timm` (or any particular `timm` version); `timm` remains a
+  train-time-only dependency of the GAN discriminators.
+- **No legacy `.pkl` loaders.** `legacy.py` and the pickle-reading paths are
+  removed; old pickled artifacts remain readable only by checking out the
+  `legacy-pkl` git tag (the last pickle-capable commit in each repo).
 - **Self-describing metadata** in every checkpoint:
   `{n_classes, resolution, class_names, cur_nimg}`. `class_names` is the new
   requirement — it removes the SAN-vs-rest index-swap hazard at the source,
   because downstream code can read grain-class *names* instead of guessing
   index conventions (the full label contract is §5).
+
+```{warning}
+Runs are unrecoverable by design: a crash or SLURM walltime kill cannot be
+resumed. Size `--kimg` (or split stages) so a run fits its job's time limit —
+the training sbatch scripts allow 3–4 days.
+```
 
 ## 4. Generation contract
 
@@ -195,6 +221,13 @@ Both repos ship `<model>-compare-samplers` producing
 
 ## 8. Per-model migration deltas
 
+**Common to all four** — the §3 checkpoint scheme: drop `--resume` /
+auto-restart, `best_model.*`, the rolling `latest` checkpoint and
+`--save-inference-only`; rename snapshot files to `<model>-snapshot-*`;
+remove legacy `.pkl` loaders (tag the last pickle-capable commit
+`legacy-pkl`). **Breaking everywhere:** interrupted runs can no longer be
+continued (see the §3 warning) and old commands using the removed flags fail.
+
 ### DiffiT-v2 — nearly compliant
 
 | change | breaking? |
@@ -211,8 +244,9 @@ Both repos ship `<model>-compare-samplers` producing
 
 | change | breaking? |
 |---|---|
-| `--cfg` alias for `--preset` | no |
+| rename `--preset` → `--cfg` (no alias kept) | **yes** — existing commands/sbatch must switch |
 | `--network` alias for `--net` | no |
+| inference snapshots become `.pt` state dicts: `edm2-snapshot-<kimg>[-<ema_std>]-inference.pt` | **yes** — old `.pkl` snapshots readable only via the `legacy-pkl` tag |
 | **`edm2-gen-images`: add `--classes` + `--samples-per-class` class-batch mode and `--save-mode hdf5` (RankH5Writer layout)** | no (additive; `--seeds` mode kept) |
 | remove `requirements.txt` (pyproject.toml is the single dependency source) | no |
 | remove `train_hydra.py` + `configs/` + `hydra-core` dep | no (unused) |
@@ -228,24 +262,17 @@ Both repos ship `<model>-compare-samplers` producing
 | `--num-fid-samples` / `--combra-ref-count` knobs (replacing fixed 10 000) | no (defaults unchanged) |
 | label contract (§5): dataset tool writes `class_names`; gen-images stamps names into h5 / `classes.json`; `--classes` accepts names; `class_names` in checkpoints | no |
 
-### san-v2 — the only repo with breaking changes
+### san-v2 — dataset rebuild + format change
 
 | change | breaking? |
 |---|---|
-| **flip `--save-inference-only` semantics to match the other three** (inference snapshots always written; the flag skips the rolling full checkpoint) | **yes** |
-| add optimizer state to `network-snapshot-latest.pt` | no (strictly more resumable) |
-| new saves as `.pt` state dicts + metadata; `legacy.py` keeps loading old pickles | no for reading; changes artifact type |
+| saves become `.pt` state dicts (pickled-module saving removed; `legacy.py` deleted) | **yes** — old `.pkl` artifacts readable only via the `legacy-pkl` tag |
 | `--num-fid-samples` / `--combra-ref-count` knobs | no |
 | combra install via `[combra]` extra (`git+https`) | no |
 | remove `requirements.txt` — its editable `-e ../wc_cv/combra` moves to the `[combra]` extra; pyproject.toml (cleaned of the dead GUI deps) becomes the single dependency source | no |
 | remove `train_hydra.py` + `configs/` + `hydra-core` dep | no (unused) |
 | label contract (§5): `dataset_tool.py` derives labels alphabetically + writes `class_names`; gen-images stamps names; `--classes` accepts names | no |
-| **rebuild the `imagenet_9to4_*` dataset zips with alphabetical labels + `class_names`** | **yes** — pre-rebuild checkpoints must never be resumed / finetuned on rebuilt zips; they and their artifacts stay under the legacy `CLASS_MAP` until retrained (§5) |
-
-**Deprecation path for the flag flip:** one transition release where the old
-behavior stays available behind `--legacy-snapshots`, and passing
-`--save-inference-only` prints a prominent warning describing the new meaning;
-the production `sbatch/train_*.sbatch` scripts are updated in the same commit.
+| **rebuild the `imagenet_9to4_*` dataset zips with alphabetical labels + `class_names`** | **yes** — pre-rebuild checkpoints must never be finetuned on rebuilt zips; they and their artifacts stay under the legacy `CLASS_MAP` until retrained (§5) |
 
 ## 9. Conformance checks
 
@@ -275,8 +302,9 @@ Wired into each repo's CI next to the existing smoke tests.
 2. **Class-label contract (§5)** — dataset tools write `class_names`, the
    san-v2 zips are rebuilt; paired with (1) so every new artifact is
    self-describing from day one.
-3. **san-v2 flag flip + state dicts (§3, §8)** — removes the most dangerous
-   cross-repo divergence and the `timm` unpickling fragility.
+3. **Checkpoint scheme (§3)** — all four repos: EMA-snapshot-only saving as
+   `.pt` state dicts; resume / best-model machinery and pickle loaders
+   removed (ends the flag divergence and the `timm` unpickling fragility).
 4. **StyleSwin-v2 parity kit (§8)**.
 5. **Aliases and eval knobs (§2, §6, §7)**.
 6. **Conformance CI (§9)** — last, so it locks in the finished state.
