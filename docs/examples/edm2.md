@@ -340,11 +340,13 @@ matches DiffiT's:
 | `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
 
 ```{warning}
-**The index order differs from SAN.** SAN numbers the same grains as
-`0 → Ultra_Co25`, `1 → Ultra_Co11` (indices 0 and 1 swapped; `2 → Ultra_Co6_2`
-matches — see {doc}`san_v2`), because SAN copies the label verbatim from a
-`dataset.json` written in non-alphabetical order. EDM2 and DiffiT both derive the
-label from the alphabetical folder sort, so they agree with each other but not with
-SAN. When comparing a generator against the real classes, remap per model with
-combra's `CLASS_MAP`.
+**The table holds only for zips EDM2's own tool built from class folders.**
+Training takes zip labels **verbatim**, and the shared `imagenet_9to4_*`
+archives (consumed by the real DiffiT and StyleSwin runs) carry labels in
+**SAN's swapped order** (`0 → Ultra_Co25`, `1 → Ultra_Co11`,
+`2 → Ultra_Co6_2` — see {doc}`san_v2`), not the alphabetical order — a zip's
+provenance, not the repo, decides the convention. Classify each checkpoint
+by the dataset path in its `training_options.json` before comparing across
+models or remapping with combra's `CLASS_MAP` — remapping a checkpoint that
+already uses SAN's order introduces the very swap it is meant to fix.
 ```

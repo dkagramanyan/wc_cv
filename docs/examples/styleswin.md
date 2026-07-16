@@ -181,8 +181,8 @@ The `sbatch/generate_256x256.sbatch` (… `512`, `1024`) scripts wrap this per r
 ### Class index → grain class
 
 The `--classes` integer selects a grain morphology. StyleSwin consumes the same
-`imagenet_9to4_*` archives as DiffiT (built by `dataset_tool_for_imagenet.py`, which derives
-labels from the **alphabetical** class-folder order), so it uses the **DiffiT** index convention:
+`imagenet_9to4_*` archives as DiffiT and takes their labels **verbatim**. Under the
+nominal **alphabetical** convention of `dataset_tool_for_imagenet.py` the indices map as:
 
 | index | grain class | morphology |
 |---|---|---|
@@ -191,11 +191,13 @@ labels from the **alphabetical** class-folder order), so it uses the **DiffiT** 
 | `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
 
 ```{warning}
-**The index order differs from the SAN generator.** san-v2 numbers the same grains as
-`0 → Ultra_Co25`, `1 → Ultra_Co11` (indices 0 and 1 swapped relative to StyleSwin/DiffiT;
-`2 → Ultra_Co6_2` matches — see {doc}`san_v2`). So the same index does **not** generate the same
-morphology across StyleSwin and SAN. When comparing a generator against the real classes — e.g.
-in the `co_angles` notebooks — remap per model with combra's `CLASS_MAP`, which
-{py:func}`combra.angles.resolve_overlay_rows` and {py:func}`combra.angles.build_overlay_grid`
-consume as `gen_name_for_mode`.
+**The trained checkpoints most likely do NOT follow this table.** The on-disk
+`imagenet_9to4_*` archives carry labels in **SAN's swapped order**
+(`0 → Ultra_Co25`, `1 → Ultra_Co11`, `2 → Ultra_Co6_2` — see {doc}`san_v2`), not the
+alphabetical order the build tool nominally produces — and StyleSwin trains on the zip
+labels verbatim. Classify each checkpoint by the dataset path in its
+`training_options.json` before assuming either convention, and do **not** apply a
+`CLASS_MAP` remap (via {py:func}`combra.angles.resolve_overlay_rows` /
+{py:func}`combra.angles.build_overlay_grid` `gen_name_for_mode`) to a checkpoint
+trained on those archives — it would introduce the very swap it is meant to fix.
 ```

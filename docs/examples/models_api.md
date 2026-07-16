@@ -43,10 +43,15 @@ Every repo follows the same conventions:
   `angle_density_metrics_from_pooled` — numerically equivalent to a single-GPU
   {py:func}`combra.metrics.compute_all_metrics` call. Results land in TensorBoard
   as `Metrics/combra_fid10k`, `Metrics/combra_cmmd10k`,
-  `Metrics/combra_fd_dinov2_10k` + the angle metrics, and in `stats.jsonl`.
+  `Metrics/combra_fd_dinov2_10k` + the angle metrics. DiffiT-v2 and EDM2-v2
+  also mirror them into `stats.jsonl`; **san-v2 and StyleSwin-v2 write them
+  to TensorBoard only** — the tfevents file is the sole record of those
+  runs' metric history.
 - **Best-model checkpoint** selected by `combra_fid10k`, plus a rolling full
-  `network-snapshot-latest.pt` overwritten in place and a pruned history of
-  small inference snapshots (`--snapshot-keep-last`, default 3).
+  `network-snapshot-latest.pt` overwritten in place and a history of small
+  inference snapshots, pruned to `--snapshot-keep-last` (default 3) —
+  except in **san-v2**, where no pruning exists and snapshots accumulate
+  unbounded.
 
 ## Training
 
@@ -123,10 +128,24 @@ conversion step before entering that pipeline.
 
 ## Class index → grain class
 
-DiffiT-v2, EDM2-v2 and StyleSwin-v2 share the **alphabetical** convention
-(`0 → Ultra_Co11`, `1 → Ultra_Co25`, `2 → Ultra_Co6_2`); **san-v2 swaps indices
-0 and 1** (`0 → Ultra_Co25`, `1 → Ultra_Co11`). Remap with combra's `CLASS_MAP`
-when comparing across models — details on each model page.
+The mapping is a property of the **zip a run trained on**, not of the repo:
+the zips store only integer labels, every repo takes them **verbatim** at
+train time, and no artifact records the `Ultra_Co*` names. The dataset
+*tools* differ — san-v2's copies labels from a source `dataset.json` written
+in the non-alphabetical order `0 → Ultra_Co25`, `1 → Ultra_Co11`,
+`2 → Ultra_Co6_2`, while the others' derive them from the alphabetical
+folder sort (`0 → Ultra_Co11`, `1 → Ultra_Co25`) — but the on-disk
+`imagenet_9to4_*` archives that the real DiffiT-v2 and StyleSwin-v2 runs
+consumed carry the **same swapped order as the san-v2 zips**.
+
+```{warning}
+The existing checkpoints of all four models therefore most likely share
+san-v2's swapped convention. Before comparing across models or remapping
+with combra's `CLASS_MAP`, classify each run by the dataset path in its
+`training_options.json` — remapping a checkpoint that already uses san-v2's
+order introduces the very swap the remap is meant to fix. Details on each
+model page and in the {doc}`models_api_proposal` label contract (§5).
+```
 
 ## Other known divergences
 

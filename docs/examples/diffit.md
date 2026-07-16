@@ -273,8 +273,9 @@ diffit-gen-images \
 
 ### Class index → grain class
 
-The `--classes` / `--class-idx` integer selects a grain morphology. For the DiffiT
-model trained on the WC-Co dataset the indices map as:
+The `--classes` / `--class-idx` integer selects a grain morphology. Under the
+**alphabetical convention of `dataset_tool_for_imagenet.py`** the indices map
+as:
 
 | index | grain class | morphology |
 |---|---|---|
@@ -283,14 +284,19 @@ model trained on the WC-Co dataset the indices map as:
 | `2` | `Ultra_Co6_2` | large grain (крупные зёрна) |
 
 ```{warning}
-**The index order differs from SAN.** SAN numbers the same grains
-as `0 → Ultra_Co25`, `1 → Ultra_Co11` (indices 0 and 1 swapped; `2 → Ultra_Co6_2`
-matches — see {doc}`san_v2`), while EDM2 and StyleSwin share DiffiT's alphabetical
-convention ({doc}`edm2`, {doc}`styleswin`). So the same index does **not** generate
-the same morphology across SAN and the other three models. When comparing a generator against the real
-classes — e.g. in the `co_angles` notebooks — remap per model with combra's
-`CLASS_MAP`, which {py:func}`combra.angles.resolve_overlay_rows` and
-{py:func}`combra.angles.build_overlay_grid` consume as `gen_name_for_mode`.
+**The trained checkpoints most likely do NOT follow this table.** The table
+is the dataset *tool's* convention, but training takes zip labels
+**verbatim** (the startup class probe remaps sorted ints to contiguous ints —
+an identity map for `0,1,2`), and the on-disk `imagenet_9to4_*` archives the
+real runs consumed (e.g. run 00017, per its `training_options.json`) carry
+labels in **SAN's swapped order** (`0 → Ultra_Co25`, `1 → Ultra_Co11`,
+`2 → Ultra_Co6_2` — see {doc}`san_v2`). Classify each checkpoint by the
+dataset path in its `training_options.json` before assuming either
+convention, and do **not** apply a `CLASS_MAP` remap
+(via {py:func}`combra.angles.resolve_overlay_rows` /
+{py:func}`combra.angles.build_overlay_grid` `gen_name_for_mode`) to a
+checkpoint trained on those archives — it would introduce the very swap it
+is meant to fix.
 ```
 
 **Why the order differs.** The dataset stores only an integer label per image — never
@@ -305,6 +311,9 @@ the `Ultra_Co*` name — and the two pipelines derive that integer by *different
 
 Because the source `dataset.json` lists `Co25` before `Co11` while the folder sort puts
 `Co11` first, the two conventions disagree on labels 0 and 1 — the `Co11`↔`Co25` swap.
-`Ultra_Co6_2` is last under both rules, so it stays `2`. Since neither pipeline records
-the grain name downstream (generated images and their h5s carry only `class_0/1/2`), the
-correspondence has to be recovered after the fact and pinned in combra's `CLASS_MAP`.
+`Ultra_Co6_2` is last under both rules, so it stays `2`. **Which rule a checkpoint
+follows depends on which zip it trained on** — the shipped `imagenet_9to4_*` archives
+carry the SAN-order labels, whichever tool nominally built them. Since neither pipeline
+records the grain name downstream (the zips hold neither `class_names` nor original
+filenames, and generated h5s carry only `class_0/1/2`), the correspondence has to be
+recovered per run from `training_options.json` and pinned in combra's `CLASS_MAP`.
