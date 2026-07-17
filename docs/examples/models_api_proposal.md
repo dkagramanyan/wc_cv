@@ -1,11 +1,12 @@
 # Generative models — proposed standard API ("v2 convention")
 
 ```{note}
-**Status: proposal.** Nothing here is implemented yet — the **current** state
-of each repo (including where they diverge) is documented in
-{doc}`models_api`. This page has two parts: **Part 1** specifies the target
-API every repo exposes; **Part 2** lists the changes each repo needs to get
-there.
+**Status: implemented.** All four repos — san-v2 (v0.2.0), StyleSwin-v2,
+DiffiT-v2 and EDM2-v2 — now expose the Part 1 API; the converged current state is
+documented in {doc}`models_api`. This page is retained as the specification of
+record: **Part 1** specifies the target API every repo exposes; **Part 2** lists
+the per-repo deltas that got each there (and the dataset-rebuild rails that remain
+before the legacy `CLASS_MAP` warnings can be dropped).
 ```
 
 The goal: any command, flag, checkpoint name, or generated artifact learned on
