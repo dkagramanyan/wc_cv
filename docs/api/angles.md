@@ -352,6 +352,57 @@ From `co_angles/1_generation_and_plots.ipynb` — one call per N draws the grid 
 ```
 ````
 
+## Display
+
+````{py:class} combra.angles.AngleDensityDisplay(density, gauss_curve, *, name='', itype='', step=None, legend=None)
+
+Angle-density curve + bimodal-Gaussian fit for one grain class, following
+scikit-learn's `*Display` convention (cf. `RocCurveDisplay`): the *computed*
+values are stored as attributes, drawing is a separate `plot` step, and
+alternate constructors build one from stored data. `plot` accepts an existing
+plotly figure (the `ax=` analogue) and **never** calls `fig.show()`.
+
+```{versionadded} 0.5
+```
+
+**Attributes**
+
+- **`density`** — `(x, y)` of the angle-histogram density.
+- **`gauss_curve`** — `(x, y)` of the fitted bimodal-Gaussian curve.
+- **`name`, `itype`, `step`, `legend`** — metadata copied from the parquet row.
+- **`figure_`** — the figure produced by the last `plot` call (set only after `plot`).
+
+**Constructors**
+
+```{py:classmethod} from_row(row)
+Build from one `{'meta': ..., 'prep': ...}` row (see {py:func}`combra.metrics.load_rows`).
+```
+
+```{py:classmethod} from_parquet(path, class_name, step)
+Load an angles parquet and select the `(class_name, step)` row.
+```
+
+**Method**
+
+```{py:method} plot(fig=None, *, row=None, col=None, color='orange', marker='square', scatter_size=8, show_legend=True, name=None)
+Draw the density markers + fitted curve onto `fig` (a new figure if `None`; pass
+`row`/`col` to target a subplot cell) and return it. Stores it on `figure_`.
+```
+
+**Example**
+
+```python
+>>> from combra.angles import AngleDensityDisplay
+>>> from plotly.subplots import make_subplots
+>>> fig = make_subplots(rows=1, cols=2)
+>>> AngleDensityDisplay.from_parquet('angles_n360.parquet', 'Ultra_Co11', step=2.0) \
+...     .plot(fig=fig, row=1, col=1, color='blue')
+>>> AngleDensityDisplay.from_parquet('gen/angles_n10000.parquet', 'class_1', step=2.0) \
+...     .plot(fig=fig, row=1, col=2, color='orange')
+>>> fig.show()   # the caller displays — the library never does
+```
+````
+
 ## See also
 
 - {py:meth}`combra.data.PobeditDataset.generate_angles` — drives `vertex_angles` across whole class folders and writes parquet.
