@@ -33,9 +33,9 @@ Extract raw contours via Canny edges + Suzuki contour finding. No simplification
 Same as `get_row_contours` but applies Douglas–Peucker simplification with tolerance `tol` to every contour. This is what most downstream code calls.
 
 ```{versionchanged} 0.4
-Renamed from ``get_contours`` (scikit-image ``find_contours`` convention) and
+Renamed from ``find_contours`` (scikit-image ``find_contours`` convention) and
 the missing ``cv2.approxPolyDP`` ``closed`` argument fixed (it previously raised
-``TypeError``). ``get_contours`` stays as a deprecated alias until 0.6.
+``TypeError``). The old ``get_contours`` name is removed (no alias).
 ```
 
 :param image: Preprocessed binary image.
@@ -216,7 +216,7 @@ Numpy version of `draw_contours` — operates on an `ndarray` instead of `PIL.Im
 >>> from combra import contours, data, image
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> simplified = contours.get_contours(processed, tol=3)
+>>> simplified = contours.find_contours(processed, tol=3)
 >>> rgb = color.gray2rgb(processed)
 >>> overlay = contours.draw_edges(rgb, simplified, color=(255, 140, 0), l_width=2)
 >>> pil = Image.fromarray(rgb)

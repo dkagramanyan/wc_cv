@@ -16,7 +16,7 @@ convention (`sklearn.utils.Bunch`). Dataset loaders such as
 self-describing (`ds.images`, `ds.class_names`) while still behaving as a plain
 `dict`. Assigning a new attribute adds a key.
 
-```{versionadded} 0.5
+```{versionadded} 0.4
 ```
 
 **Example**

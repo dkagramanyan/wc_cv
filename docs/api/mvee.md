@@ -17,8 +17,8 @@ Fit MVEE to every contour in a preprocessed image. This is the per-image primiti
 ```{versionchanged} 0.4
 Renamed from ``get_mvee_params`` (scikit-image ``get_`` drop) and now returns a
 {py:class}`~combra.mvee.MveeResult` named tuple. Field order is unchanged, so
-``a, b, angles, centroids, cnts = fit_mvee(...)`` still unpacks. ``get_mvee_params``
-stays as a deprecated alias until 0.6.
+``a, b, angles, centroids, cnts = fit_mvee(...)`` still unpacks. The old
+``get_mvee_params`` name is removed (no alias).
 ```
 
 :param image: Preprocessed image.
@@ -282,4 +282,3 @@ Plot a single polygon (index `pos`) and the ellipse fitted around it. Useful for
 ## See also
 
 - {py:meth}`combra.data.PobeditDataset.generate_beams` — drives `fit_mvee` across whole class folders and writes parquet.
-- {doc}`combra.areas <areas>` — area / effective-radius plots built on top of beams parquets.

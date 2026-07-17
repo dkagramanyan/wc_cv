@@ -37,7 +37,7 @@ Load the bundled 5-class microstructure sample as a scikit-learn-style
 {py:func}`~combra.data.microstructure_images`. Class names are **alphabetically
 sorted** and the integer `target` is index-aligned to them.
 
-```{versionadded} 0.5
+```{versionadded} 0.4
 ```
 
 :returns: **data** – a {py:class}`~combra.utils.Bunch` with `images` (list of `uint8` arrays), `target` (int class-index array), `class_names` (sorted grain names), `filenames`, and `DESCR`.
@@ -105,8 +105,8 @@ folder-of-classes to one; the first call to a `generate_*` method then builds a
 preprocessed-image cache (`.npy` memmap) that subsequent calls reuse.
 
 When an h5 lives at `<data>/h5/<stem>.h5`, the cache is written to
-`<data>/cache/<stem>/<task>_n<N>_p<V>.npy`. The legacy layout (cache next to the h5 with a
-`prep_cache_` filename prefix) is still supported for backwards compatibility.
+`<data>/cache/<stem>/<task>_n<N>_p<V>.npy`. For an h5 outside a `h5/` directory the
+cache falls back next to it with a `prep_cache_` filename prefix.
 
 ```{versionchanged} 0.4
 Adopts the torchvision `ImageFolder` attribute contract

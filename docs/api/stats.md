@@ -30,28 +30,6 @@ Quantize `array` to multiples of `step`, count occurrences via `np.bincount`, an
 ```
 ````
 
-````{py:function} combra.stats.legacy_stats_preprocess(array, step) -> tuple[ndarray, ndarray, ndarray, dict]
-
-Older variant that returns the snapped array, the unique bin centres, the raw counts, and a per-bin index dictionary. Kept for backwards compatibility with pre-parquet code paths; prefer `stats_preprocess` in new code.
-
-:param array: 1-D input.
-:type array: array_like
-:param step: Bin width. Must be non-zero.
-:type step: int
-:returns: **new_array** (*ndarray*) – Original entries snapped to multiples of `step`; and **bin_centres** (*ndarray*) – Sorted unique snapped values; and **counts** (*ndarray*) – Per-bin counts (non-normalised); and **index_map** (*dict*) – `{bin_centre: [original_values_in_bin…]}`.
-:rtype: tuple(ndarray, ndarray, ndarray, dict)
-
-**Example**
-
-```python
->>> import numpy as np
->>> from combra import stats
->>> arr = np.array([1.0, 1.2, 5.1, 5.3, 9.8, 10.2])
->>> new_arr, centres, counts, idx = stats.legacy_stats_preprocess(arr, step=1)
->>> print(f'centres={centres}  counts={counts}')
-```
-````
-
 ## Distributions
 
 These functions are designed to be passed to `scipy.optimize.curve_fit` by {doc}`combra.approx <approx>`. They return ndarrays — feed them an x grid and parameters, get back y values.

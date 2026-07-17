@@ -54,7 +54,7 @@ Five lines that exercise the full pipeline — load a bundled image, preprocess 
 >>> from combra import data, image, angles
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> arr, contours = angles.get_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
+>>> arr, contours = angles.vertex_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
 >>> print(f'{len(arr)} angles, mean={arr.mean():.2f}°')
 ```
 
@@ -88,7 +88,6 @@ The output file's `run_meta` column records who/when/what — including the git 
 | {doc}`combra.contours <api/contours>` | Polygon extraction + drawing. |
 | {doc}`combra.angles <api/angles>` | Per-image angle extraction and grid plots. |
 | {doc}`combra.mvee <api/mvee>` | Minimum-volume enclosing ellipses, beam distributions. |
-| {doc}`combra.areas <api/areas>` | Polygon-area and effective-radius distribution plots. |
 | {doc}`combra.stats <api/stats>` | Parametric distributions + histogram preprocessor. |
 | {doc}`combra.approx <api/approx>` | Fits Gaussian/binomial/poisson/exponential/linear models. |
 | {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, sampler-vs-steps comparison, and convergence-vs-N analysis (Kendall trend, plateau fit, gain-distribution plot). |
