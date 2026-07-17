@@ -13,37 +13,20 @@ working.
 from combra import exceptions
 ```
 
-````{py:exception} combra.exceptions.CombraError
+```{eval-rst}
+.. autoexception:: combra.exceptions.CombraError
+.. autoexception:: combra.exceptions.SchemaError
+.. autoexception:: combra.exceptions.IncompleteShardError
+.. autoexception:: combra.exceptions.CombraWarning
+.. autoexception:: combra.exceptions.UnknownFormatWarning
+```
 
-Base class for all combra-specific errors (subclasses `Exception`).
-````
-
-````{py:exception} combra.exceptions.SchemaError
-
-A parquet / HDF5 file does not match the expected combra schema — e.g.
-{py:func}`combra.io.load_rows` on a non-current-schema parquet. Subclasses
-{py:class}`~combra.exceptions.CombraError` and `ValueError`.
-````
-
-````{py:exception} combra.exceptions.IncompleteShardError
-
-A generated-image HDF5 shard is incomplete (a nonzero `missing_count` or unwritten
-slots in the `written` mask). Raised by {py:class}`combra.data.PobeditDataset` when
-it refuses to consume a crashed generation run. Subclasses
-{py:class}`~combra.exceptions.CombraError` and `ValueError`.
-````
-
-````{py:exception} combra.exceptions.CombraWarning
-
-Base class for all combra-specific warnings (subclasses `UserWarning`).
-````
-
-````{py:exception} combra.exceptions.UnknownFormatWarning
-
-An HDF5 file carries an unrecognized `format` attribute. Emitted (not raised) by
-{py:class}`combra.data.PobeditDataset`. Subclasses
-{py:class}`~combra.exceptions.CombraWarning`.
-````
+`SchemaError` and `IncompleteShardError` also subclass `ValueError`;
+`UnknownFormatWarning` subclasses `CombraWarning` (itself a `UserWarning`).
+`SchemaError` is what {py:func}`combra.io.load_rows` raises on a non-current-schema
+parquet, and `IncompleteShardError` is raised by {py:class}`combra.data.PobeditDataset`
+when it refuses to consume a crashed generation run (a nonzero `missing_count` or
+unwritten slots in the `written` mask).
 
 **Example**
 

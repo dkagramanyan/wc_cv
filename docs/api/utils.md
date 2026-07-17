@@ -8,16 +8,16 @@ from combra import utils
 
 ## Bunch
 
-````{py:class} combra.utils.Bunch(**kwargs)
-
-A `dict` that also exposes its keys as attributes — the scikit-learn container
-convention (`sklearn.utils.Bunch`). Dataset loaders such as
-{py:func}`combra.data.load_microstructure` return one so results are
-self-describing (`ds.images`, `ds.class_names`) while still behaving as a plain
-`dict`. Assigning a new attribute adds a key.
+```{eval-rst}
+.. autoclass:: combra.utils.Bunch
+```
 
 ```{versionadded} 0.4
 ```
+
+Dataset loaders such as {py:func}`combra.data.load_microstructure` return one so
+results are self-describing (`ds.images`, `ds.class_names`) while still behaving as
+a plain `dict`.
 
 **Example**
 
@@ -29,11 +29,12 @@ self-describing (`ds.images`, `ds.class_names`) while still behaving as a plain
 >>> b['class_names'] is b.class_names   # dict access too
 True
 ```
-````
 
 ## NumpyEncoder
 
-````{py:class} combra.utils.NumpyEncoder(json.JSONEncoder)
+```{eval-rst}
+.. autoclass:: combra.utils.NumpyEncoder
+```
 
 A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it whenever you need to dump combra outputs to JSON without converting types by hand.
 
@@ -58,4 +59,3 @@ A `json.JSONEncoder` subclass that handles numpy scalars and arrays. Use it when
 >>> with open('out.json', 'w') as f:
 ...     json.dump(payload, f, cls=NumpyEncoder)
 ```
-````
