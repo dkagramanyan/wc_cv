@@ -80,8 +80,22 @@ folder-of-classes to one; the first call to a `generate_*` method then builds a
 preprocessed-image cache (`.npy` memmap) that subsequent calls reuse.
 
 When an h5 lives at `<data>/h5/<stem>.h5`, the cache is written to
-`<data>/cache/<stem>/<task>_n<N>.npy`. The legacy layout (cache next to the h5 with a
+`<data>/cache/<stem>/<task>_n<N>_p<V>.npy`. The legacy layout (cache next to the h5 with a
 `prep_cache_` filename prefix) is still supported for backwards compatibility.
+
+```{versionchanged} 0.4
+Adopts the torchvision `ImageFolder` attribute contract
+({py:attr}`~combra.data.PobeditDataset.classes` /
+{py:attr}`~combra.data.PobeditDataset.class_to_idx` /
+{py:attr}`~combra.data.PobeditDataset.samples` /
+{py:attr}`~combra.data.PobeditDataset.targets`, plus `len()` and indexing).
+Class **names** are resolved from the h5 `class_names` root attr (per-group
+`class_name` attr, then the group-name suffix, as fallbacks), `class_*` groups
+are sorted numerically, and the file's `format` / `schema_version` are validated
+— an incomplete generated shard (`written` mask / `missing_count`) is rejected
+rather than fed into the pipeline as black images. The prep-cache filename gains
+a `_p<V>` preprocessing-version tag so a stale cache is never silently reused.
+```
 
 :param path: Either a folder containing `class_*/` subfolders of images, or an existing `*.h5` produced by combra. When a folder is passed, the constructor converts it to HDF5 next to the source on first run. Default: `None`.
 :type path: str or Path, optional
@@ -92,6 +106,15 @@ When an h5 lives at `<data>/h5/<stem>.h5`, the cache is written to
 :param compression: HDF5 compression used when converting a folder. Pass `None` for uncompressed (faster prep-cache builds, larger file). Default: `'lzf'`.
 :type compression: str or None, optional
 
+:var classes: Bare grain-class names, index-aligned to the label integers (torchvision `ImageFolder` convention).
+:vartype classes: list[str]
+:var class_to_idx: `{class_name: class_idx}` mapping.
+:vartype class_to_idx: dict[str, int]
+:var samples: `(image_ref, class_idx)` over the balanced image grid.
+:vartype samples: list[tuple[str, int]]
+:var targets: Class index of each sample, aligned with `samples`.
+:vartype targets: list[int]
+
 **Example**
 
 ```python
@@ -100,6 +123,10 @@ When an h5 lives at `<data>/h5/<stem>.h5`, the cache is written to
 ...     path=data.microstructure_class_path(),
 ...     max_images_num_per_class=360,
 ... )
+>>> ds.classes                      # ['Ultra_Co11', 'Ultra_Co25', ...] — bare, sorted
+>>> ds.class_to_idx['Ultra_Co11']   # 0
+>>> len(ds)                         # n_classes * n_per_class
+>>> img, class_idx = ds[0]          # (image_uint8, class_idx) — DataLoader-ready
 ```
 
 ````{py:method} generate_angles(save_path, types_dict, step, workers=20, angles_tol=3, min_segment_len=10.0, keep_contours=False, chunksize=64, run_meta=None, force_rebuild_cache=False) -> Path
@@ -295,6 +322,36 @@ not append), so reruns are cheap. One status line is printed per call.
 
 The output sweep folder is exactly the shape {py:func}`combra.metrics.metrics_vs_n` and
 `combra.metrics.compare.find_ethalon` expect.
+````
+
+## Class-label remapping
+
+````{py:data} combra.data.CLASS_MAP
+
+Module-level registry mapping a legacy generated-image class **index string**
+(`'0'` / `'1'` / `'2'`) to its grain-class **name**, in the san-v2 training-zip
+order every existing checkpoint was most likely trained on:
+
+```python
+CLASS_MAP = {'0': 'Ultra_Co25', '1': 'Ultra_Co11', '2': 'Ultra_Co6_2'}
+```
+
+```{versionadded} 0.4
+```
+
+Generated HDF5 files written by the standardized pipeline carry a `class_names`
+attribute and resolve by name, so they never need this map. `CLASS_MAP` is the
+fallback identity for **legacy** generated artifacts that predate that attribute
+— pass it (or a per-call `class_map` dict) to the comparison helpers so a
+generated `class_0` group is matched against the correct real grain class.
+
+**Example**
+
+```python
+>>> from combra.data import CLASS_MAP
+>>> from combra.metrics import compare_folders
+>>> compare_folders(folder_paths, ethalon, class_map=CLASS_MAP, steps=[2])
+```
 ````
 
 ## See also

@@ -305,7 +305,7 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :type images: ndarray or torch.Tensor
 :param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
 :type step: float or None, optional
-:param border_eps: Border margin passed to {py:func}`combra.angles.get_angles`. Default: `5`.
+:param border_eps: Border margin passed to {py:func}`combra.angles.vertex_angles`. Default: `5`.
 :type border_eps: int, optional
 :param tol: Polygon-approximation tolerance passed to `get_angles`. Default: `3`.
 :type tol: int, optional
@@ -323,7 +323,7 @@ The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: 
 
 :param images: Image batch.
 :type images: ndarray or torch.Tensor
-:param border_eps: Border margin passed to {py:func}`combra.angles.get_angles`. Default: `5`.
+:param border_eps: Border margin passed to {py:func}`combra.angles.vertex_angles`. Default: `5`.
 :type border_eps: int, optional
 :param tol: Polygon-approximation tolerance passed to `get_angles`. Default: `3`.
 :type tol: int, optional
@@ -505,6 +505,66 @@ Angle-density metrics from pre-pooled angle arrays — the distributed-friendly 
 :rtype: dict
 ````
 
+## Startup check & normalization
+
+````{py:function} combra.metrics.combra_smoke_test(image_metrics=False, device=None, size=64) -> dict
+
+Verify combra's metric pipeline is importable and runnable **before** a training
+run — the single shared implementation the model training loops call at startup
+(replacing the private per-repo copies). Runs the full
+{py:func}`~combra.metrics.compute_all_metrics` gather on two tiny synthetic grain
+batches; the angle-density metrics must come back finite (else it raises
+`RuntimeError`). With `image_metrics=True` the image-feature backends are
+exercised too, each allowed to be `nan` (missing optional dep / no network).
+
+```{versionadded} 0.4
+```
+
+:param image_metrics: Also exercise the FID / CMMD / FD-DINOv2 backends. Default: `False`.
+:type image_metrics: bool, optional
+:param device: Torch device for the image metrics. Default: `None` (auto).
+:type device: str or None, optional
+:param size: Side length of the synthetic probe images. Default: `64`.
+:type size: int, optional
+:returns: **results** (*dict*) – The metrics dict, so the caller can log which backends are live.
+:rtype: dict
+
+**Example**
+
+```python
+>>> from combra.metrics import combra_smoke_test
+>>> combra_smoke_test()          # angle-only: raises if combra is misconfigured
+>>> combra_smoke_test(image_metrics=True, device='cpu')   # also probes FID/CMMD/DINOv2
+```
+````
+
+````{py:function} combra.metrics.to_uint8(a, data_range=None) -> ndarray
+
+Rescale an image array to `uint8 [0, 255]` under an **explicit** range contract —
+the strict, caller-facing counterpart of combra's internal per-image guessing, so
+two images in one scored batch can never be rescaled under different assumptions
+(the normalization hazard behind content-dependent FID/CMMD bias).
+
+```{versionadded} 0.4
+```
+
+:param a: Image array.
+:type a: array_like
+:param data_range: `None` — `a` must already be `uint8`, else `ValueError`; `(lo, hi)` — linearly map `[lo, hi]` onto `[0, 255]`; `"infer"` — the deprecated per-image heuristic (kept one release; emits `FutureWarning`). Default: `None`.
+:type data_range: None or tuple[float, float] or str, optional
+:returns: **out** (*ndarray[uint8]*) – The rescaled image.
+:rtype: ndarray
+
+**Example**
+
+```python
+>>> import numpy as np
+>>> from combra.metrics import to_uint8
+>>> to_uint8(np.array([-1.0, 0.0, 1.0]), data_range=(-1.0, 1.0))
+array([  0, 127, 255], dtype=uint8)
+```
+````
+
 ## Distribution comparison
 
 These helpers compare angle-distribution parquet files (as produced by {py:meth}`combra.data.PobeditDataset.generate_angles`) against an "ethalon" reference. The lower-level plumbing they build on — `index_by_name_step`, `find_ethalon`, `parquet_has_step`, and the row-pair `compute_metrics` — is not part of the public surface; import it from `combra.metrics.compare` if you need it directly.
@@ -570,7 +630,13 @@ Adapted from `co_angles/2_comparison.ipynb` — compare every diffit checkpoint 
 
 ````{py:function} combra.metrics.load_fid_by_kimg(stats_path) -> dict[str, float]
 
-Parse a training run's `stats.jsonl` and map each evaluated checkpoint's FID to a **6-digit zero-padded `floor(kimg)`** key (e.g. `403.2 → '000403'`) — the same token `compare_folders` derives from a `..._kimg_<key>_...` sweep-folder name, so the result drops straight into its `fid_by_kimg` argument. Only the periodic eval records (JSON lines carrying both an `FID` and a `kimg` field) contribute; the human-readable text-log lines are skipped.
+Parse a training run's `stats.jsonl` and map each evaluated checkpoint's FID to a **6-digit zero-padded `floor(kimg)`** key (e.g. `403.2 → '000403'`) — the same token `compare_folders` derives from a `..._kimg_<key>_...` sweep-folder name, so the result drops straight into its `fid_by_kimg` argument. Only scalar eval records contribute; text/log records (and any line missing the keys) are shape-filtered out.
+
+```{versionchanged} 0.4
+Reads the standardized logging-contract keys `Metrics/combra_fid10k` and
+`Progress/kimg` first, falling back to the legacy bare `FID` / `kimg` pair for
+pre-standardization runs.
+```
 
 :param stats_path: Path to a training run's `stats.jsonl`.
 :type stats_path: str or Path
