@@ -111,17 +111,22 @@ console-script family:
   draws the same latents at any `--gpus`. "Data shuffling" includes the
   distributed sampler: its epoch seed derives from `--seed` (today DiffiT-v2
   never seeds its `DistributedSampler`, so `--seed` does not change
-  multi-GPU data order at all). Generation-side determinism is the §4 seed
-  rule.
+  multi-GPU data order at all). Paired draws come from **one** seeded
+  generator: today san-v2 draws eval latents from torch's RNG but the
+  paired class labels from numpy's global RNG, so a specific fake batch is
+  not reproducible even at a fixed GPU count. Generation-side determinism
+  is the §4 seed rule.
 - Run directory: `<outdir>/<id:05d>-<cfg>-gpus<G>-batch<B>[-desc]`, where
   `B` is the **total** batch and the name after the id is exactly
   `<cfg>-gpus<G>-batch<B>` — no dataset name spliced in (today san-v2 and
   StyleSwin-v2 embed the dataset basename). A **fresh id is always
-  allocated**: existing directories are never reused (today DiffiT-v2,
-  EDM2-v2 **and san-v2** re-enter a matching directory to resume — san-v2's
-  reuse branch is permanently active because `--restart_every` defaults to
-  999999999 — that goes away with §3). The directory contents are fixed by
-  the §7 log contract.
+  allocated**: existing directories are never reused (today EDM2-v2 and
+  san-v2 re-enter a matching directory to resume — san-v2's reuse branch is
+  permanently active because `--restart_every` defaults to 999999999, and
+  each re-entry truncates `stats.jsonl` **and overwrites
+  `training_options.json`**, losing config provenance; DiffiT-v2 re-enters
+  a matching directory only when `--resume` is passed — all of that goes
+  away with §3). The directory contents are fixed by the §7 log contract.
 
 ## 3. Checkpoint contract
 
@@ -136,9 +141,13 @@ final checkpoint:
   and no auto-restart: training runs start-to-finish.
 - **Writes are atomic — MUST.** Every snapshot is written to a temp file in
   the run directory and moved into place with `os.replace`, so a snapshot
-  that exists under its final name is always complete (today only EDM2-v2
-  does this; san-v2 streams `latest.pt` / `best_model.pkl` in place, so a
-  walltime kill mid-dump corrupts the very file its restart machinery
+  that exists under its final name is always complete (today **no repo does
+  this fully**: EDM2-v2 is atomic for its `.pt` checkpoints only — the
+  per-tick inference `.pkl` is a plain in-place `pickle.dump`; DiffiT-v2
+  writes its `-inference.pt` files — exactly what generation loads — in
+  place, and its pruning can then delete the last good snapshot while
+  keeping a corrupt newest; san-v2 and StyleSwin-v2 stream every checkpoint
+  in place, so a walltime kill mid-dump corrupts the very file resume
   depends on).
 - **The last tick always snapshots — MUST**, even when `--kimg` is not a
   multiple of the snapshot cadence (today EDM2-v2 never snapshots the final
@@ -199,8 +208,9 @@ completed run always ends in a usable model — and both are verified by the
 - `--classes` accepts indices **or class names**
   (`--classes Ultra_Co11,Ultra_Co6_2`) — see the label contract in §5 — and
   every entry is validated against the checkpoint's `n_classes` /
-  `class_names` metadata (today san-v2 accepts any integer unvalidated and
-  silently generates from an untrained embedding row).
+  `class_names` metadata (today san-v2 does no validation: an out-of-range
+  index dies with a bare `IndexError` deep in `w_avg` indexing, and an
+  in-range but untrained or swapped row generates silently).
 - **Determinism rule** in all four: `seed = base + class·samples_per_class + idx`
   — any subset of the output is reproducible in isolation.
 - **Identical outputs across repos**:
@@ -213,6 +223,12 @@ completed run always ends in a usable model — and both are verified by the
   `format = "generated_images_shard"` (one value for all four repos) and
   `schema_version = 1`, so downstream code sniffs any model's output
   identically.
+- **The merge hard-fails on incomplete shards.** Every shard records a
+  per-sample `written` mask and a `missing_count` attribute; rank 0 refuses
+  to produce the merged `<desc>.h5` while any `missing_count` is nonzero
+  (today the san-v2 and DiffiT-v2 mergers record `missing_count` but merge
+  anyway — and the combra consumer never reads it, so a crashed generation
+  run's zero-filled slots are consumed downstream as black images).
 
 ## 5. Class-label & dataset contract
 
@@ -291,8 +307,8 @@ What a dataset yields is part of the API, identical in all four repos:
   and `--combra-ref-count` (cap the reference side). A capped reference is a
   **seeded random subset** — never the first N: dataset zips are
   class-sorted, so a first-N slice is class-biased (today EDM2-v2 takes the
-  first N, biasing both the metrics and the best-model selection they
-  drive).
+  first N while its fakes draw classes uniformly — the two sides of the FID
+  that drives `best_model.pt` don't even share a class distribution).
 - **Uniform keys**: `Metrics/combra_fid10k`, `Metrics/combra_cmmd10k`,
   `Metrics/combra_fd_dinov2_10k`, the angle-density metrics, and
   `Metrics/combra_fid10k_best` — all mirrored to `stats.jsonl` (today san-v2
@@ -348,7 +364,7 @@ One console log, one scalar stream, one TensorBoard event file:
 |---|---|
 | `training_options.json` | the resolved launch config |
 | `<id:05d>-<cfg>-gpus<G>-batch<B>[-desc].log` | rank-0 console transcript, named after the run directory; every line prefixed `[YYYY-MM-DD HH:MM:SS]` |
-| `stats.jsonl` | **the machine-readable source of truth**: one JSON line per tick holding every scalar (same keys as the TensorBoard tags) plus `wall_time` / `datetime` columns |
+| `stats.jsonl` | **the machine-readable source of truth**: one JSON line per tick holding every scalar (same keys as the TensorBoard tags) plus `wall_time` / `datetime` columns — **scalar rows only**, no text/log records (today DiffiT-v2's vendored logger interleaves `{"kind": "text", ...}` console records among the scalar rows: archived run 00018 holds 2 607 text lines among 2 395 scalar rows, so any reader must shape-filter first) |
 | `events.out.tfevents.*.<id:05d>-<cfg>-gpus<G>-batch<B>[-desc]` | TensorBoard scalars, image grids and text — written by rank 0 only; the run name is appended via `SummaryWriter(filename_suffix=...)` |
 | `reals.png`, `fakes_init.png`, `fakes<kimg>.png` | sample grids (see below) |
 
@@ -575,9 +591,12 @@ using the removed or renamed flags fail.
 | dataset returns uint8 + one-hot (normalization moves into the loop); the silent `convert("RGB")` is removed — conversion happens at build time; the hardcoded `random_flip=True` becomes `--mirror` | no (internal + new flag) |
 | `--workers` default 4 → 3; merged h5 `generated.h5` → `<desc>.h5`; h5 `format` attr → unified value | no |
 | `--combra-ref-count` knob; `--num-fid-samples` governs the combra fake count | no |
-| class count & names read from `dataset.json` / `class_names` — replaces the startup probe (first ~50 shuffled batches ≈ 3200 samples) and the dir-mode `filename.split("_")[0]` class heuristic (yields `"Ultra"` for `Ultra_Co11_*.png` names). The probe can miss a rare class, and a missed class either crashes the label remap or — worse — trains that class's images **silently as the CFG null token** (an unmapped label maps to −1, the null-embedding row) | no (internal) |
-| gen-images adopts the §4 **per-image** seed formula — today one generator is seeded per batch (`base + class·10⁶ + first-batch-index`), so outputs depend on `--batch-size` **and the GPU count** | **yes** — generated outputs change |
+| class count & names read from `dataset.json` / `class_names` — replaces the startup probe (first ~50 shuffled batches ≈ 3200 samples) and the dir-mode `filename.split("_")[0]` class heuristic (yields `"Ultra"` for `Ultra_Co11_*.png` names, collapsing every class into one). A probe-missed class maps to −1, which is **out of range** for the label `nn.Embedding` — CPU raises `IndexError`, CUDA device-asserts or reads out-of-bounds memory — and if the probe misses the *largest* raw label the remap table itself is under-sized (`IndexError` on the first batch containing that class). Not, as previously described here, a silent null-token remap: `token_drop` never touches the −1 entries | no (internal) |
+| gen-images adopts the §4 **per-image** seed formula — today one generator is seeded per batch (`base + class·10⁶ + first-batch-index`), so outputs depend on `--batch-size` **and the GPU count** (and the 10⁶ stride collides across classes above a million samples per class) | **yes** — generated outputs change |
 | seed the `DistributedSampler` from `--seed` (§2) — today it is never seeded, so `--seed` does not change multi-GPU data order; the in-training eval FID also shifts with the GPU count | no (internal) |
+| atomic writes for the `-inference.pt` snapshots (§3 MUST) — today only `latest` / `best` / full `final` go through `atomic_save`; the per-tick inference snapshots (exactly what `gen_images` loads) are plain `torch.save`, and `prune_inference_snapshots` can then delete the last good snapshot while keeping a corrupt newest | no (internal) |
+| persist `best_fid` / `cur_tick` across restarts — today both reset on resume (`best_fid = inf`, `cur_tick = 0`), so the first post-resume eval overwrites `best_model.pt` even when worse and the snapshot cadence restarts | with §3 (resume and best-model both removed) |
+| `stats.jsonl` becomes scalar-rows-only (§7) — today the vendored logger's TB-text mirror interleaves `{"kind": "text"}` records among the scalar rows | with §7 |
 | TB tags and `stats.jsonl` keys renamed to the §7 schema (today tags are `Train/<name>` and stats keys are `kimg`, `sec/tick`, `sec/kimg`) | **yes** — key renames |
 | combra extra → `git+https` source | no |
 | dead-code cleanup: remove the unused `--metrics` train flag and the duplicate `diffit/resample.py` module (functionally identical to `timestep_sampler.py` — only the attribution header differs — and never imported); `scripts/sample.py`'s ImageNet `--num-classes 1000` default noted as legacy | no |
@@ -595,10 +614,13 @@ using the removed or renamed flags fail.
 | **`edm2-gen-images`: add `--classes` + `--samples-per-class` class-batch mode and `--save-mode hdf5` (RankH5Writer layout)**; `--batch` → `--batch-gpu`; torchrun → self-spawning `--gpus` | **yes** — launch + flags (`--seeds` mode kept) |
 | snapshot grids: replace the unshuffled 8×8 scheme with the class-sorted adaptive grid; reals from raw dataset samples (not encoder round-trips) | no |
 | combra **reference features from raw dataset pixels** — today the reference is VAE round-tripped reals (`encode`→`decode`), hiding the VAE quality gap and breaking cross-repo FID comparability (§6): EDM2-v2 scores VAE'd reals vs VAE'd fakes while DiffiT-v2 scores raw reals vs VAE-decoded fakes | **yes** — metric values shift |
-| `--combra-ref-count` takes a **seeded random slice** (§6) — today it takes the first N of a class-sorted dataset, so the capped reference (and the best-model selection it drives) is class-biased | **yes** — metric values shift |
+| `--combra-ref-count` takes a **seeded random slice** (§6) — today it takes the first N of a class-sorted dataset, so the capped reference is class-biased while the fakes draw classes uniformly: the two sides of the FID (and the best-model selection it drives) don't even share a class distribution | **yes** — metric values shift |
 | fresh run id on every launch — the desc-matching run-dir reuse (silent auto-resume) goes away | with §3 |
 | resume-machinery bugs that §3 removes outright: `best_fid` resets to `inf` on resume, so the first post-resume eval overwrites `best_model.pt` even if worse; re-launching a completed run — the documented resume method — dies on a bare `assert` | with §3 |
 | the final partial interval snapshots (§3's last-tick MUST) — today no snapshot is written after the last full `--snap` interval when `--kimg` is not a multiple of the cadence | no |
+| the atomic-write MUST extends to the inference artifacts — today `CheckpointIO` is atomic for `.pt` only; the per-tick inference `.pkl` is a plain in-place `pickle.dump` | no (internal) |
+| `dataset_tool.py encode` / `decode` chain repaired or declared legacy — today `decode` filters its `--source` through `is_image_ext`, which rejects the `.npy` latents `encode` writes, so the two subcommands cannot chain | no |
+| remove the dead suspend/stop stubs — `should_stop` / `should_suspend` / `update_progress` are no-ops, so the loop's graceful-stop block is unreachable and the only early exit is a kill (which the non-atomic `.pkl` writes make hazardous) | no (dead code) |
 | fix the startup error hint that references the nonexistent `--no-combra-metrics` flag (the real spelling is `--combra-metrics False`) | no |
 | drop the README / comment references to `network-snapshot-final.pkl` (nothing ever writes it) and the README's multi-GPU `torchrun` example (it spawns N independent single-GPU trainers racing one run dir — §2's self-spawning `--gpus` is the launch model) | no (docs) |
 | inference snapshots keep the EMA-std suffix: `edm2-snapshot-<kimg>[-<ema_std>]-inference.pt` | no (naming detail) |
@@ -613,8 +635,11 @@ using the removed or renamed flags fail.
 | add `--precision` (the repo currently trains pure fp32 — fp16/bf16 via autocast is new capability) | no (additive) |
 | `--use-flip` merged into `--mirror`, and the flip becomes the §2 loader-level augmentation — today the two flags are OR-ed into dataset x-flip **doubling**, which also flip-doubles the combra reference (the reference is the same dataset object) | **yes** — flag removed + train/eval behavior change |
 | combra metrics mirrored into `stats.jsonl` — today they are **TensorBoard-only**, so `stats.jsonl` never contains `Metrics/combra_*` and the §3 post-hoc best-snapshot selection is impossible | no (additive) |
+| clear `stats_metrics` when an eval tick fails — today the dict persists across ticks, so a failed combra eval re-logs the *previous* tick's values at the new step and best-model tracking compares against a stale FID | no (bugfix) |
+| resume stops silently discarding state — today D and both optimizers load inside a bare `except` that just prints "We don't load D." (a shape mismatch silently reinitializes them mid-run) while the unguarded G load hard-crashes | with §3 (resume removed) |
+| checkpoint metadata gains the §3 keys **plus the architecture hyperparameters** — today `gen_images.py` hardcodes `style_dim=512` / `n_mlp=8` etc., so a checkpoint from a non-default architecture loads wrong or fails | no (additive) |
 | §3 removes the `--save-inference-only` trap: with the flag set and combra eval off (or failed), **no resumable checkpoint is ever written** — a crash loses the whole run; resuming from an inference snapshot dies with `KeyError: 'g'` | with §3 |
-| §5 build-time grayscale→RGB + runtime 3-channel asserts — today a grayscale zip crashes at the D / normalization boundary (no gray→RGB path exists) | with §5 |
+| §5 build-time grayscale→RGB + runtime 3-channel asserts — today a grayscale zip does **not** crash (as previously described here): the `(1,3,1,1)` ImageNet mean/std broadcasts the 1-channel batch to 3 channels with *different* stats per channel — a silently tinted image trained as RGB — while the combra reference fails on the 1-channel array and eval is silently disabled | with §5 |
 | `dataset_tool.py` derives labels alphabetically and writes `class_names` — today it copies labels verbatim from the source `dataset.json` (only `dataset_tool_for_imagenet.py` sorts) | no for new zips |
 | run-dir desc uses `--cfg` (today it splices in the dataset basename: `styleswin-<dataset>-gpusN-batchB`) | no (naming) |
 | **`gen_images.py`: add `--save-mode hdf5` (RankH5Writer layout)** | no (additive) |
@@ -638,12 +663,15 @@ using the removed or renamed flags fail.
 | atomic snapshot writes (tmp + `os.replace`, §3) — today `latest.pt` / `best_model.pkl` are streamed in place, so a walltime kill mid-dump corrupts the file resume depends on | no (internal) |
 | progressive flags renamed to kebab-case: `--up_factor`→`--up-factor`, `--path_stem`→`--path-stem`, `--syn_layers`→`--syn-layers`, `--head_layers`→`--head-layers`, `--cls_weight`→`--cls-weight` | **yes** — flag renames |
 | `dataset_tool.py` derives labels alphabetically (stops copying them verbatim from the source `dataset.json`) | no for new zips |
+| `dataset_tool.py` errors on missing labels — today a single unlabeled image silently drops the **entire** label set (`labels if all(...) else None`), converting the dataset to unconditional with no warning | no (bugfix) |
+| class count read from `dataset.json` `class_names` — today `label_shape` is `max(label)+1`, so a split that happens to miss the highest class silently shrinks `c_dim` and shifts every class index | no (internal) |
+| re-enable a DDP weight-consistency check before saving — today the stock `check_ddp_consistency` block is commented out, so silently diverged ranks save rank 0's weights undetected | no (internal) |
 | `--num-fid-samples` / `--combra-ref-count` knobs | no |
 | implement `--snapshot-keep-last` pruning — today **no pruning exists** in san-v2: snapshots accumulate unbounded (DiffiT-v2's archived run 00018, 48 unpruned snapshots, shows what that looks like in practice) | no (additive) |
 | run-dir desc drops the dataset name (today `<cfg>-<dataset>-gpusN-batchB`) to match the §2 pattern | no (naming) |
 | gen-images: merged file becomes `<desc>.h5` in `--outdir` — today it is `<network-stem>_trunc_<t>[-desc].h5` inside a self-created numbered run dir | **yes** — output paths change |
 | add the startup `combra_smoke_test` (today only a try/except around the reference precompute) | no (additive) |
-| one normalize/denormalize pair with a round-trip assert (§5) — today two denorm formulas coexist: `rint(x·127.5+128)` in the eval path vs `(x+1)·255/2 = x·127.5+127.5` in `gen_utils`, a constant 0.5 apart — so on-disk generated images are not byte-identical to what combra scored during training | no (internal) |
+| one normalize/denormalize pair with a round-trip assert (§5) — today two denorm formulas coexist: `rint(x·127.5+128)` in the eval path vs `(x+1)·255/2 = x·127.5+127.5` in `gen_utils`, a constant 0.5 apart. Worse, inside the eval itself the **reals** enter as raw uint8 while the **fakes** get the `+128` formula, so every combra FID/CMMD/angle value san-v2 has ever reported carries a systematic real-vs-fake intensity offset — and on-disk generated images are not byte-identical to what combra scored during training | **yes** — metric values shift |
 | the native `--metrics` registry (`fid50k_full`, …) and its per-metric jsonl files fall outside the contract — combra is the metric path, and the per-metric jsonls violate the §7 five-artifact rule | no (legacy) |
 | dead-code cleanup: unused `training/networks_stylegan3.py` (only the `_resetting` variant is imported), the misnamed `Dataset.has_onehot_labels` (returns `True` for **integer** labels), the dead `set_classes` API (with its one-hot dtype bug), `debug.txt` written unguarded by every rank, and the near-duplicate `dataset_tool_for_imagenet.py` | no |
 | combra install via `[combra]` extra (`git+https`) — replaces the editable `-e ../wc_cv/combra`; pyproject.toml cleaned of the dead GUI deps | no |
@@ -662,6 +690,11 @@ is welded to its training-time indices:
   / EDM2-v2 holds only for zips their own tools built from class folders —
   so **every existing run must be audited** via the dataset path in its
   `training_options.json` before assuming either convention.
+- **The 16×16 stem zip is unlabeled**:
+  `datasets/san/o_bc_left_4x_1536_1024x1024_rgb_16x16.zip` contains no
+  `dataset.json` at all, so a conditional stem trained on it silently loses
+  class conditioning (compounded by `dataset_tool`'s silent label-drop
+  above). Rebuild it with labels + `class_names` along with the rest.
 - Rebuilt zips are for **new runs only** — never finetune a pre-rebuild
   checkpoint against a rebuilt zip: the label semantics of classes 0 and 1
   silently swap.
@@ -682,7 +715,11 @@ them the producer-side work is inert:
 | move `combra_smoke_test` into `combra.metrics` | today it exists only as private copies inside DiffiT-v2 and EDM2-v2; the GANs have none |
 | update `load_fid_by_kimg` to the contract keys (`Metrics/combra_fid10k` + `Progress/kimg`) | today it parses the legacy bare `FID` / `kimg` pair, which no standardized run will emit |
 | `PobeditDataset`: resolve class names from the h5 `class_names` attribute (group-name suffix as fallback), sort `class_*` groups numerically, validate `format` / `schema_version` | today **no h5 attribute is ever read** — class identity is the literal group-name suffix (generated files yield classes `"0"/"1"/"2"` vs real files' `Ultra_Co*`), and the plain string sort misorders ≥10 classes |
-| `combra.metrics`: strict uint8 input mode (assert, or an explicit range parameter) | today `_to_uint8` guesses the float range from the batch minimum — an all-positive `[-1,1]` batch is scaled ×255 instead of ×127.5 (the §5 hazard) |
+| `PobeditDataset`: validate the h5 `written` mask / `missing_count` attrs (fail, or warn and skip unwritten slots) | today neither is ever read — a crashed generation run's zero-filled slots are consumed as **black images**, silently biasing the angle metrics (pairs with the §4 merge hard-fail) |
+| one gray-conversion path for both input routes | today file-path images are read as BGR (`cv2.imread`) but converted with `COLOR_RGB2GRAY` — swapped luminance weights — while h5 images are RGB; harmless for near-gray SEM, wrong for any colored source |
+| prep-cache gains a content/version tag (or auto-invalidates) | today `_cache_ok` checks only shape+dtype, so regenerating after a generator change silently reuses the stale cache unless `force_rebuild_cache` is passed by hand |
+| class-coverage check in comparisons | today the real reference set has 5 classes (`Ultra_Co8`, `Ultra_Co15` included) while the generators emit 3 — nothing warns that comparisons silently omit the other two |
+| `combra.metrics`: strict uint8 input mode (assert, or an explicit range parameter) | today `_to_uint8` guesses the float range **per image** (not per batch) from the image minimum — an all-positive `[-1,1]` image is scaled ×255 instead of ×127.5, so two images in one scored batch can be rescaled under different assumptions (the §5 hazard) |
 | `co_angles/generate_class_samples.py`: update the checkpoint glob to the §3 `<model>-snapshot-*-inference.pt` names | today it globs the old `network-snapshot-<kimg:06d>.pt` pattern, which the rename silently breaks |
 | `ml/logs.ipynb`: repoint the hardcoded tfevents paths and adopt the §7 suffix-named event files | the hardcoded `…/ssd_2_sata/python/phd/…` prefix no longer exists on disk, and runs are currently identified by hand-typed dict keys |
 
@@ -699,9 +736,12 @@ grew silently). No model execution needed:
    option names and the run-dir naming pattern.
 3. **Artifact contract** — validate a sample `.h5` against the RankH5Writer
    schema (`class_<c>/images|seeds` + the §4 `format`/`schema_version`
-   attrs) and a checkpoint against the §3 metadata keys; assert the snapshot
-   writer goes through tmp + `os.replace`, so a `.pt` present under its
-   final name is always complete (the §3 atomic-write MUST).
+   attrs), assert its `written` mask is complete and `missing_count` is
+   zero (the §4 merge hard-fail), and validate a checkpoint against the §3
+   metadata keys; assert the snapshot writer goes through tmp +
+   `os.replace`, so a `.pt` present under its final name is always complete
+   (the §3 atomic-write MUST); assert the repo's normalize/denormalize pair
+   round-trips exactly (§5).
 4. **Label contract** — assert `class_names` present and index-aligned in
    `dataset.json`, in checkpoint metadata and in a generated h5; assert the
    alphabetical ordering rule on a fresh dataset build (§5).
@@ -732,6 +772,24 @@ follow.
    - *Fix DiffiT-v2's rank-colliding logging* (or land the §7
      vendored-logger removal early) — until then every multi-GPU run
      corrupts its own `log.txt` / `progress.csv`.
+   - *san-v2 denorm hotfix* — change the eval-path `+128` to `+127.5`
+     (§12): every combra metric today compares `+128`-denormalized fakes
+     against raw-uint8 reals; a one-line fix, though it shifts the metric
+     history.
+   - *Atomic-write helper in all four repos* — hoisted out of §3 because it
+     is independent of the checkpoint redesign: ~10 lines of tmp +
+     `os.replace` per repo; today san-v2 and StyleSwin-v2 stream every
+     checkpoint in place, and DiffiT-v2 / EDM2-v2 leave exactly their
+     inference artifacts unprotected.
+   - *combra consumes only complete h5 slots* — read `written` /
+     `missing_count` (§12); until then a crashed generation run feeds black
+     images into the angle pipeline.
+   - *Rebuild the unlabeled 16×16 stem zip and make san-v2's
+     `dataset_tool` error on missing labels* (§12) — a conditional stem run
+     today silently trains unconditional.
+   - *Persist `best_fid` on resume in DiffiT-v2 and EDM2-v2* (or skip
+     best-model overwrites after resume) — until §3 lands, every resumed
+     run risks overwriting its true best checkpoint.
 1. **Generation contract (§4)** — the only change with direct scientific
    payoff: EDM2-v2 and StyleSwin-v2 outputs become consumable by the wc_cv
    angle pipeline; DiffiT-v2's per-image seeds end batch-size/GPU-dependent
