@@ -157,6 +157,13 @@ Adapted from `poliamid/data_viz.ipynb` (per-group Gaussian fit on contour-length
 
 Bimodal Gaussian fit + sampled curve. Used inside {py:meth}`combra.data.PobeditDataset.generate_angles` to populate `prep_per_step.angles_gauss_*`.
 
+```{versionchanged} 0.4
+Returns a {py:class}`~combra.approx.BimodalGaussFit` named tuple
+``(curve, mus, sigmas, amps)``. Field order is unchanged, so
+``(x, y), mus, sigmas, amps = bimodal_gauss_approx(...)`` still unpacks; the
+fields are also reachable as ``.mus`` / ``.sigmas`` / ``.amps``.
+```
+
 :param x: Input histogram bin centres.
 :type x: array_like
 :param y: Input histogram densities.
@@ -173,15 +180,15 @@ Bimodal Gaussian fit + sampled curve. Used inside {py:meth}`combra.data.PobeditD
 :type amp1: float, optional
 :param amp2: Initial guess for the second amplitude. Default: `1`.
 :type amp2: float, optional
-:returns: **curve** (*tuple[ndarray, ndarray]*) – `(x_gauss, y_gauss)` sampled curve; and **mus** (*list[float, float]*) – Fitted means; and **sigmas** (*list[float, float]*) – Fitted sigmas; and **amps** (*list[float, float]*) – Fitted amplitudes.
-:rtype: tuple(tuple(ndarray, ndarray), list[float], list[float], list[float])
+:returns: **result** – a {py:class}`~combra.approx.BimodalGaussFit` ``(curve, mus, sigmas, amps)``: the `(x_gauss, y_gauss)` sampled curve, and the fitted per-mode means, sigmas and amplitudes.
+:rtype: BimodalGaussFit
 
 **Example**
 
 ```python
 >>> import numpy as np
 >>> from combra import angles, approx, stats
->>> # Suppose `arr` is the angles array from combra.angles.get_angles
+>>> # Suppose `arr` is the angles array from combra.angles.vertex_angles
 >>> arr = np.concatenate([np.random.normal(90, 20, 1000),
 ...                       np.random.normal(270, 25, 1500)])
 >>> x, y = stats.stats_preprocess(arr, step=2)
@@ -294,12 +301,19 @@ From `poliamid/data_viz.ipynb`:
 
 Least-squares line $y = kx + b$. Used in {py:meth}`combra.data.PobeditDataset.generate_beams` to populate `prep.a_*` and `prep.b_*` fit fields.
 
+```{versionchanged} 0.4
+Returns a {py:class}`~combra.approx.LinearFit` named tuple
+``(curve, slope, intercept, angle_deg, r2)``. Field order is unchanged, so
+``(x_pred, y_pred), k, b, angle, score = linear_approx(...)`` still unpacks; the
+fields are also reachable as ``.slope`` / ``.intercept`` / ``.angle_deg`` / ``.r2``.
+```
+
 :param x: Input series.
 :type x: array_like
 :param y: Input series.
 :type y: array_like
-:returns: **curve** (*tuple[ndarray, ndarray]*) – `(x_pred, y_pred)` sampled line; and **k** (*float*) – Slope; and **b** (*float*) – Intercept; and **angle_deg** (*float*) – `arctan(k)` in degrees; and **score** (*float*) – R².
-:rtype: tuple(tuple(ndarray, ndarray), float, float, float, float)
+:returns: **result** – a {py:class}`~combra.approx.LinearFit` ``(curve, slope, intercept, angle_deg, r2)``: the `(x_pred, y_pred)` sampled line, the slope, the intercept, `arctan(slope)` in degrees, and the R².
+:rtype: LinearFit
 
 **Example**
 
@@ -308,8 +322,9 @@ Least-squares line $y = kx + b$. Used in {py:meth}`combra.data.PobeditDataset.ge
 >>> from combra import approx
 >>> x = np.linspace(0, 10, 50)
 >>> y = 2.5 * x + 1.0 + np.random.normal(scale=0.5, size=50)
->>> (x_pred, y_pred), k, b, angle_deg, score = approx.linear_approx(x, y)
->>> print(f'k={k:.3f}  b={b:.3f}  angle={angle_deg:.2f}°  R²={score:.3f}')
+>>> fit = approx.linear_approx(x, y)
+>>> print(f'k={fit.slope:.3f}  b={fit.intercept:.3f}  angle={fit.angle_deg:.2f}°  R²={fit.r2:.3f}')
+>>> (x_pred, y_pred), k, b, angle_deg, score = fit  # positional unpacking still works
 ```
 ````
 
@@ -368,6 +383,42 @@ Driven inside {py:func}`combra.metrics.convergence_stats` over a W-dist curve. S
 >>> a, a_se, b = approx.fit_plateau(ns, vals)
 >>> print(f'plateau a={a:.4f} ± {a_se:.4f}    b={b:.4f}')
 ```
+````
+
+## Result types
+
+The fit functions return SciPy-style named tuples (cf. `scipy.stats.linregress`),
+so results carry attribute names while staying unpacking-compatible with the
+historical plain tuples.
+
+````{py:class} combra.approx.LinearFit
+
+Result of {py:func}`~combra.approx.linear_approx`.
+
+:param curve: `(x_pred, y_pred)` of the fitted line sampled across the data span.
+:type curve: tuple[ndarray, ndarray]
+:param slope: Line slope `k`.
+:type slope: float
+:param intercept: Line intercept `b` (value at `x = 0`).
+:type intercept: float
+:param angle_deg: Slope as an angle in degrees, `atan(k)`.
+:type angle_deg: float
+:param r2: Coefficient of determination on the input points.
+:type r2: float
+````
+
+````{py:class} combra.approx.BimodalGaussFit
+
+Result of {py:func}`~combra.approx.bimodal_gauss_approx`.
+
+:param curve: `(x, y)` of the fitted bimodal-Gaussian density.
+:type curve: tuple[ndarray, ndarray]
+:param mus: The two per-mode means.
+:type mus: list[float]
+:param sigmas: The two per-mode standard deviations.
+:type sigmas: list[float]
+:param amps: The two per-mode amplitudes.
+:type amps: list[float]
 ````
 
 ## See also

@@ -10,16 +10,23 @@ from combra import mvee
 
 ## Build
 
-````{py:function} combra.mvee.get_mvee_params(image, tol=0.2) -> tuple[ndarray, ndarray, ndarray, ndarray, list[ndarray]]
+````{py:function} combra.mvee.fit_mvee(image, tol=0.2) -> MveeResult
 
 Fit MVEE to every contour in a preprocessed image. This is the per-image primitive that {py:meth}`combra.data.PobeditDataset.generate_beams` calls in parallel.
+
+```{versionchanged} 0.4
+Renamed from ``get_mvee_params`` (scikit-image ``get_`` drop) and now returns a
+{py:class}`~combra.mvee.MveeResult` named tuple. Field order is unchanged, so
+``a, b, angles, centroids, cnts = fit_mvee(...)`` still unpacks. ``get_mvee_params``
+stays as a deprecated alias until 0.6.
+```
 
 :param image: Preprocessed image.
 :type image: ndarray
 :param tol: Convergence tolerance. Lower → tighter ellipses, slower. Default: `0.2`.
 :type tol: float, optional
-:returns: **a_beams** (*ndarray*) – Semi-major axes (in pixels); and **b_beams** (*ndarray*) – Semi-minor axes; and **angles** (*ndarray*) – Rotation angles in radians; and **centroids** (*ndarray*) – Centre coordinates; and **contours** (*list[ndarray]*) – The source contours, in the order MVEEs were fit.
-:rtype: tuple(ndarray, ndarray, ndarray, ndarray, list[ndarray])
+:returns: **result** – an {py:class}`~combra.mvee.MveeResult` ``(a, b, angle_rad, centroid, contour)``: per-contour semi-major axes, semi-minor axes, rotation angles (radians), centre coordinates, and the source contours in fit order.
+:rtype: MveeResult
 
 **Example**
 
@@ -27,9 +34,26 @@ Fit MVEE to every contour in a preprocessed image. This is the per-image primiti
 >>> from combra import mvee, image, data
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> a, b, angles, centroids, cnts = mvee.get_mvee_params(processed, tol=0.2)
->>> print(f'{len(a)} polygons   median a/b = {sum(a)/sum(b):.2f}')
+>>> res = mvee.fit_mvee(processed, tol=0.2)
+>>> print(f'{len(res.a)} polygons   median a/b = {res.a.sum()/res.b.sum():.2f}')
 ```
+````
+
+````{py:class} combra.mvee.MveeResult
+
+SciPy-style named tuple returned by {py:func}`~combra.mvee.fit_mvee` (cf.
+``scipy.stats.linregress``). Unpacking-compatible with the historical 5-tuple.
+
+:param a: Per-contour semi-major axis lengths (pixels).
+:type a: ndarray
+:param b: Per-contour semi-minor axis lengths (pixels).
+:type b: ndarray
+:param angle_rad: Per-contour ellipse orientation in radians.
+:type angle_rad: ndarray
+:param centroid: Per-contour ``(x, y)`` centre coordinates.
+:type centroid: ndarray
+:param contour: The accepted ``(N, 2)`` contours the ellipses were fit to.
+:type contour: list[ndarray]
 ````
 
 ````{py:function} combra.mvee.beams_legend(images_amount, name, itype, norm, k, angle, b, score, dist_step, dist_mean) -> str
@@ -257,5 +281,5 @@ Plot a single polygon (index `pos`) and the ellipse fitted around it. Useful for
 
 ## See also
 
-- {py:meth}`combra.data.PobeditDataset.generate_beams` — drives `get_mvee_params` across whole class folders and writes parquet.
+- {py:meth}`combra.data.PobeditDataset.generate_beams` — drives `fit_mvee` across whole class folders and writes parquet.
 - {doc}`combra.areas <areas>` — area / effective-radius plots built on top of beams parquets.

@@ -704,24 +704,17 @@ is welded to its training-time indices:
   convention and the class-map warnings on the model pages become historical
   notes about legacy artifacts.
 
-### wc_cv & combra (downstream consumers)
-
-The §5–§7 contracts require matching changes on the consumer side — without
-them the producer-side work is inert:
-
-| change | why |
-|---|---|
-| implement `CLASS_MAP` in combra | today it exists **only in the docs**; the code has just per-call `class_map` dict arguments (`compare_folders`, `resolve_overlay_rows`) |
-| move `combra_smoke_test` into `combra.metrics` | today it exists only as private copies inside DiffiT-v2 and EDM2-v2; the GANs have none |
-| update `load_fid_by_kimg` to the contract keys (`Metrics/combra_fid10k` + `Progress/kimg`) | today it parses the legacy bare `FID` / `kimg` pair, which no standardized run will emit |
-| `PobeditDataset`: resolve class names from the h5 `class_names` attribute (group-name suffix as fallback), sort `class_*` groups numerically, validate `format` / `schema_version` | today **no h5 attribute is ever read** — class identity is the literal group-name suffix (generated files yield classes `"0"/"1"/"2"` vs real files' `Ultra_Co*`), and the plain string sort misorders ≥10 classes |
-| `PobeditDataset`: validate the h5 `written` mask / `missing_count` attrs (fail, or warn and skip unwritten slots) | today neither is ever read — a crashed generation run's zero-filled slots are consumed as **black images**, silently biasing the angle metrics (pairs with the §4 merge hard-fail) |
-| one gray-conversion path for both input routes | today file-path images are read as BGR (`cv2.imread`) but converted with `COLOR_RGB2GRAY` — swapped luminance weights — while h5 images are RGB; harmless for near-gray SEM, wrong for any colored source |
-| prep-cache gains a content/version tag (or auto-invalidates) | today `_cache_ok` checks only shape+dtype, so regenerating after a generator change silently reuses the stale cache unless `force_rebuild_cache` is passed by hand |
-| class-coverage check in comparisons | today the real reference set has 5 classes (`Ultra_Co8`, `Ultra_Co15` included) while the generators emit 3 — nothing warns that comparisons silently omit the other two |
-| `combra.metrics`: strict uint8 input mode (assert, or an explicit range parameter) | today `_to_uint8` guesses the float range **per image** (not per batch) from the image minimum — an all-positive `[-1,1]` image is scaled ×255 instead of ×127.5, so two images in one scored batch can be rescaled under different assumptions (the §5 hazard) |
-| `co_angles/generate_class_samples.py`: update the checkpoint glob to the §3 `<model>-snapshot-*-inference.pt` names | today it globs the old `network-snapshot-<kimg:06d>.pt` pattern, which the rename silently breaks |
-| `ml/logs.ipynb`: repoint the hardcoded tfevents paths and adopt the §7 suffix-named event files | the hardcoded `…/ssd_2_sata/python/phd/…` prefix no longer exists on disk, and runs are currently identified by hand-typed dict keys |
+```{note}
+The combra-library changes these contracts require of the downstream consumer
+(the `CLASS_MAP` registry, `combra_smoke_test`, the `load_fid_by_kimg` contract
+keys, the `PobeditDataset` h5-attribute / `written` / `missing_count`
+validation, the single gray-conversion path, the prep-cache version tag, the
+comparison class-coverage check and the strict-uint8 input mode) have been
+**implemented** in combra and are documented in the {doc}`API reference
+<../api/data>`. The two remaining wc_cv-repo consumer edits —
+`co_angles/generate_class_samples.py`'s checkpoint glob and `ml/logs.ipynb`'s
+tfevents paths — are tracked with the producer work.
+```
 
 ## 13. Conformance checks
 

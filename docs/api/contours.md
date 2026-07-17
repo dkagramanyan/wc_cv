@@ -1,6 +1,6 @@
 # combra.contours
 
-The `combra.contours` module extracts polygon contours from preprocessed binary images and renders them back onto images for visualisation. Used internally by {py:func}`combra.angles.get_angles`, {py:func}`combra.mvee.get_mvee_params`, and the crack-graph builder.
+The `combra.contours` module extracts polygon contours from preprocessed binary images and renders them back onto images for visualisation. Used internally by {py:func}`combra.angles.vertex_angles`, {py:func}`combra.mvee.fit_mvee`, and the crack-graph builder.
 
 ```python
 from combra import contours
@@ -28,9 +28,15 @@ Extract raw contours via Canny edges + Suzuki contour finding. No simplification
 ```
 ````
 
-````{py:function} combra.contours.get_contours(image, tol=3) -> list[ndarray]
+````{py:function} combra.contours.find_contours(image, tol=3) -> list[ndarray]
 
 Same as `get_row_contours` but applies Douglas–Peucker simplification with tolerance `tol` to every contour. This is what most downstream code calls.
+
+```{versionchanged} 0.4
+Renamed from ``get_contours`` (scikit-image ``find_contours`` convention) and
+the missing ``cv2.approxPolyDP`` ``closed`` argument fixed (it previously raised
+``TypeError``). ``get_contours`` stays as a deprecated alias until 0.6.
+```
 
 :param image: Preprocessed binary image.
 :type image: ndarray
@@ -45,8 +51,8 @@ Same as `get_row_contours` but applies Douglas–Peucker simplification with tol
 >>> from combra import contours, image, data
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> raw = contours.get_row_contours(processed)            # ~thousands of vertices per region
->>> simplified = contours.get_contours(processed, tol=3)  # ~tens of vertices per region
+>>> raw = contours.get_row_contours(processed)             # ~thousands of vertices per region
+>>> simplified = contours.find_contours(processed, tol=3)  # ~tens of vertices per region
 >>> print(f'raw[0]: {len(raw[0])} pts   simplified[0]: {len(simplified[0])} pts')
 ```
 ````
@@ -153,7 +159,7 @@ Draw simplified contours onto a `PIL.Image`. When `corners=True`, also draws fil
 
 :param image: Background to draw on.
 :type image: PIL.Image
-:param cnts: Contours from `get_contours`.
+:param cnts: Contours from `find_contours`.
 :type cnts: list[ndarray]
 :param color_corner: Vertex marker colour `(R, G, B)`. Default: `(0, 139, 139)`.
 :type color_corner: tuple[int, int, int], optional
@@ -177,7 +183,7 @@ Draw simplified contours onto a `PIL.Image`. When `corners=True`, also draws fil
 >>> from skimage import color
 >>> from combra import contours, data, image
 >>> _, img = data.microstructure_images()[0]
->>> simplified = contours.get_contours(image.do_otsu(img), tol=3)
+>>> simplified = contours.find_contours(image.do_otsu(img), tol=3)
 >>> pil = Image.fromarray(color.gray2rgb(image.do_otsu(img)))
 >>> overlay = contours.draw_contours(pil, simplified, corners=True, r=2)
 ```
@@ -227,5 +233,5 @@ Numpy version of `draw_contours` — operates on an `ndarray` instead of `PIL.Im
 ## See also
 
 - {py:func}`combra.image.do_otsu` — the binariser upstream of all contour calls.
-- {py:func}`combra.angles.get_angles` — uses `get_contours` internally.
-- {py:func}`combra.mvee.get_mvee_params` — fits an MVEE to each `get_contours` output.
+- {py:func}`combra.angles.vertex_angles` — uses `find_contours` internally.
+- {py:func}`combra.mvee.fit_mvee` — fits an MVEE to each `find_contours` output.

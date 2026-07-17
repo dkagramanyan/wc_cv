@@ -10,12 +10,17 @@ from combra import angles
 
 ## Extraction
 
-````{py:function} combra.angles.get_angles(image, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, list[ndarray]]
+````{py:function} combra.angles.vertex_angles(image, border_eps=5, tol=3, min_segment_len=10.0) -> tuple[ndarray, list[ndarray]]
 
 Extract polygon angles from a preprocessed binary image. Each contour is
 Douglas–Peucker simplified, short segments are pruned, and the angle at every
 remaining vertex is computed (signed, counter-clockwise traversal — values
 above 180° are preserved).
+
+```{versionchanged} 0.4
+Renamed from ``get_angles`` (dropping the ``get_`` prefix, scikit-image
+convention). ``get_angles`` stays as a deprecated alias until 0.6.
+```
 
 :param image: Preprocessed image, shape $(H, W)$ or $(H, W, 1)$. Use {py:func}`combra.image.do_otsu` upstream.
 :type image: ndarray
@@ -34,7 +39,7 @@ above 180° are preserved).
 >>> from combra import angles, data, image
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> arr, contours = angles.get_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
+>>> arr, contours = angles.vertex_angles(processed, border_eps=5, tol=3, min_segment_len=10.0)
 >>> print(f'{len(arr)} angles  mean={arr.mean():.1f}°')
 ```
 ````
@@ -349,6 +354,6 @@ From `co_angles/1_generation_and_plots.ipynb` — one call per N draws the grid 
 
 ## See also
 
-- {py:meth}`combra.data.PobeditDataset.generate_angles` — drives `get_angles` across whole class folders and writes parquet.
-- {doc}`combra.contours <contours>` — the contour extractor `get_angles` relies on internally.
+- {py:meth}`combra.data.PobeditDataset.generate_angles` — drives `vertex_angles` across whole class folders and writes parquet.
+- {doc}`combra.contours <contours>` — the contour extractor `vertex_angles` relies on internally.
 - {py:func}`combra.metrics.load_rows` — loads angles parquets into the row shape these plotters expect.
