@@ -298,7 +298,7 @@ Fractal dimension of a single contour.
 >>> from combra import image, contours, data
 >>> _, img = data.microstructure_images()[0]
 >>> processed = image.do_otsu(img)
->>> cnts = contours.get_contours(processed, tol=3)
+>>> cnts = contours.find_contours(processed, tol=3)
 >>> fd = image.contour_fractal_dimension(cnts[0], max_size_thr=64)
 >>> print(f'contour fd = {fd:.3f}')
 ```

@@ -299,7 +299,7 @@ The density-level core (used by the parquet comparison path) lives at `combra.me
 
 ````{py:function} combra.metrics.images_to_angle_density(images, step=None, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> tuple[ndarray, ndarray]
 
-Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_image → get_angles` on each image, pools all vertex angles, then histograms them with {py:func}`combra.stats.stats_preprocess` at `step` degrees.
+Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_image → vertex_angles` on each image, pools all vertex angles, then histograms them with {py:func}`combra.stats.stats_preprocess` at `step` degrees.
 
 :param images: Image batch.
 :type images: ndarray or torch.Tensor
@@ -307,11 +307,11 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 :type step: float or None, optional
 :param border_eps: Border margin passed to {py:func}`combra.angles.vertex_angles`. Default: `5`.
 :type border_eps: int, optional
-:param tol: Polygon-approximation tolerance passed to `get_angles`. Default: `3`.
+:param tol: Polygon-approximation tolerance passed to `vertex_angles`. Default: `3`.
 :type tol: int, optional
-:param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
+:param min_segment_len: Minimum segment length passed to `vertex_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
-:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → vertex_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
 :type workers: int or None, optional
 :returns: **density** (*tuple[ndarray, ndarray]*) – `(x, y)` angle-bin centres and densities.
 :rtype: tuple(ndarray, ndarray)
@@ -319,17 +319,17 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 
 ````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> ndarray
 
-The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → get_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
+The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → vertex_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
 
 :param images: Image batch.
 :type images: ndarray or torch.Tensor
 :param border_eps: Border margin passed to {py:func}`combra.angles.vertex_angles`. Default: `5`.
 :type border_eps: int, optional
-:param tol: Polygon-approximation tolerance passed to `get_angles`. Default: `3`.
+:param tol: Polygon-approximation tolerance passed to `vertex_angles`. Default: `3`.
 :type tol: int, optional
-:param min_segment_len: Minimum segment length passed to `get_angles`. Default: `10.0`.
+:param min_segment_len: Minimum segment length passed to `vertex_angles`. Default: `10.0`.
 :type min_segment_len: float, optional
-:param workers: When `> 1`, distribute the per-image `_preprocess_image → get_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
+:param workers: When `> 1`, distribute the per-image `_preprocess_image → vertex_angles` extraction over a multiprocessing pool of this many workers. `None` (or `1`) runs it serially. Default: `None`.
 :type workers: int or None, optional
 :returns: **pooled** (*ndarray*) – 1-D array of all pooled vertex angles (degrees).
 :rtype: ndarray
@@ -550,7 +550,7 @@ two images in one scored batch can never be rescaled under different assumptions
 
 :param a: Image array.
 :type a: array_like
-:param data_range: `None` — `a` must already be `uint8`, else `ValueError`; `(lo, hi)` — linearly map `[lo, hi]` onto `[0, 255]`; `"infer"` — the deprecated per-image heuristic (kept one release; emits `FutureWarning`). Default: `None`.
+:param data_range: `None` — `a` must already be `uint8`, else `ValueError`; `(lo, hi)` — linearly map `[lo, hi]` onto `[0, 255]`. Default: `None`.
 :type data_range: None or tuple[float, float] or str, optional
 :returns: **out** (*ndarray[uint8]*) – The rescaled image.
 :rtype: ndarray
@@ -633,9 +633,8 @@ Adapted from `co_angles/2_comparison.ipynb` — compare every diffit checkpoint 
 Parse a training run's `stats.jsonl` and map each evaluated checkpoint's FID to a **6-digit zero-padded `floor(kimg)`** key (e.g. `403.2 → '000403'`) — the same token `compare_folders` derives from a `..._kimg_<key>_...` sweep-folder name, so the result drops straight into its `fid_by_kimg` argument. Only scalar eval records contribute; text/log records (and any line missing the keys) are shape-filtered out.
 
 ```{versionchanged} 0.4
-Reads the standardized logging-contract keys `Metrics/combra_fid10k` and
-`Progress/kimg` first, falling back to the legacy bare `FID` / `kimg` pair for
-pre-standardization runs.
+Reads the logging-contract keys `Metrics/combra_fid10k` and `Progress/kimg`
+(text/log records are shape-filtered out).
 ```
 
 :param stats_path: Path to a training run's `stats.jsonl`.

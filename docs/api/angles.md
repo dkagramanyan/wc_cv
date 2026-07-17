@@ -19,7 +19,7 @@ above 180° are preserved).
 
 ```{versionchanged} 0.4
 Renamed from ``get_angles`` (dropping the ``get_`` prefix, scikit-image
-convention). ``get_angles`` stays as a deprecated alias until 0.6.
+convention). The old name is removed (no alias).
 ```
 
 :param image: Preprocessed image, shape $(H, W)$ or $(H, W, 1)$. Use {py:func}`combra.image.do_otsu` upstream.
@@ -362,7 +362,7 @@ values are stored as attributes, drawing is a separate `plot` step, and
 alternate constructors build one from stored data. `plot` accepts an existing
 plotly figure (the `ax=` analogue) and **never** calls `fig.show()`.
 
-```{versionadded} 0.5
+```{versionadded} 0.4
 ```
 
 **Attributes**
