@@ -16,11 +16,23 @@ pip install .          # or:  pip install -e .   for an editable install
 
 | Extra         | Install                          | Adds                                          |
 | ------------- | -------------------------------- | --------------------------------------------- |
+| `viz`         | `pip install ".[viz]"`           | plotly + kaleido (all `combra.*` plotting)    |
+| `metrics`     | `pip install ".[metrics]"`       | torch stack for the image-feature metrics (FID / CMMD / FD-DINOv2) |
 | `tests`       | `pip install ".[tests]"`         | pytest + pytest-cov                           |
 | `docs`        | `pip install ".[docs]"`          | Sphinx docs toolchain                         |
-| `dev`         | `pip install -e ".[dev]"`        | the `tests` extra + ruff                      |
+| `dev`         | `pip install -e ".[dev]"`        | the `tests` + `viz` extras + ruff             |
 
-All generative metrics work out of the box — `open-clip-torch` (for `compute_cmmd`), `pytorch-fid` and `torchvision` are core dependencies, so a plain `pip install combra` pulls everything. `compute_fid` delegates to [pytorch-fid](https://github.com/mseitzer/pytorch-fid), which downloads/caches its own InceptionV3 weights on first use; the DINOv2 backbone for `compute_fd_dinov2` is fetched from `torch.hub` on first use — no manual model setup. The metrics score in-memory image batches and run on CUDA when available, falling back to CPU; see {doc}`combra.metrics <api/metrics>`.
+```{versionchanged} 0.4
+The heavy dependencies moved to extras, so a plain `pip install combra` stays lean
+(the angle/beam extraction + distribution-metric pipeline). Install `[viz]` for the
+`combra.*` plot functions and `[metrics]` for the torch image-feature metrics.
+```
+
+The image-feature metrics (`[metrics]` extra) score in-memory image batches and run on
+CUDA when available, falling back to CPU. `compute_fid` delegates to
+[pytorch-fid](https://github.com/mseitzer/pytorch-fid), which downloads/caches its own
+InceptionV3 weights on first use; the DINOv2 backbone for `compute_fd_dinov2` is fetched
+from `torch.hub` on first use — no manual model setup. See {doc}`combra.metrics <api/metrics>`.
 
 The angle-Wasserstein training metrics use [POT](https://pythonot.github.io/) (`pot`), also a core dependency.
 

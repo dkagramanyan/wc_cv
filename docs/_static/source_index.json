@@ -4,16 +4,16 @@
   "qual": "__dir__",
   "subpkg": "",
   "file": "combra/__init__.py",
-  "start": 28,
-  "end": 29
+  "start": 37,
+  "end": 38
  },
  {
   "leaf": "_raise_build_error",
   "qual": "_raise_build_error",
   "subpkg": "",
   "file": "combra/__init__.py",
-  "start": 45,
-  "end": 55
+  "start": 54,
+  "end": 64
  },
  {
   "leaf": "AngleDensityDisplay",
@@ -112,68 +112,76 @@
   "end": 220
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "angles",
+  "file": "combra/angles/plot.py",
+  "start": 10,
+  "end": 10
+ },
+ {
   "leaf": "_load_angles_parquet",
   "qual": "_load_angles_parquet",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 9,
-  "end": 16
+  "start": 13,
+  "end": 20
  },
  {
   "leaf": "_build_traces_batch",
   "qual": "_build_traces_batch",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 19,
-  "end": 58
+  "start": 23,
+  "end": 59
  },
  {
   "leaf": "angles_plot_base",
   "qual": "angles_plot_base",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 61,
-  "end": 184
+  "start": 62,
+  "end": 173
  },
  {
   "leaf": "_find_row_idx",
   "qual": "_find_row_idx",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 201,
-  "end": 205
+  "start": 176,
+  "end": 180
  },
  {
   "leaf": "resolve_overlay_rows",
   "qual": "resolve_overlay_rows",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 208,
-  "end": 264
+  "start": 183,
+  "end": 239
  },
  {
   "leaf": "build_overlay_grid",
   "qual": "build_overlay_grid",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 267,
-  "end": 333
+  "start": 242,
+  "end": 308
  },
  {
   "leaf": "plot_overlay_grid_from_sources",
   "qual": "plot_overlay_grid_from_sources",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 336,
-  "end": 392
+  "start": 311,
+  "end": 367
  },
  {
   "leaf": "angles_plot_grid",
   "qual": "angles_plot_grid",
   "subpkg": "angles",
   "file": "combra/angles/plot.py",
-  "start": 395,
-  "end": 587
+  "start": 370,
+  "end": 548
  },
  {
   "leaf": "LinearFit",
@@ -544,316 +552,372 @@
   "end": 88
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "data",
+  "file": "combra/data/pobedit_dataset.py",
+  "start": 35,
+  "end": 35
+ },
+ {
   "leaf": "_attr_str",
   "qual": "_attr_str",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 44,
-  "end": 48
+  "start": 48,
+  "end": 52
  },
  {
   "leaf": "_sorted_class_groups",
   "qual": "_sorted_class_groups",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 51,
-  "end": 63
+  "start": 55,
+  "end": 67
  },
  {
   "leaf": "_resolve_class_names",
   "qual": "_resolve_class_names",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 66,
-  "end": 87
+  "start": 70,
+  "end": 91
  },
  {
   "leaf": "_validate_h5_format",
   "qual": "_validate_h5_format",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 90,
-  "end": 105
+  "start": 94,
+  "end": 110
  },
  {
   "leaf": "_validate_written",
   "qual": "_validate_written",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 108,
-  "end": 133
+  "start": 113,
+  "end": 138
  },
  {
   "leaf": "ParentDataset",
   "qual": "ParentDataset",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 136,
-  "end": 278
+  "start": 141,
+  "end": 283
  },
  {
   "leaf": "__init__",
   "qual": "ParentDataset.__init__",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 137,
-  "end": 187
+  "start": 142,
+  "end": 192
  },
  {
   "leaf": "_list_files_limited",
   "qual": "ParentDataset._list_files_limited",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 190,
-  "end": 203
+  "start": 195,
+  "end": 208
  },
  {
   "leaf": "print_tree",
   "qual": "ParentDataset.print_tree",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 206,
-  "end": 227
+  "start": 211,
+  "end": 232
  },
  {
   "leaf": "_print_hdf5_tree",
   "qual": "ParentDataset._print_hdf5_tree",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 230,
-  "end": 249
+  "start": 235,
+  "end": 254
  },
  {
   "leaf": "_print_folder_tree",
   "qual": "ParentDataset._print_folder_tree",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 252,
-  "end": 278
+  "start": 257,
+  "end": 283
  },
  {
   "leaf": "PobeditDataset",
   "qual": "PobeditDataset",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 281,
-  "end": 945
+  "start": 286,
+  "end": 950
  },
  {
   "leaf": "__init__",
   "qual": "PobeditDataset.__init__",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 284,
-  "end": 308
+  "start": 289,
+  "end": 313
  },
  {
   "leaf": "close",
   "qual": "PobeditDataset.close",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 310,
-  "end": 316
+  "start": 315,
+  "end": 321
  },
  {
   "leaf": "__del__",
   "qual": "PobeditDataset.__del__",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 318,
-  "end": 322
+  "start": 323,
+  "end": 327
  },
  {
   "leaf": "_get_pool",
   "qual": "PobeditDataset._get_pool",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 324,
-  "end": 337
+  "start": 329,
+  "end": 342
  },
  {
   "leaf": "_init_image_paths",
   "qual": "PobeditDataset._init_image_paths",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 339,
-  "end": 364
+  "start": 344,
+  "end": 369
  },
  {
   "leaf": "samples",
   "qual": "PobeditDataset.samples",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 376,
-  "end": 385
+  "start": 381,
+  "end": 390
  },
  {
   "leaf": "targets",
   "qual": "PobeditDataset.targets",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 388,
-  "end": 393
+  "start": 393,
+  "end": 398
  },
  {
   "leaf": "__len__",
   "qual": "PobeditDataset.__len__",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 395,
-  "end": 396
+  "start": 400,
+  "end": 401
  },
  {
   "leaf": "__getitem__",
   "qual": "PobeditDataset.__getitem__",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 398,
-  "end": 406
+  "start": 403,
+  "end": 411
  },
  {
   "leaf": "_n_processed",
   "qual": "PobeditDataset._n_processed",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 408,
-  "end": 409
+  "start": 413,
+  "end": 414
  },
  {
   "leaf": "_cache_file_path",
   "qual": "PobeditDataset._cache_file_path",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 411,
-  "end": 424
+  "start": 416,
+  "end": 429
  },
  {
   "leaf": "_build_path_index",
   "qual": "PobeditDataset._build_path_index",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 426,
-  "end": 433
+  "start": 431,
+  "end": 438
  },
  {
   "leaf": "_cache_ok",
   "qual": "PobeditDataset._cache_ok",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 435,
-  "end": 453
+  "start": 440,
+  "end": 458
  },
  {
   "leaf": "_ensure_prep_cache_ready",
   "qual": "PobeditDataset._ensure_prep_cache_ready",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 455,
-  "end": 492
+  "start": 460,
+  "end": 497
  },
  {
   "leaf": "_build_prep_cache_cpu",
   "qual": "PobeditDataset._build_prep_cache_cpu",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 494,
-  "end": 510
+  "start": 499,
+  "end": 515
  },
  {
   "leaf": "_class_meta",
   "qual": "PobeditDataset._class_meta",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 512,
-  "end": 530
+  "start": 517,
+  "end": 535
  },
  {
   "leaf": "_parquet_path",
   "qual": "PobeditDataset._parquet_path",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 533,
-  "end": 538
+  "start": 538,
+  "end": 543
  },
  {
   "leaf": "_begin_generate",
   "qual": "PobeditDataset._begin_generate",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 540,
-  "end": 556
+  "start": 545,
+  "end": 561
  },
  {
   "leaf": "_write_class_row",
   "qual": "PobeditDataset._write_class_row",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 559,
-  "end": 577
+  "start": 564,
+  "end": 582
  },
  {
   "leaf": "generate_angles",
   "qual": "PobeditDataset.generate_angles",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 579,
-  "end": 785
+  "start": 584,
+  "end": 790
  },
  {
   "leaf": "generate_beams",
   "qual": "PobeditDataset.generate_beams",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 787,
-  "end": 945
+  "start": 792,
+  "end": 950
  },
  {
   "leaf": "generate_angles_sweep",
   "qual": "generate_angles_sweep",
   "subpkg": "data",
   "file": "combra/data/pobedit_dataset.py",
-  "start": 948,
-  "end": 985
+  "start": 953,
+  "end": 990
+ },
+ {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "data",
+  "file": "combra/data/poliamid_dataset.py",
+  "start": 19,
+  "end": 19
  },
  {
   "leaf": "PoliamidDataset",
   "qual": "PoliamidDataset",
   "subpkg": "data",
   "file": "combra/data/poliamid_dataset.py",
-  "start": 21,
-  "end": 158
+  "start": 24,
+  "end": 161
  },
  {
   "leaf": "__init__",
   "qual": "PoliamidDataset.__init__",
   "subpkg": "data",
   "file": "combra/data/poliamid_dataset.py",
-  "start": 37,
-  "end": 56
+  "start": 40,
+  "end": 59
  },
  {
   "leaf": "_extract_num",
   "qual": "PoliamidDataset._extract_num",
   "subpkg": "data",
   "file": "combra/data/poliamid_dataset.py",
-  "start": 59,
-  "end": 60
+  "start": 62,
+  "end": 63
  },
  {
   "leaf": "generate",
   "qual": "PoliamidDataset.generate",
   "subpkg": "data",
   "file": "combra/data/poliamid_dataset.py",
-  "start": 62,
-  "end": 100
+  "start": 65,
+  "end": 103
  },
  {
   "leaf": "_metrics_for_image",
   "qual": "PoliamidDataset._metrics_for_image",
   "subpkg": "data",
   "file": "combra/data/poliamid_dataset.py",
-  "start": 103,
-  "end": 158
+  "start": 106,
+  "end": 161
+ },
+ {
+  "leaf": "CombraError",
+  "qual": "CombraError",
+  "subpkg": "",
+  "file": "combra/exceptions.py",
+  "start": 12,
+  "end": 13
+ },
+ {
+  "leaf": "SchemaError",
+  "qual": "SchemaError",
+  "subpkg": "",
+  "file": "combra/exceptions.py",
+  "start": 16,
+  "end": 17
+ },
+ {
+  "leaf": "IncompleteShardError",
+  "qual": "IncompleteShardError",
+  "subpkg": "",
+  "file": "combra/exceptions.py",
+  "start": 20,
+  "end": 21
+ },
+ {
+  "leaf": "CombraWarning",
+  "qual": "CombraWarning",
+  "subpkg": "",
+  "file": "combra/exceptions.py",
+  "start": 24,
+  "end": 25
+ },
+ {
+  "leaf": "UnknownFormatWarning",
+  "qual": "UnknownFormatWarning",
+  "subpkg": "",
+  "file": "combra/exceptions.py",
+  "start": 28,
+  "end": 29
  },
  {
   "leaf": "get_edges",
@@ -912,36 +976,44 @@
   "end": 508
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "graph",
+  "file": "combra/graph/energy.py",
+  "start": 15,
+  "end": 15
+ },
+ {
   "leaf": "get_energies",
   "qual": "get_energies",
   "subpkg": "graph",
   "file": "combra/graph/energy.py",
-  "start": 15,
-  "end": 87
+  "start": 18,
+  "end": 90
  },
  {
   "leaf": "find_shortest_energy_paths",
   "qual": "find_shortest_energy_paths",
   "subpkg": "graph",
   "file": "combra/graph/energy.py",
-  "start": 90,
-  "end": 187
+  "start": 93,
+  "end": 190
  },
  {
   "leaf": "paths_queues",
   "qual": "paths_queues",
   "subpkg": "graph",
   "file": "combra/graph/energy.py",
-  "start": 190,
-  "end": 239
+  "start": 193,
+  "end": 242
  },
  {
   "leaf": "fixed_paths_energies",
   "qual": "fixed_paths_energies",
   "subpkg": "graph",
   "file": "combra/graph/energy.py",
-  "start": 242,
-  "end": 315
+  "start": 245,
+  "end": 318
  },
  {
   "leaf": "graph_plot",
@@ -1200,44 +1272,52 @@
   "end": 51
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "io",
+  "file": "combra/io/hdf5.py",
+  "start": 15,
+  "end": 15
+ },
+ {
   "leaf": "convert_folder_to_hdf5",
   "qual": "convert_folder_to_hdf5",
   "subpkg": "io",
   "file": "combra/io/hdf5.py",
-  "start": 15,
-  "end": 166
+  "start": 18,
+  "end": 169
  },
  {
   "leaf": "repack_hdf5_uncompressed",
   "qual": "repack_hdf5_uncompressed",
   "subpkg": "io",
   "file": "combra/io/hdf5.py",
-  "start": 169,
-  "end": 223
+  "start": 172,
+  "end": 226
  },
  {
   "leaf": "load_rows",
   "qual": "load_rows",
   "subpkg": "io",
   "file": "combra/io/parquet.py",
-  "start": 15,
-  "end": 33
+  "start": 17,
+  "end": 35
  },
  {
   "leaf": "load_angles",
   "qual": "load_angles",
   "subpkg": "io",
   "file": "combra/io/parquet.py",
-  "start": 38,
-  "end": 38
+  "start": 40,
+  "end": 40
  },
  {
   "leaf": "load_beams",
   "qual": "load_beams",
   "subpkg": "io",
   "file": "combra/io/parquet.py",
-  "start": 39,
-  "end": 39
+  "start": 41,
+  "end": 41
  },
  {
   "leaf": "_run_meta_struct",
@@ -1288,92 +1368,100 @@
   "end": 228
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "metrics",
+  "file": "combra/metrics/compare.py",
+  "start": 9,
+  "end": 9
+ },
+ {
   "leaf": "index_by_name_step",
   "qual": "index_by_name_step",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 9,
-  "end": 10
+  "start": 12,
+  "end": 13
  },
  {
   "leaf": "find_ethalon",
   "qual": "find_ethalon",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 13,
-  "end": 22
+  "start": 16,
+  "end": 25
  },
  {
   "leaf": "parquet_has_step",
   "qual": "parquet_has_step",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 25,
-  "end": 36
+  "start": 28,
+  "end": 39
  },
  {
   "leaf": "compute_metrics",
   "qual": "compute_metrics",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 39,
-  "end": 59
+  "start": 42,
+  "end": 62
  },
  {
   "leaf": "load_fid_by_kimg",
   "qual": "load_fid_by_kimg",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 62,
-  "end": 92
+  "start": 65,
+  "end": 95
  },
  {
   "leaf": "find_kimg_parquets",
   "qual": "find_kimg_parquets",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 95,
-  "end": 126
+  "start": 98,
+  "end": 129
  },
  {
   "leaf": "compare_folders",
   "qual": "compare_folders",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 129,
-  "end": 307
+  "start": 132,
+  "end": 316
  },
  {
   "leaf": "compute_all_metrics_vs_n",
   "qual": "compute_all_metrics_vs_n",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 310,
-  "end": 358
+  "start": 319,
+  "end": 367
  },
  {
   "leaf": "compare_pairs",
   "qual": "compare_pairs",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 361,
-  "end": 427
+  "start": 370,
+  "end": 436
  },
  {
   "leaf": "_requested_n_from_name",
   "qual": "_requested_n_from_name",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 430,
-  "end": 434
+  "start": 439,
+  "end": 443
  },
  {
   "leaf": "metrics_vs_n",
   "qual": "metrics_vs_n",
   "subpkg": "metrics",
   "file": "combra/metrics/compare.py",
-  "start": 437,
-  "end": 526
+  "start": 446,
+  "end": 544
  },
  {
   "leaf": "_safe_pct",
@@ -1568,12 +1656,20 @@
   "end": 901
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "metrics",
+  "file": "combra/metrics/samplers.py",
+  "start": 19,
+  "end": 19
+ },
+ {
   "leaf": "compare_samplers",
   "qual": "compare_samplers",
   "subpkg": "metrics",
   "file": "combra/metrics/samplers.py",
-  "start": 18,
-  "end": 84
+  "start": 22,
+  "end": 88
  },
  {
   "leaf": "logger",
@@ -1936,44 +2032,52 @@
   "end": 172
  },
  {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "mvee",
+  "file": "combra/mvee/plot.py",
+  "start": 11,
+  "end": 11
+ },
+ {
   "leaf": "plot_beam_base",
   "qual": "plot_beam_base",
   "subpkg": "mvee",
   "file": "combra/mvee/plot.py",
-  "start": 13,
-  "end": 62
+  "start": 17,
+  "end": 66
  },
  {
   "leaf": "plot_angles",
   "qual": "plot_angles",
   "subpkg": "mvee",
   "file": "combra/mvee/plot.py",
-  "start": 65,
-  "end": 122
+  "start": 69,
+  "end": 126
  },
  {
   "leaf": "plot_beam_compare",
   "qual": "plot_beam_compare",
   "subpkg": "mvee",
   "file": "combra/mvee/plot.py",
-  "start": 125,
-  "end": 224
+  "start": 129,
+  "end": 228
  },
  {
   "leaf": "beams_heatmap",
   "qual": "beams_heatmap",
   "subpkg": "mvee",
   "file": "combra/mvee/plot.py",
-  "start": 227,
-  "end": 342
+  "start": 231,
+  "end": 346
  },
  {
   "leaf": "enclosing_ellipse_show",
   "qual": "enclosing_ellipse_show",
   "subpkg": "mvee",
   "file": "combra/mvee/plot.py",
-  "start": 346,
-  "end": 381
+  "start": 350,
+  "end": 385
  },
  {
   "leaf": "gaussian",
@@ -2053,15 +2157,23 @@
   "subpkg": "stats",
   "file": "combra/stats/preprocess.py",
   "start": 4,
-  "end": 24
+  "end": 23
+ },
+ {
+  "leaf": "logger",
+  "qual": "logger",
+  "subpkg": "tests",
+  "file": "combra/tests/fractal.py",
+  "start": 7,
+  "end": 7
  },
  {
   "leaf": "test_fractal_dimensions",
   "qual": "test_fractal_dimensions",
   "subpkg": "tests",
   "file": "combra/tests/fractal.py",
-  "start": 6,
-  "end": 129
+  "start": 10,
+  "end": 133
  },
  {
   "leaf": "Bunch",
@@ -2118,5 +2230,45 @@
   "file": "combra/utils/build.py",
   "start": 36,
   "end": 43
+ },
+ {
+  "leaf": "PALETTE",
+  "qual": "PALETTE",
+  "subpkg": "viz",
+  "file": "combra/viz/theme.py",
+  "start": 15,
+  "end": 15
+ },
+ {
+  "leaf": "MARKERS",
+  "qual": "MARKERS",
+  "subpkg": "viz",
+  "file": "combra/viz/theme.py",
+  "start": 16,
+  "end": 16
+ },
+ {
+  "leaf": "MARKER_GLYPHS",
+  "qual": "MARKER_GLYPHS",
+  "subpkg": "viz",
+  "file": "combra/viz/theme.py",
+  "start": 19,
+  "end": 29
+ },
+ {
+  "leaf": "axis_style",
+  "qual": "axis_style",
+  "subpkg": "viz",
+  "file": "combra/viz/theme.py",
+  "start": 32,
+  "end": 50
+ },
+ {
+  "leaf": "export_png",
+  "qual": "export_png",
+  "subpkg": "viz",
+  "file": "combra/viz/theme.py",
+  "start": 53,
+  "end": 55
  }
 ]
