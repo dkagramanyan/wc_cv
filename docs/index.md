@@ -41,6 +41,7 @@ examples/angles
 examples/fid
 examples/models_api
 examples/models_api_proposal
+examples/combra_api_proposal
 examples/san_v2
 examples/styleswin
 examples/diffit
