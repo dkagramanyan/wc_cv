@@ -21,8 +21,25 @@ extensions = [
     "myst_parser",
     "sphinx_design",
     "sphinx_copybutton",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
     "sphinx.ext.linkcode",
 ]
+
+# -- autodoc / napoleon ------------------------------------------------------
+#
+# The API pages pull signatures + descriptions straight from the combra
+# docstrings (numpydoc style, parsed by napoleon) instead of restating them by
+# hand. combra must therefore be importable at build time (the Pages workflow
+# installs the pinned submodule); heavy ML deps (torch stack) are imported
+# lazily inside functions, so they are not needed just to introspect.
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_use_rtype = False
+napoleon_use_ivar = True
+
+autodoc_member_order = "bysource"
+autodoc_typehints = "signature"
 
 # Markdown (MyST) is the source format for every page.
 source_suffix = {".md": "markdown"}
@@ -118,12 +135,12 @@ python_use_unqualified_type_names = True
 
 # -- Source links ("[source]" next to every object) --------------------------
 #
-# The API pages are hand-authored ``py:`` directives rather than autodoc, so we
-# resolve each object back to its definition in the combra source tree through a
-# pre-built index (``_static/source_index.json``, generated from the package
-# AST). ``sphinx.ext.linkcode`` then renders a GitHub "[source]" link for every
-# function, class, and method — the same affordance the scikit-image API pages
-# offer.
+# The API pages render objects with autodoc; ``sphinx.ext.linkcode`` resolves
+# each one back to its definition in the combra source tree through a pre-built
+# index (``_static/source_index.json``), giving a GitHub "[source]" link for
+# every function, class, and method — the same affordance the scikit-image API
+# pages offer. Regenerate the index from the pinned submodule AST after a combra
+# bump with ``python docs/_tools/gen_source_index.py``.
 
 _COMBRA_REPO = "https://github.com/dkagramanyan/combra"
 _COMBRA_REF = "main"
