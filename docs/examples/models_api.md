@@ -11,6 +11,20 @@ remaining divergences — including per-repo migration deltas — is proposed in
 {doc}`models_api_proposal`.
 ```
 
+```{note}
+**DiffiT-v2 now implements the v2 convention** ({doc}`models_api_proposal` §12).
+Its checkpoint scheme (EMA-only `diffit-snapshot-<kimg>-inference.pt`, atomic,
+no resume/best/latest/final), training CLI (`--precision`, `True/False`
+booleans, `--init-weights`, `--mirror`), generation contract (`--network` /
+`--steps`, self-spawning `--gpus`, per-image seeds, unified
+`format="generated_images_shard"` / `schema_version=1` h5 merged to `<desc>.h5`),
+dataset/label contract (uint8 items, `class_names` in `dataset.json` /
+checkpoints / h5), logging (`stats.jsonl` scalar rows + §7 TensorBoard
+namespaces) and infrastructure (no Hydra, no `requirements.txt`, `sh/` launch
+scripts) all follow the spec. The DiffiT-v2 cells below reflect that; the other
+three repos still diverge as noted.
+```
+
 | repo | family | upstream | docs |
 |---|---|---|---|
 | [san-v2](https://github.com/dkagramanyan/san-v2) | GAN — StyleGAN3 + Projected GAN + SAN | Sony StyleSAN-XL | {doc}`san_v2` |
@@ -51,17 +65,18 @@ Every repo follows the same conventions:
   `network-snapshot-latest.pt` overwritten in place and a history of small
   inference snapshots, pruned to `--snapshot-keep-last` (default 3) —
   except in **san-v2**, where no pruning exists and snapshots accumulate
-  unbounded.
+  unbounded, and **DiffiT-v2**, which has dropped resume/best/latest entirely
+  and keeps only the pruned EMA-only inference snapshots (§12).
 
 ## Training
 
 | | san-v2 | StyleSwin-v2 | DiffiT-v2 | EDM2-v2 |
 |---|---|---|---|---|
 | entry point | `train.py` | `train.py` | `scripts/train.py` (`diffit-train`) | `train_edm2.py` (`edm2-train`) |
-| Hydra wrapper | `train_hydra.py` | **none** | `train_hydra.py` | `train_hydra.py` |
+| Hydra wrapper | `train_hydra.py` | **none** | **none** (removed) | `train_hydra.py` |
 | presets | `--cfg` = architecture (`stylegan3-r`, …) | `--cfg styleswin-{256,512,1024}` | `--cfg diffit-{256,512,1024}` | `--preset edm2-img{256,512,1024}-s` (+ more sizes) |
 | required flags | `--outdir --cfg --data --gpus --batch-gpu` | `--outdir --data --gpus` | `--outdir --cfg --data --gpus --batch-gpu` | `--outdir --data` |
-| resolution strategy | **progressive**: 16² stem, then superres stages (`--superres --up_factor 2 --path_stem`) | independent run per resolution | finetune upward via `--resume` (RoPE-2D) | independent preset per resolution (shared VAE latent space) |
+| resolution strategy | **progressive**: 16² stem, then superres stages (`--superres --up_factor 2 --path_stem`) | independent run per resolution | finetune upward via `--init-weights` (RoPE-2D) | independent preset per resolution (shared VAE latent space) |
 
 ## Evaluation
 
@@ -76,11 +91,11 @@ Every repo follows the same conventions:
 
 | | san-v2 | StyleSwin-v2 | DiffiT-v2 | EDM2-v2 |
 |---|---|---|---|---|
-| format | **pickled modules** (`.pkl`, loaded via `legacy.py`) | `.pt` state dicts | `.pt` state dicts | mixed: inference `.pkl` + resume `.pt` |
-| rolling full checkpoint | `network-snapshot-latest.pt` (`G`/`D`/`G_ema` + progress; **no optimizer state**) | `network-snapshot-latest.pt` (G, D, G_ema, both optimizers) | `network-snapshot-latest.pt` (model, ema, opt, scaler) | `network-snapshot-latest.pt` (state, net, loss, optimizer, ema) |
-| inference history (pruned) | `network-snapshot-<kimg>-inference.pkl` — only with `--save-inference-only 1` | `network-snapshot-<kimg>-inference.pt` — always | `network-snapshot-<kimg>-inference.pt` — always | `network-snapshot-<kimg>-<ema_std>.pkl` — always, one per EMA std |
-| best model | `best_model.pkl` | `best_model.pt` | `best_model.pt` | `best_model.pt` |
-| final artifact | — | — | `network-final.pt` / `network-final-inference.pt` | — |
+| format | **pickled modules** (`.pkl`, loaded via `legacy.py`) | `.pt` state dicts | `.pt` state dicts (EMA-only + metadata) | mixed: inference `.pkl` + resume `.pt` |
+| rolling full checkpoint | `network-snapshot-latest.pt` (`G`/`D`/`G_ema` + progress; **no optimizer state**) | `network-snapshot-latest.pt` (G, D, G_ema, both optimizers) | **none** (no resume) | `network-snapshot-latest.pt` (state, net, loss, optimizer, ema) |
+| inference history (pruned) | `network-snapshot-<kimg>-inference.pkl` — only with `--save-inference-only 1` | `network-snapshot-<kimg>-inference.pt` — always | `diffit-snapshot-<kimg>-inference.pt` — every snap tick **+ last tick**, atomic, EMA-only + `{n_classes, resolution, class_names, cur_nimg}` | `network-snapshot-<kimg>-<ema_std>.pkl` — always, one per EMA std |
+| best model | `best_model.pkl` | `best_model.pt` | **none** (pick post-hoc from `stats.jsonl`) | `best_model.pt` |
+| final artifact | — | — | **none** (last-tick snapshot *is* final) | — |
 | EMA | classic `G_ema` (rampup) | classic `g_ema` | classic EMA (`--ema-rate`) | **PowerFunctionEMA** (post-hoc reconstructable via `reconstruct_phema.py`) |
 
 ```{warning}
@@ -99,7 +114,7 @@ between repos.
 | available | `dpm++`, `unipc`, `ddim`, `ddpm` | `dpm++`, `edm` (Heun), `euler`, `ddim` (≡ `euler`) |
 | space | DDPM 1000-step discrete schedule | EDM σ-space (Karras schedule) |
 | eval default | `ddim` @ 100 steps | `dpm++` @ 25 steps |
-| flags | `--eval-sampler` / `--eval-sampling-steps` (training), `--sampler` / `--num-sampling-steps` (generation) | `--eval-sampler` / `--eval-sampling-steps` (training), `--sampler` / `--steps` (generation) |
+| flags | `--eval-sampler` / `--eval-sampling-steps` (training), `--sampler` / `--steps` (generation) | `--eval-sampler` / `--eval-sampling-steps` (training), `--sampler` / `--steps` (generation) |
 
 ```{note}
 The overlapping names are **not interchangeable**: `ddim` and `dpm++` integrate
@@ -113,10 +128,10 @@ compare-samplers tool ({doc}`sampler_comparison`).
 | | san-v2 | StyleSwin-v2 | DiffiT-v2 | EDM2-v2 |
 |---|---|---|---|---|
 | script | `gen_images.py` | `gen_images.py` | `diffit-gen-images` | `edm2-gen-images` |
-| checkpoint flag | `--network` (`.pkl`) | `--network` (`.pt`) | `--model-path` (`.pt`) | `--net` (`.pkl`) |
-| class selection | `--classes 0,1,2` + `--samples-per-class` | `--classes` + `--samples-per-class` | `--classes` + `--samples-per-class` (or `--seeds`) | **`--class <idx>` + `--seeds 0-999`** — one class per run |
-| output | **HDF5 (default)** or per-class PNG dirs (`--save-mode`) | per-class PNG dirs only | HDF5 shards → merged `.h5`, or dirs (`--save-mode`) | flat `<seed>.png` only |
-| quality knobs | `--trunc`, `--centroids-path` | `--trunc` | `--cfg-scale`, `--sampler`, `--num-sampling-steps` | `--sampler`, `--steps`, `--guidance --gnet` |
+| checkpoint flag | `--network` (`.pkl`) | `--network` (`.pt`) | `--network` (alias `--model-path`) (`.pt`) | `--net` (`.pkl`) |
+| class selection | `--classes 0,1,2` + `--samples-per-class` | `--classes` + `--samples-per-class` | `--classes` (indices **or names**) + `--samples-per-class` (or `--seeds`) | **`--class <idx>` + `--seeds 0-999`** — one class per run |
+| output | **HDF5 (default)** or per-class PNG dirs (`--save-mode`) | per-class PNG dirs only | HDF5 shards → merged `<desc>.h5` (unified sig), or dirs + `classes.json` (`--save-mode`) | flat `<seed>.png` only |
+| quality knobs | `--trunc`, `--centroids-path` | `--trunc` | `--cfg-scale`, `--sampler`, `--steps` | `--sampler`, `--steps`, `--guidance --gnet` |
 
 ```{warning}
 **The generation artifacts are not equivalent.** The downstream angle pipeline
@@ -150,11 +165,10 @@ model page and in the {doc}`models_api_proposal` label contract (§5).
 ## Other known divergences
 
 1. **combra install source differs per repo**: san-v2's `requirements.txt` uses
-   an editable local checkout (`-e ../wc_cv/combra`); EDM2-v2 and StyleSwin-v2
-   pull the private repo over `git+https` via the `[combra]` extra; DiffiT-v2
-   expects combra installed first from a local checkout.
-2. **StyleSwin-v2 has no `requirements.txt`** — dependencies live only in
-   `pyproject.toml` (`pip install -e .`), unlike the other three.
+   an editable local checkout (`-e ../wc_cv/combra`); EDM2-v2, StyleSwin-v2 and
+   **DiffiT-v2** pull the private repo over `git+https` via the `[combra]` extra.
+2. **StyleSwin-v2 and DiffiT-v2 have no `requirements.txt`** — dependencies live
+   only in `pyproject.toml` (`pip install -e .`), unlike san-v2 and EDM2-v2.
 3. **CUDA toolchain**: san-v2 compiles its ops against conda's `nvcc`
    (`CUDA_HOME=$CONDA_PREFIX`); StyleSwin-v2 uses the system module
    (`module load CUDA/13.1`). DiffiT-v2 and EDM2-v2 need no custom CUDA ops.
