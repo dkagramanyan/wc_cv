@@ -30,6 +30,31 @@ Load the five SEM example images shipped with combra (`Ultra_Co{6_2, 8, 11, 15, 
 ```
 ````
 
+````{py:function} combra.data.load_microstructure() -> combra.utils.Bunch
+
+Load the bundled 5-class microstructure sample as a scikit-learn-style
+{py:class}`~combra.utils.Bunch` — the self-describing counterpart of
+{py:func}`~combra.data.microstructure_images`. Class names are **alphabetically
+sorted** and the integer `target` is index-aligned to them.
+
+```{versionadded} 0.5
+```
+
+:returns: **data** – a {py:class}`~combra.utils.Bunch` with `images` (list of `uint8` arrays), `target` (int class-index array), `class_names` (sorted grain names), `filenames`, and `DESCR`.
+:rtype: combra.utils.Bunch
+
+**Example**
+
+```python
+>>> from combra import data
+>>> ds = data.load_microstructure()
+>>> ds.class_names
+['Ultra_Co11', 'Ultra_Co15', 'Ultra_Co25', 'Ultra_Co6_2', 'Ultra_Co8']
+>>> ds.images[0].shape, int(ds.target[0])
+((..., ...), 0)
+```
+````
+
 ````{py:function} combra.data.microstructure_class_path() -> str
 
 Return the path to the bundled 5-class WC/Co directory tree (one subfolder per class).
