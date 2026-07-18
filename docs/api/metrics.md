@@ -78,7 +78,7 @@ Classic InceptionV3 FID between two **in-memory image batches** (a numpy array o
 >>> print(f'FID = {fid:.4f}')
 ```
 
-A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`. `compute_fid` works from images; for sharded or distributed evaluation the feature-extraction and distance halves are exposed separately as {py:func}`combra.metrics.fid_features` / {py:func}`combra.metrics.fid_from_features` (see [Sharded feature extraction](#sharded-feature-extraction) below). combra does not expose the raw mean/covariance (`mu`/`sigma`) form directly.
+A full multi-resolution loop is shown in the {doc}`FID example </examples/fid>`. `compute_fid` works from images; for sharded or distributed evaluation the feature-extraction and distance halves are exposed separately as {py:func}`combra.metrics.fid_features` / {py:func}`combra.metrics.frechet_from_features` (see [Sharded feature extraction](#sharded-feature-extraction) below). combra does not expose the raw mean/covariance (`mu`/`sigma`) form directly.
 ````
 
 ````{py:function} combra.metrics.compute_cmmd(reference_images, generated_images, model_name='ViT-L-14-336-quickgelu', pretrained='openai', device=None, batch_size=64, sigma=10.0, scale=1000.0, reference_cache=None) -> float
@@ -142,9 +142,10 @@ Fréchet distance between the [DINOv2](https://github.com/facebookresearch/dinov
 Each image-feature metric is also exposed as **two halves** — a *feature
 extractor* (`fid_features`, `cmmd_features`, `fd_dinov2_features`) that turns an
 image batch into its backbone features, and a *distance* function
-(`fid_from_features`, `cmmd_from_features`, `fd_dinov2_from_features`) that scores
-two feature sets. The `compute_*` functions above are thin wrappers over these
-two halves, so the numbers are identical.
+(`frechet_from_features` for both Fréchet metrics — FID and FD-DINOv2 — and
+`cmmd_from_features` for CMMD) that scores two feature sets. The `compute_*`
+functions above are thin wrappers over these two halves, so the numbers are
+identical.
 
 Splitting them lets the (expensive) feature extraction be **sharded across
 devices or processes**: extract features for disjoint slices of the generated set
@@ -160,15 +161,15 @@ the (cached) reference features.
 
 ```python
 >>> import numpy as np
->>> from combra.metrics import fid_features, fid_from_features
+>>> from combra.metrics import fid_features, frechet_from_features
 >>> ref_feats = fid_features(real_batch)                       # once, cacheable
 >>> gen_feats = np.concatenate([fid_features(s) for s in gen_shards])  # sharded
->>> fid = fid_from_features(ref_feats, gen_feats)              # == compute_fid(real, gen)
+>>> fid = frechet_from_features(ref_feats, gen_feats)          # == compute_fid(real, gen)
 ```
 
 ````{py:function} combra.metrics.fid_features(images, device=None, batch_size=50, dims=2048) -> ndarray
 
-Feature half of {py:func}`combra.metrics.compute_fid`: run `images` through InceptionV3 and return the pooled activations as a float32 array `[N, dims]`. Pair with {py:func}`combra.metrics.fid_from_features`. Same `device` / `batch_size` / `dims` semantics as `compute_fid`.
+Feature half of {py:func}`combra.metrics.compute_fid`: run `images` through InceptionV3 and return the pooled activations as a float32 array `[N, dims]`. Pair with {py:func}`combra.metrics.frechet_from_features`. Same `device` / `batch_size` / `dims` semantics as `compute_fid`.
 
 :param images: Image batch (numpy array or torch tensor).
 :type images: ndarray or torch.Tensor
@@ -182,15 +183,15 @@ Feature half of {py:func}`combra.metrics.compute_fid`: run `images` through Ince
 :rtype: ndarray
 ````
 
-````{py:function} combra.metrics.fid_from_features(reference_features, generated_features) -> float
+````{py:function} combra.metrics.frechet_from_features(reference_features, generated_features) -> float
 
-Distance half of {py:func}`combra.metrics.compute_fid`: the Fréchet distance between two InceptionV3 feature sets produced by {py:func}`combra.metrics.fid_features`. Each side needs **≥ 2 rows** (it estimates a covariance).
+The distance half shared by every Fréchet-distance metric (FID and FD-DINOv2): reduce each feature set to its `(mu, sigma)` and take the Fréchet distance between the two. The backbone is irrelevant here — pair it with {py:func}`combra.metrics.fid_features` for FID or {py:func}`combra.metrics.fd_dinov2_features` for FD-DINOv2. Each side needs **≥ 2 rows** (it estimates a covariance). Pooling features from several shards before this call is exact.
 
-:param reference_features: Reference features, shape `[N, dims]`.
+:param reference_features: Reference features, shape `[N, D]`.
 :type reference_features: ndarray
-:param generated_features: Generated features, shape `[M, dims]`.
+:param generated_features: Generated features, shape `[M, D]`.
 :type generated_features: ndarray
-:returns: **fid** (*float*) – Fréchet (FID) distance.
+:returns: **fd** (*float*) – Fréchet distance between the two feature sets.
 :rtype: float
 ````
 
@@ -230,7 +231,7 @@ Distance half of {py:func}`combra.metrics.compute_cmmd`: the Gaussian-RBF MMD be
 
 ````{py:function} combra.metrics.fd_dinov2_features(images, model_name='dinov2_vitb14', device=None, batch_size=64, image_size=224) -> ndarray
 
-Feature half of {py:func}`combra.metrics.compute_fd_dinov2`: the per-image DINOv2 features as a float32 array `[N, D]`. Pair with {py:func}`combra.metrics.fd_dinov2_from_features`.
+Feature half of {py:func}`combra.metrics.compute_fd_dinov2`: the per-image DINOv2 features as a float32 array `[N, D]`. Pair with {py:func}`combra.metrics.frechet_from_features`.
 
 :param images: Image batch (numpy array or torch tensor).
 :type images: ndarray or torch.Tensor
@@ -244,18 +245,6 @@ Feature half of {py:func}`combra.metrics.compute_fd_dinov2`: the per-image DINOv
 :type image_size: int, optional
 :returns: **features** (*ndarray*) – DINOv2 features, shape `[N, D]`.
 :rtype: ndarray
-````
-
-````{py:function} combra.metrics.fd_dinov2_from_features(reference_features, generated_features) -> float
-
-Distance half of {py:func}`combra.metrics.compute_fd_dinov2`: the Fréchet distance between two DINOv2 feature sets produced by {py:func}`combra.metrics.fd_dinov2_features`. Each side needs **≥ 2 rows**.
-
-:param reference_features: Reference features, shape `[N, D]`.
-:type reference_features: ndarray
-:param generated_features: Generated features, shape `[M, D]`.
-:type generated_features: ndarray
-:returns: **fd** (*float*) – Fréchet distance between the two DINOv2 feature sets.
-:rtype: float
 ````
 
 ### Angle-Wasserstein metrics
@@ -319,7 +308,7 @@ Reduce a batch of images to a single angle density `(x, y)`. Runs `_preprocess_i
 
 ````{py:function} combra.metrics.images_to_pooled_angles(images, border_eps=5, tol=3, min_segment_len=10.0, workers=None) -> ndarray
 
-The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → vertex_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded (see [Sharded angle metrics](#sharded-angle-metrics)).
+The step-independent part of {py:func}`combra.metrics.images_to_angle_density`: run `_preprocess_image → vertex_angles` on each image and concatenate the per-image vertex angles, but **without** histogramming. Histogram the result with {py:func}`combra.stats.stats_preprocess` to obtain the `(x, y)` density. Because pooling is plain concatenation and `stats_preprocess` is a `bincount`, pooled arrays from disjoint image shards combine exactly — `stats_preprocess(concat(pooled_a, pooled_b))` equals the density over the full set, in any order — so this is the unit to extract per worker/rank when the per-image angle work is sharded.
 
 :param images: Image batch.
 :type images: ndarray or torch.Tensor
@@ -376,75 +365,6 @@ Bimodal-Gaussian relative-error metrics between a reference and a generated samp
 The density-level core (used by the parquet comparison path) lives at `combra.metrics.gauss.gauss_density_metrics`; the raw per-mode error math, shared with `compute_metrics`, is `combra.metrics.gauss.gauss_relative_errors`.
 ````
 
-#### Single-parameter wrappers
-
-When you want just one of the six Gaussian metrics, each has a dedicated function that returns that scalar directly. They take the **same inputs and options** as `compute_gauss_metrics` (single image, batch, or `(x, y)` density; `step`, `reference_cache`, `**angle_kw`) and simply return one value from it — so `compute_mu1(ref, gen)` is exactly `compute_gauss_metrics(ref, gen)['mu1']`. Each returns `(generated − reference) / reference` for the named fitted parameter; **mode 1** is the lower-angle Gaussian, **mode 2** the higher-angle one. When you need **several** of them, call `compute_gauss_metrics` once instead — it fits each side only once, whereas the wrappers refit per call.
-
-````{py:function} combra.metrics.compute_mu1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-1 Gaussian mean** — the `mu1` value of {py:func}`combra.metrics.compute_gauss_metrics`. `reference` and `generated` may each be a single `(H, W)` image, a batch, or a precomputed `(x, y)` density.
-
-:param reference: Reference sample — image, image batch, or `(x, y)` density.
-:type reference: ndarray or torch.Tensor or tuple
-:param generated: Generated sample to score — image, image batch, or `(x, y)` density.
-:type generated: ndarray or torch.Tensor or tuple
-:param step: Histogram bin width in degrees (image input only). Defaults to `5.0`. Default: `None`.
-:type step: float or None, optional
-:param reference_cache: Opt-in dict memoising the reference angle density across calls. Default: `None`.
-:type reference_cache: dict or None, optional
-:param angle_kw: Extra keyword args forwarded to `images_to_angle_density` (`border_eps`, `tol`, `min_segment_len`).
-:returns: **mu1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted mean.
-:rtype: float
-
-**Example**
-
-```python
->>> from combra.metrics import compute_mu1
->>> compute_mu1(real_batch, generated_batch)      # relative error of the mode-1 mean
->>> compute_mu1(real_image, generated_image)      # single images are fine too
-```
-````
-
-````{py:function} combra.metrics.compute_mu2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-2 Gaussian mean** — the `mu2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
-
-:returns: **mu2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted mean.
-:rtype: float
-````
-
-````{py:function} combra.metrics.compute_sigma1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-1 Gaussian width** — the `sigma1` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
-
-:returns: **sigma1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted width.
-:rtype: float
-````
-
-````{py:function} combra.metrics.compute_sigma2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-2 Gaussian width** — the `sigma2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
-
-:returns: **sigma2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted width.
-:rtype: float
-````
-
-````{py:function} combra.metrics.compute_amp1(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-1 Gaussian amplitude** — the `amp1` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
-
-:returns: **amp1** (*float*) – `(generated − reference) / reference` for the mode-1 fitted amplitude.
-:rtype: float
-````
-
-````{py:function} combra.metrics.compute_amp2(reference, generated, step=None, reference_cache=None, **angle_kw) -> float
-
-Relative error of the **mode-2 Gaussian amplitude** — the `amp2` value of {py:func}`combra.metrics.compute_gauss_metrics`. Same inputs and options as {py:func}`combra.metrics.compute_mu1`.
-
-:returns: **amp2** (*float*) – `(generated − reference) / reference` for the mode-2 fitted amplitude.
-:rtype: float
-````
-
 ### Unified entry point
 
 ````{py:function} combra.metrics.compute_all_metrics(reference_images, generated_images, *, step=None, device=None, angle_kw=None, reference_cache=None, image_metrics=False, workers=None) -> dict
@@ -477,32 +397,6 @@ Run every requested batch metric for a (reference, generated) pair in parallel a
 >>> scores = compute_all_metrics(real_batch, generated_batch, image_metrics=True)
 >>> scores['cmmd'], scores['w1'], scores['mu1']
 ```
-````
-
-### Sharded angle metrics
-
-Just as the image-feature metrics split into [extractor + distance halves](#sharded-feature-extraction), the angle suite splits into {py:func}`combra.metrics.images_to_pooled_angles` (the expensive, per-image extraction) and `angle_density_metrics_from_pooled` (the cheap histogram + Wasserstein + Gaussian-fit assembly). This lets the angle extraction be **sharded across devices or processes**: pool the angles for disjoint slices in parallel, concatenate the 1-D arrays, then compute the metrics once. Pooling is plain concatenation and the histogram is a `bincount`, so the sharded result is **exact**, not an approximation — identical to `compute_all_metrics(..., image_metrics=False)` over the full set. The model training loops (DiffiT-v2, EDM2-v2, san-v2, StyleSwin-v2) use this (alongside the sharded features) so the angle work — for both the generated and the reference set — is spread over every rank instead of running on rank 0 (see the {doc}`DiffiT example </examples/diffit>`).
-
-```python
->>> import numpy as np
->>> from combra.metrics import images_to_pooled_angles, angle_density_metrics_from_pooled
->>> ref_ang = images_to_pooled_angles(real_batch)                          # once, cacheable
->>> gen_ang = np.concatenate([images_to_pooled_angles(s) for s in gen_shards])  # sharded
->>> m = angle_density_metrics_from_pooled(ref_ang, gen_ang)  # == compute_all_metrics(..., image_metrics=False)
-```
-
-````{py:function} combra.metrics.angle_density_metrics_from_pooled(reference_angles, generated_angles, step=None) -> dict
-
-Angle-density metrics from pre-pooled angle arrays — the distributed-friendly counterpart of `compute_all_metrics(image_metrics=False)`. Callers that sharded {py:func}`combra.metrics.images_to_pooled_angles` across workers/ranks gather the pooled arrays and pass them here. Histograms each side at `step` degrees with {py:func}`combra.stats.stats_preprocess` and returns the same angle-suite keys as {py:func}`combra.metrics.compute_all_metrics` — the Wasserstein `w1`/`w2`/`circular_w1`/`circular_w2` and the bimodal-Gaussian relative errors `mu1`/`mu2`/`sigma1`/`sigma2`/`amp1`/`amp2`.
-
-:param reference_angles: 1-D pooled reference angles, as returned by {py:func}`combra.metrics.images_to_pooled_angles`.
-:type reference_angles: ndarray
-:param generated_angles: 1-D pooled generated angles.
-:type generated_angles: ndarray
-:param step: Histogram bin width in degrees. Defaults to `5.0`. Default: `None`.
-:type step: float or None, optional
-:returns: **results** (*dict*) – Flat `{metric_name: value}` dict with keys `w1`, `w2`, `circular_w1`, `circular_w2`, `mu1`, `mu2`, `sigma1`, `sigma2`, `amp1`, `amp2`.
-:rtype: dict
 ````
 
 ## Startup check & normalization

@@ -90,47 +90,6 @@ Sum of two Gaussians. Use {py:func}`combra.approx.bimodal_gauss_approx` to fit i
 ```
 ````
 
-````{py:function} combra.stats.gaussian_termodal(x, mu1, mu2, mu3, sigma1, sigma2, sigma3, amp1=1, amp2=1, amp3=1) -> ndarray
-
-Sum of three Gaussians.
-
-:param x: Evaluation points.
-:type x: array_like
-:param mu1: First mean.
-:type mu1: float
-:param mu2: Second mean.
-:type mu2: float
-:param mu3: Third mean.
-:type mu3: float
-:param sigma1: First standard deviation.
-:type sigma1: float
-:param sigma2: Second standard deviation.
-:type sigma2: float
-:param sigma3: Third standard deviation.
-:type sigma3: float
-:param amp1: First amplitude. Default: `1`.
-:type amp1: float, optional
-:param amp2: Second amplitude. Default: `1`.
-:type amp2: float, optional
-:param amp3: Third amplitude. Default: `1`.
-:type amp3: float, optional
-:returns: **y** (*ndarray*) – Function values at `x`.
-:rtype: ndarray
-
-**Example**
-
-```python
->>> import numpy as np
->>> from combra import stats
->>> x = np.linspace(0, 360, 200)
->>> y = stats.gaussian_termodal(
-...     x, mu1=30, mu2=180, mu3=300,
-...     sigma1=15, sigma2=25, sigma3=20,
-...     amp1=0.6, amp2=1.0, amp3=0.5,
-... )
-```
-````
-
 ````{py:function} combra.stats.ellipse(a, b, angle, xc=0, yc=0, num=50) -> tuple[ndarray, ndarray]
 
 Sample `num` points on the ellipse with semi-axes `(a, b)`, rotation `angle` (radians, decreasing → clockwise), and centre `(xc, yc)`. Handy for overlaying MVEE results.

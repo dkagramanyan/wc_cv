@@ -166,10 +166,9 @@ metrics are computed once against the reference. The reference side is sharded t
 same way and extracted **once before training** (each rank processes its
 deterministic slice of the reals), then cached on rank 0 — so no reference work or
 collective recurs per tick. This uses combra's split APIs — the feature halves
-({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`
-and the `cmmd_*` / `fd_dinov2_*` analogues) and the angle halves
-({py:func}`combra.metrics.images_to_pooled_angles` +
-`angle_density_metrics_from_pooled`) — and is numerically identical to the
+({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.frechet_from_features`
+and the `cmmd_*` / `fd_dinov2_*` analogues) and the pooled-angle extractor
+({py:func}`combra.metrics.images_to_pooled_angles`) — and is numerically identical to the
 single-GPU `compute_all_metrics` path. Sharding the angle extraction this way also
 fixes a multi-GPU hang: when it ran rank-0-only over the full gathered batch, at
 512²/1024² it could take longer than NCCL's watchdog while the other ranks idled,

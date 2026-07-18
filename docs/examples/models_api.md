@@ -50,9 +50,8 @@ Every repo follows the same conventions:
   `true`): every snapshot tick, fakes are generated **sharded across all ranks**
   and scored against the training set (reference features precomputed once) using
   combra's split APIs — {py:func}`combra.metrics.fid_features` /
-  `fid_from_features`, the `cmmd_*` / `fd_dinov2_*` analogues, and
-  {py:func}`combra.metrics.images_to_pooled_angles` +
-  `angle_density_metrics_from_pooled` — numerically equivalent to a single-GPU
+  `frechet_from_features`, the `cmmd_*` / `fd_dinov2_*` analogues, and
+  {py:func}`combra.metrics.images_to_pooled_angles` — numerically equivalent to a single-GPU
   {py:func}`combra.metrics.compute_all_metrics` call. Results are mirrored into
   **both** TensorBoard (`Metrics/combra_fid10k`, `Metrics/combra_cmmd10k`,
   `Metrics/combra_fd_dinov2_10k` + the angle metrics) and `stats.jsonl` in all

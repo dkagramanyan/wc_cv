@@ -76,49 +76,6 @@ Bimodal Gaussian fit. Bounded: `sigma > 0`, `amp ≥ 0` (prevents the silent sig
 ```
 ````
 
-````{py:function} combra.approx.gaussian_fit_termodal(x, y, mu1=10, mu2=100, mu3=240, sigma1=10, sigma2=30, sigma3=30, amp1=1, amp2=1, amp3=1) -> tuple[list[float], list[float], list[float]]
-
-Trimodal Gaussian fit.
-
-:param x: Histogram bin centres.
-:type x: array_like
-:param y: Histogram densities.
-:type y: array_like
-:param mu1: Initial guess for the first mean. Default: `10`.
-:type mu1: float, optional
-:param mu2: Initial guess for the second mean. Default: `100`.
-:type mu2: float, optional
-:param mu3: Initial guess for the third mean. Default: `240`.
-:type mu3: float, optional
-:param sigma1: Initial guess for the first sigma. Default: `10`.
-:type sigma1: float, optional
-:param sigma2: Initial guess for the second sigma. Default: `30`.
-:type sigma2: float, optional
-:param sigma3: Initial guess for the third sigma. Default: `30`.
-:type sigma3: float, optional
-:param amp1: Initial guess for the first amplitude. Default: `1`.
-:type amp1: float, optional
-:param amp2: Initial guess for the second amplitude. Default: `1`.
-:type amp2: float, optional
-:param amp3: Initial guess for the third amplitude. Default: `1`.
-:type amp3: float, optional
-:returns: **mus** (*list[float, float, float]*) – Fitted length-3 means; and **sigmas** (*list[float, float, float]*) – Fitted length-3 sigmas; and **amps** (*list[float, float, float]*) – Fitted length-3 amplitudes.
-:rtype: tuple(list[float], list[float], list[float])
-
-**Example**
-
-```python
->>> import numpy as np
->>> from combra import stats, approx
->>> arr = np.concatenate([np.random.normal(20, 5, 800),
-...                       np.random.normal(120, 25, 1500),
-...                       np.random.normal(260, 20, 1000)])
->>> x, y = stats.stats_preprocess(arr, step=2)
->>> mus, sigmas, amps = approx.gaussian_fit_termodal(x, y)
->>> print(f'mus={mus}')
-```
-````
-
 ````{py:function} combra.approx.gauss_approx(x, y, mu=1, sigma=1, amp=1, x_lim=None, N=100) -> tuple[tuple[ndarray, ndarray], float, float, float]
 
 Single Gaussian fit + sampled curve.

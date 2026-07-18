@@ -161,10 +161,9 @@ distances and the angle metrics are computed once against the reference. The
 reference side is the **raw dataset pixels** (never VAE round-tripped), extracted
 **once before training** (each rank processes its deterministic slice of the reals),
 then cached on rank 0. This uses combra's split APIs
-({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`
+({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.frechet_from_features`
 and the `cmmd_*` / `fd_dinov2_*` analogues, plus
-{py:func}`combra.metrics.images_to_pooled_angles` +
-`angle_density_metrics_from_pooled`) — numerically identical to the single-GPU
+{py:func}`combra.metrics.images_to_pooled_angles`) — numerically identical to the single-GPU
 `compute_all_metrics` path.
 
 **Sample count.** Each combra eval scores `--num-fid-samples` generated images

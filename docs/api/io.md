@@ -42,12 +42,6 @@ is the same function) and the angle plotters share.
 Alias of {py:func}`~combra.io.load_rows` for angle parquets.
 ````
 
-````{py:function} combra.io.load_beams(path) -> list[dict]
-
-Alias of {py:func}`~combra.io.load_rows` for beam parquets (angle and beam files
-share the `meta` / `prep_per_step` layout).
-````
-
 ## Schemas & provenance
 
 ````{py:data} combra.io.ANGLES_SCHEMA
@@ -105,12 +99,6 @@ class). Written to a temp file and renamed on full success. This is what
 :type chunk_images: int, optional
 :returns: **output_path** – the written file.
 :rtype: pathlib.Path
-````
-
-````{py:function} combra.io.repack_hdf5_uncompressed(src_path, dst_path=None, chunk_images=32, overwrite=False) -> pathlib.Path
-
-Re-pack an existing pobedit HDF5 to uncompressed, preserving all attributes. Use
-once on an LZF cache to eliminate the source-decompression bottleneck.
 ````
 
 ## See also
