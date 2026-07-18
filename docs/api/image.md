@@ -139,6 +139,57 @@ Walk a folder-of-classes tree and tile every image into quarters (`split=3`) or 
 ```
 ````
 
+````{py:function} combra.image.augment_quadrants(image, size=1024) -> Iterator[tuple[str, PIL.Image.Image]]
+
+Generate the deduplicated augmentations of a single image. The image is scaled to a `1.5 * size` square and cut into the four overlapping `size × size` quadrant crops (a 2×2 window slid over a 3×3 grid); each crop is expanded into its 8 dihedral orientations (rotations of 0/90/180/270° × {plain, mirrored}). Rotations are lossless `transpose` operations (no interpolation). Crops identical (pixel-for-pixel) to one already yielded for the same source image are skipped, so a plain image yields up to 32 crops.
+
+:param image: Source image; converted to RGB internally.
+:type image: PIL.Image.Image
+:param size: Side length of each output crop in pixels. Default: `1024`.
+:type size: int, optional
+:returns: Iterator of **(suffix, crop)** pairs — **suffix** (*str*) a filename tag such as `"combo_2_rot90_mirror"`, and **crop** (*PIL.Image.Image*) the transformed `size × size` RGB crop.
+:rtype: Iterator[tuple[str, PIL.Image.Image]]
+
+**Example**
+
+```python
+>>> from PIL import Image
+>>> from combra import image
+>>> src = Image.open('./data/orig/Ultra_Co11/img001.jpeg')
+>>> for suffix, crop in image.augment_quadrants(src, size=1024):
+...     crop.save(f'img001_{suffix}.jpeg', 'JPEG', quality=95)
+```
+````
+
+````{py:function} combra.image.build_quadrant_dataset(input_folder, output_folder, class_map, size=1024, quality=95) -> str
+
+Augment a folder-of-classes tree and write a StyleGAN-style `dataset.json`. For every image in each `class_map` subfolder of `input_folder`, the deduplicated crops from `augment_quadrants` are written to the mirrored subfolder under `output_folder` and recorded as `[relative_path, class_index]` label pairs. Only the subfolders listed in `class_map` are processed.
+
+:param input_folder: Root folder with one subfolder per class.
+:type input_folder: str or Path
+:param output_folder: Destination root; class subfolders and `dataset.json` are created here.
+:type output_folder: str or Path
+:param class_map: Mapping from class-subfolder name to integer class label.
+:type class_map: dict[str, int]
+:param size: Side length of each output crop in pixels. Default: `1024`.
+:type size: int, optional
+:param quality: JPEG quality for the saved crops. Default: `95`.
+:type quality: int, optional
+:returns: **json_path** (*str*) – Path to the written `dataset.json` (`{"labels": [[relative_path, class_index], ...]}`).
+:rtype: str
+
+**Example**
+
+```python
+>>> from combra import image
+>>> class_map = {'Ultra_Co25': 0, 'Ultra_Co11': 1, 'Ultra_Co6_2': 2}
+>>> json_path = image.build_quadrant_dataset(
+...     './data/orig', './data/imagenet_9to4_1024x1024', class_map,
+... )
+>>> print(json_path)   # ./data/imagenet_9to4_1024x1024/dataset.json
+```
+````
+
 ````{py:function} combra.image.do_edt(image) -> None
 
 ```{warning}
