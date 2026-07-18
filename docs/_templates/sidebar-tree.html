@@ -1,9 +1,0 @@
-{# Full site navigation as a structured tree in the left sidebar.
-   Uses Sphinx's global ``toctree()`` so every section (the per-module API
-   pages, getting started, examples) appears here instead of in the header. #}
-<nav class="bd-docs-nav bd-links" aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Site navigation</p>
-  <div class="bd-toc-item navbar-nav">
-    {{ toctree(collapse=False, maxdepth=2, includehidden=True, titles_only=True) }}
-  </div>
-</nav>
