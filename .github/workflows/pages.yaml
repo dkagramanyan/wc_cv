@@ -21,9 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          # The combra submodule is imported by autodoc to render the API pages.
-          submodules: recursive
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -34,12 +31,6 @@ jobs:
 
       - name: Install documentation dependencies
         run: pip install -r docs/requirements.txt
-
-      - name: Install combra (autodoc imports it)
-        # The [viz] extra pulls plotly so the plot modules import; the torch
-        # metrics stack is imported lazily inside functions, so it isn't needed
-        # just to introspect signatures + docstrings.
-        run: pip install -e "./combra[viz]"
 
       - name: Setup Pages
         id: pages

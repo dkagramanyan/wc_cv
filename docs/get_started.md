@@ -16,16 +16,15 @@ pip install .          # or:  pip install -e .   for an editable install
 
 | Extra         | Install                          | Adds                                          |
 | ------------- | -------------------------------- | --------------------------------------------- |
-| `viz`         | `pip install ".[viz]"`           | plotly + kaleido (all `combra.*` plotting)    |
 | `metrics`     | `pip install ".[metrics]"`       | torch stack for the image-feature metrics (FID / CMMD / FD-DINOv2) |
 | `tests`       | `pip install ".[tests]"`         | pytest + pytest-cov                           |
 | `docs`        | `pip install ".[docs]"`          | Sphinx docs toolchain                         |
-| `dev`         | `pip install -e ".[dev]"`        | the `tests` + `viz` extras + ruff             |
+| `dev`         | `pip install -e ".[dev]"`        | the `tests` extra + ruff + mypy               |
 
 ```{versionchanged} 0.4
-The heavy dependencies moved to extras, so a plain `pip install combra` stays lean
-(the angle/beam extraction + distribution-metric pipeline). Install `[viz]` for the
-`combra.*` plot functions and `[metrics]` for the torch image-feature metrics.
+The torch stack moved to the `[metrics]` extra, so a plain `pip install combra`
+covers the full analysis + plotting API (plotly and kaleido are core
+dependencies); install `[metrics]` only for the torch image-feature metrics.
 ```
 
 The image-feature metrics (`[metrics]` extra) score in-memory image batches and run on
