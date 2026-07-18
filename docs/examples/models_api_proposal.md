@@ -345,8 +345,8 @@ One eval pass per snapshot tick, identical in all four repos:
    `fd_dinov2`), the CLIP MMD (`cmmd`) and the angle-density metrics
    (Wasserstein `w1`/`w2`/`circular_*` + bimodal-Gaussian fit errors) against
    the cached reference
-   ({py:func}`combra.metrics.fid_from_features` + analogues,
-   `angle_density_metrics_from_pooled`).
+   ({py:func}`combra.metrics.frechet_from_features` + analogues,
+   {py:func}`combra.metrics.images_to_pooled_angles`).
 4. **Logging.** Results land in TensorBoard as `Metrics/combra_*` and in
    `stats.jsonl`. A metric whose backend is unavailable (e.g. no network for
    DINOv2 weights) records `nan`; a missing combra package prints a startup

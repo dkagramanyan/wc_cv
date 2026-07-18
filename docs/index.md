@@ -63,8 +63,8 @@ examples/sampler_comparison
 | {doc}`combra.approx <api/approx>` | Fits Gaussian/binomial/poisson/exponential/linear models. |
 | {doc}`combra.metrics <api/metrics>` | FID, batch generative-quality metrics (CMMD, FD-DINOv2, angle-Wasserstein), per-class Wasserstein comparison, sampler-vs-steps comparison, and convergence-vs-N analysis. |
 | {doc}`combra.graph <api/graph>` | Crack-image → graph → shortest-energy-path search. |
-| {doc}`combra.io <api/io>` | One loader (`load_angles`/`load_beams`) + parquet schemas + HDF5 conversion. |
+| {doc}`combra.io <api/io>` | One loader (`load_rows`/`load_angles`) + parquet schemas + HDF5 conversion. |
 | {doc}`combra.viz <api/viz>` | Shared plotting theme: palette, axis style, PNG export. |
 | {doc}`combra.exceptions <api/exceptions>` | Typed error/warning hierarchy (`CombraError`, `SchemaError`, …). |
-| {doc}`combra.utils <api/utils>` | `NumpyEncoder` for JSON dumps. |
+| {doc}`combra.utils <api/utils>` | `Bunch` attribute-accessible dict container. |
 | {doc}`combra.tests <api/tests>` | Self-validation helpers (fractal-dimension sanity check). |

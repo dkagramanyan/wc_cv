@@ -148,10 +148,9 @@ each rank generates its shard of the fakes, extracts the CLIP / DINOv2 / Incepti
 features and pools the vertex angles; the feature rows and pooled-angle arrays are
 gathered to rank 0, which takes the Fréchet / MMD distances and the angle metrics
 against the cached reference. This uses combra's split APIs — the feature halves
-({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.fid_from_features`,
-and the `cmmd_*` / `fd_dinov2_*` analogues) and the angle halves
-({py:func}`combra.metrics.images_to_pooled_angles` +
-`angle_density_metrics_from_pooled`) — and is numerically identical to the
+({py:func}`combra.metrics.fid_features` + {py:func}`combra.metrics.frechet_from_features`,
+and the `cmmd_*` / `fd_dinov2_*` analogues) and the pooled-angle extractor
+({py:func}`combra.metrics.images_to_pooled_angles`) — and is numerically identical to the
 single-GPU `compute_all_metrics(image_metrics=True)` path. Any metric whose optional
 backend is unavailable (e.g. no network to fetch DINOv2/CLIP weights) is recorded as
 `nan` rather than aborting. Pre-download the weights once on a login node with
