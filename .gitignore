@@ -217,9 +217,10 @@ docs/resources/_gen/*
 docs/.hugo_build.lock
 
 co_angles/data/*
-crack_graph/data/*
-poliamid/data/*
+crack_data/*
+poliamid_data/*
 poliamid/*.parquet
 poliamid/*.jpg
 
 co_angles/*.parquet
+

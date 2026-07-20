@@ -1,29 +1,7 @@
+
 # CLAUDE.md
 
-## About this project
-
-`wc_cv` is the research and documentation repository for **combra** — computer-vision
-tools for analysis of WC-Co (tungsten-carbide / cobalt) composite-alloy microstructure
-SEM images: contour/angle extraction, MVEE beam fitting, fractal dimension, crack
-graphs, and distribution metrics.
-
-- `docs/` is a **Sphinx** site (MyST markdown) that documents the `combra` library API.
-  It is published to GitHub Pages on every push to `main`. Build it locally with:
-  ```bash
-  python -m sphinx -b html docs public
-  ```
-  Doc pages live in `docs/api/*.md` (one per combra submodule), `docs/get_started.md`,
-  and `docs/examples/*.md`. When the combra library changes, keep these pages in sync.
-- `combra` itself is maintained in a **separate repo** (`dkagramanyan/combra`, wired in
-  here as the `combra/` git submodule). Run its test suite from that repo with `pytest`.
-- The top-level notebooks (`co_angles/`, `crack_graph/`, `ml/`, `poliamid/`) are
-  exploratory analyses that exercise the documented combra API.
-
----
-
-Behavioral guidelines to reduce common LLM coding mistakes, derived from
-[Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876)
-on LLM coding pitfalls. Merge with project-specific instructions as needed.
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
