@@ -4,6 +4,12 @@ combra's least-squares histogram fit (LSQ), on the three reference parquets.
 
 Usage: python pilot_mle.py synthetic | pilot
 """
+# NOTE: this pilot ran on 2026-09-03 against the combra 0.12.0 parquets, whose
+# stored fits carried two amplitudes under `angles_gauss_amps`. The parquets
+# were refitted to the 0.13.0 schema afterwards (`angles_gauss_shares`), so the
+# stored-fit comparisons here no longer run as-is; the JSON reports and figures
+# next to this file are the record of the pilot.
+
 
 import glob
 import json
